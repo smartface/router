@@ -1,0 +1,21 @@
+- UI editor explorer will contain routers
+    - Selecting a router may not open a tab? Or may not display a thing inside the tab.
+- This will not generate any code
+- This is used only for display purposes of the HeaderBar
+- Page is going to select one among the routers
+    - If the router type is stack or split, headerBar can be shown for iOS
+    - Android is not affacted by this at all
+- Splitted HeaderBar properties will not generate any code
+- Routers in explorer can have classes assigned for their HeaderBars in iOS
+- Root of the explorer will be:
+    - Pages
+    - Library
+    - Routers
+- Each library item will have their own tab
+- New item button on the exporer will offer also:
+    - new Library Component
+    - new Router:
+        - stack
+        - bottom tab bar
+        - split
+        - modal

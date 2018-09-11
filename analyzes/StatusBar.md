@@ -1,0 +1,7 @@
+- StatusBar will be no longer a property of the page
+- It will be property of the application
+- UI editor will keep showing and editing of the StatusBar within the page. This is just for UI editor feeling
+    - This will generate any JavaScript code via transpiler.
+- It will be accessed via `Application.statusBar`
+- It is automatically context bound after initiating the theme.
+    - has default class is set as `.statusBar`

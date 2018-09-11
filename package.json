@@ -1,0 +1,31 @@
+{
+  "name": "@smartface/router",
+  "version": "1.0.0-alpha.1",
+  "description": "Smmartface Router",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cenkce/router.git"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "author": "Cenk Cetinkaya",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cenkce/router/issues"
+  },
+  "homepage": "https://github.com/cenkce/router#readme",
+  "dependencies": {
+    "history": "^4.7.2",
+    "path-to-regexp": "^2.4.0"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^3.0.1",
+    "jest": "^23.5.0",
+    "prettier": "^1.14.2"
+  }
+}
