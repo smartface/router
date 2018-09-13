@@ -1,11 +1,8 @@
 const Route = require("./Route");
 const createMemoryHistory = require("history/createMemoryHistory");
 const mapComposer = require("../utils/map");
-const middlewares = new WeakSet();
 const matchPath = require("../commmon/matchPath");
 const matchRoutes = require("../commmon/matchRoutes");
-
-const resolveMiddleware = mw => {};
 
 /**
  * Router
@@ -27,7 +24,7 @@ class Router extends Route {
   render(matches) {
     let view;
     matches.map(({ match, route }) => {
-      if (match.isExact === true) view = route.render();
+      if (match.isExact === true) view = route.build();
     });
 
     return view;
@@ -45,7 +42,7 @@ class Router extends Route {
     // this._cache.get(path) ||
     const matches = matchRoutes(this._routes, path);
     // !this._cache.has(path) && this._cache.set({}, matches);
-    match && this.render(matches);
+    this.render(matches);
 
     return matches;
   }

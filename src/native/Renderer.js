@@ -1,9 +1,10 @@
 class Renderer {
   constructor() {
-    this.rootPage;
-    this._currentPage;
+    this._rootPage;
   }
 
   show() {}
   remove() {}
 }
+
+module.exports = Renderer;
