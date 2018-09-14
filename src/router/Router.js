@@ -13,7 +13,7 @@ class Router extends Route {
   /**
    * @param {{ path: string, target: object|null, routes: Array }} param0
    */
-  constructor({ path = "", build = null, routes = [], exact = true }) {
+  constructor({ path = "", build = null, routes = [], exact = false }) {
     super({ path, build, routes });
 
     this._exact = exact;
@@ -26,7 +26,7 @@ class Router extends Route {
     matches.map(({ match, route }) => {
       if (match.isExact === true) view = route.build();
     });
-
+    
     return view;
   }
 

@@ -70,8 +70,9 @@ class Route {
     };
   }
 
-  build() {
-    return (this._match && this._build(this._props, this.match)) || null;
+  build(match) {
+    console.log(this._build && this._build());
+    return (this._build && this._build(this._props, match)) || null;
   }
 
   onPrematch(match) {

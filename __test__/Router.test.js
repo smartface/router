@@ -24,21 +24,21 @@ describe("Router", () => {
       routes: [
         new Route({
           path: "/path/to/:name",
-          build: () => {
-            type: "target1";
-          }
+          build: (props, match) => ({
+            type: "target1"
+          })
         }),
         new Route({
           path: "/path/to/:id",
-          build: () => {
-            type: "target2";
-          }
+          build: (props, match) => ({
+            type: "target2"
+          })
         }),
-        new Route({ path: "*", build: { type: "target3" } })
+        new Route({ path: "*", build: (props, match) => ({ type: "target3" }) })
       ]
     });
     let matches = matchRoutes([router], "/path/to/1").map(
-      ({ match, route }) => ({ match, route: route.toObject() })
+      ({ match, route }) => ({ match, route: route.toObject(), view: route.build() })
     );
     // console.log(JSON.stringify(matches, " ", "\t"));
     expect(matches).toEqual([
@@ -51,7 +51,8 @@ describe("Router", () => {
             { path: "/path/to/:id", routes: [] },
             { path: "*", routes: [] }
           ]
-        }
+        },
+        view: null
       },
       {
         match: {
@@ -60,7 +61,10 @@ describe("Router", () => {
           path: "/path/to/:name",
           url: "/path/to/1"
         },
-        route: { path: "/path/to/:name", routes: [] }
+        route: { path: "/path/to/:name", routes: [] },
+        view: {
+            type: "target1"
+          }
       }
     ]);
   });
