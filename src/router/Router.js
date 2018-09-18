@@ -86,17 +86,13 @@ class Router extends Route {
 
     matches.some(({ match, route }, index) => {
       // console.log(" route "+(route instanceof Router)+" : "+index+" "+JSON.stringify(match));
-      if (route instanceof Router) {
-        route._go(match.path, location.state.userState.data, {
-          ...location,
-          state: {
-            userState: location.state.userState,
-            matches: matches.slice(index + 1, matches.length)
-          }
-        });
-        route.addParentRenderer(this._renderer);
-        return true;
-      } else if (match.isExact === true) {
+      // if (route instanceof Router) {
+      //   route.go(location.pathname, location.state.data);
+
+      //   route.addParentRenderer(this._renderer);
+      //   return true;
+      // } else
+      if (match.isExact === true) {
         view = route.build(match.params, location.state.userState || {});
         return true;
       }
@@ -126,16 +122,30 @@ class Router extends Route {
       (location && location.state && location.state.matches) ||
       matchRoutes(this._routes, path);
 
-    if (addtoHistory) {
-      (location &&
-        this._history.push(path, {
-          userState: Object.assign({}, location.state.userState),
-          matches
-        })) ||
+    matches.some(({ match, route }, index) => {
+      // console.log(" route "+(route instanceof Router)+" : "+index+" "+JSON.stringify(match));
+      if (route instanceof Router) {
+        route.go(path, data);
+        route.addParentRenderer(this._renderer);
+
+        return true;
+      } else if (match.isExact === true) {
         this._history.push(path, { userState: { data }, matches });
-    } else {
-      this.render(location);
-    }
+        return true;
+      }
+    });
+
+    // if (addtoHistory) {
+    //   (location &&
+    //     matches &&
+    //     this._history.push(path, {
+    //       userState: Object.assign({}, location.state.userState),
+    //       matches
+    //     })) ||
+    //     (matches && this._history.push(path, { userState: { data }, matches }));
+    // } else {
+    //   this.render(location);
+    // }
 
     return matches;
   }
