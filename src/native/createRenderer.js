@@ -12,6 +12,6 @@ module.exports = function createRenderer(root) {
     default:
       throw new TypeError(Device.deviceOS + " Invalid OS definition.");
   }
-  
+
   return new Renderer(root);
-}
+};

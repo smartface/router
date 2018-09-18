@@ -22,7 +22,7 @@ class Router extends Route {
     this._cache = new WeakMap();
     this._historyUnlisten = [];
     this._unblock = () => null;
-    
+
     this._history = createMemoryHistory({
       initialEntries: ["/"], // The initial URLs in the history stack
       initialIndex: 0, // The starting index in the history stack
@@ -30,10 +30,11 @@ class Router extends Route {
       // A function to use to confirm navigation with the user. Required
       // if you return string prompts from transition hooks (see below)
       getUserConfirmation: (handler, callback) => {
-        this._blockPath && handler(callback, this.onBlockPath.bind(this)) || true;
+        (this._blockPath && handler(callback, this.onBlockPath.bind(this))) ||
+          true;
       }
     });
-    
+
     this._historyUnlisten.push(
       /**
        * @params {{
@@ -48,23 +49,25 @@ class Router extends Route {
       })
     );
   }
-  
-  setHistory(){
-    
+
+  setHistory() {}
+
+  addParentRenderer(parent) {
+    parent && parent.show(this._renderer._rootPage);
   }
-  
-  setRenderer(renderer){
+
+  setRenderer(renderer) {
     this._renderer = renderer;
   }
-  
+
   /**
    * Blocks path handler for user inteact for example user confirmation
    *
    */
-  onBlockPath(fn){
-    this._blockPath = fn
+  onBlockPath(fn) {
+    this._blockPath = fn;
   }
-  
+
   /**
    * @params {{
         pathname: string,
@@ -74,30 +77,37 @@ class Router extends Route {
    * @params {object} action
    */
   onHistoryChange(location, action) {
-    this.render(location.state);
+    this.render(location);
   }
 
-  render(matches) {
+  render(location) {
     let view;
-    
+    const { matches } = location.state;
+
     matches.some(({ match, route }, index) => {
-      console.log(" route "+(route instanceof Router)+" : "+index+" "+JSON.stringify(match));
-      if(route instanceof Router){
-        
-        route.go(match.path, matches.slice(index+1, matches.length));
+      // console.log(" route "+(route instanceof Router)+" : "+index+" "+JSON.stringify(match));
+      if (route instanceof Router) {
+        route._go(match.path, location.state.userState.data, {
+          ...location,
+          state: {
+            userState: location.state.userState,
+            matches: matches.slice(index + 1, matches.length)
+          }
+        });
+        route.addParentRenderer(this._renderer);
         return true;
       } else if (match.isExact === true) {
-        view = route.build();
+        view = route.build(match.params, location.state.userState || {});
         return true;
       }
     });
-    
+
     return view;
   }
-  
-    /**
+
+  /**
    * User block event handler for protected use
-   * 
+   *
    * @protected
    * @param {function} handler
    */
@@ -109,24 +119,38 @@ class Router extends Route {
   }
 
   /**
+   * @protected
+   */
+  _go(path, data, location = null, addtoHistory = true) {
+    const matches =
+      (location && location.state && location.state.matches) ||
+      matchRoutes(this._routes, path);
+
+    if (addtoHistory) {
+      (location &&
+        this._history.push(path, {
+          userState: Object.assign({}, location.state.userState),
+          matches
+        })) ||
+        this._history.push(path, { userState: { data }, matches });
+    } else {
+      this.render(location);
+    }
+
+    return matches;
+  }
+
+  /**
    * Change history by specified path
-   * 
+   *
    * @params {object|string} path - Path or matches of the route
    * @params {boolean} [=true] addtoHistory
    */
-  go(path, matches, addtoHistory=true) {
+  go(path, data, addtoHistory = true) {
     // this._cache.get(path) ||
-    const _matches = matches || matchRoutes(this._routes, path);
-
-    if(addtoHistory){
-      this._history.push(path, _matches);
-    } else {
-      this.render(_matches);
-    }
-    
-    return matches;
+    return this._go(path, data, null, addtoHistory);
   }
-  
+
   /**
    * Rewinds history
    *
@@ -134,16 +158,15 @@ class Router extends Route {
   goBack() {
     this._history.goBack();
   }
-  
+
   /**
    * Forwards history
    *
    */
-  goForward(){
+  goForward() {
     this._history.goForward();
   }
-  
-  
+
   /**
    * Adds new route
    * @params {Route} route
@@ -152,16 +175,16 @@ class Router extends Route {
   add(route) {
     this._routes.push(route);
   }
-  
+
   /**
-   * Iterate child routes
-   * 
+   * Iterates child routes
+   *
    * @paramms {function} fn
    */
   map(fn) {
     return this._routes.map(fn);
   }
-  
+
   /**
    * Unloads the router
    *
@@ -191,9 +214,14 @@ class StackRouter extends Router {
     build = null,
     routes = []
   }) {
-    super({options: {initialEntries, initialIndex, keyLength}, path, build, routes });
+    super({
+      options: { initialEntries, initialIndex, keyLength },
+      path,
+      build,
+      routes
+    });
   }
-  
+
   /**
    * Location change event handler
    *

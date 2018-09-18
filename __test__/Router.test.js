@@ -1,4 +1,4 @@
-const { Router, StackRouter } = require("../src/router/Router");
+const Router = require("../src/router/Router");
 const Route = require("../src/router/Route");
 const matchRoutes = require("../src/common/matchRoutes");
 
@@ -37,23 +37,12 @@ describe("Router", () => {
         new Route({ path: "*", build: (props, match) => ({ type: "target3" }) })
       ]
     });
-    let matches = matchRoutes([router], "/path/to/1").map(
-      ({ match, route }) => ({ match, route: route.toObject(), view: route.build() })
-    );
-    // console.log(JSON.stringify(matches, " ", "\t"));
+    // let matches = matchRoutes([router], "/path/to/1").map(
+    //   ({ match, route }) => ({ match, route: route.toObject(), view: route.build() })
+    // );
+    var matches = router.go("/path/to/1").map(({match, route}) => ({match, route: route.toObject(), view: route.build()}));
+
     expect(matches).toEqual([
-      {
-        match: { isExact: false, params: {}, path: "/", url: "/" },
-        route: {
-          path: "/",
-          routes: [
-            { path: "/path/to/:name", routes: [] },
-            { path: "/path/to/:id", routes: [] },
-            { path: "*", routes: [] }
-          ]
-        },
-        view: null
-      },
       {
         match: {
           isExact: true,
@@ -63,8 +52,8 @@ describe("Router", () => {
         },
         route: { path: "/path/to/:name", routes: [] },
         view: {
-            type: "target1"
-          }
+          type: "target1"
+        }
       }
     ]);
   });
@@ -87,7 +76,70 @@ describe("Router", () => {
         new Route({ path: "*", build: { type: "target3" } })
       ]
     });
-    let matches = matchRoutes([router], "/path/to");
+    let matches = router.go("/path/to");
     expect(matches).toEqual([]);
+  });
+  it("sends data and params to specified route", () => {
+    let data;
+    const router = new Router({
+      path: "/",
+      routes: [
+        new Route({
+          path: "/path/to/:name",
+          build: (params, state) => {
+            data = {
+              params,
+              state
+            }
+            return {type: "target1"}
+          }
+        }),
+        new Route({
+          path: "/path/to/dev",
+          build: () => {
+            type: "target2";
+          }
+        }),
+        new Route({ path: "*", build: { type: "target3" } })
+      ]
+    });
+    let matches = router.go("/path/to/1", {name: "name"});
+    expect(data).toEqual({"params": {"name": "1"}, "state": {"data": {"name": "name"}}});
+  });
+  it("sends data and params to nested router's route", () => {
+    let data;
+    let callCount = 0;
+    const router = new Router({
+      path: "/",
+      routes: [
+        new Router({
+          path: '/path',
+          routes: [
+            new Route({
+              path: "/path/to/:name",
+              build: (params, state) => {
+                data = {
+                  params,
+                  state
+                }
+                callCount++;
+                return {type: "target1"}
+              }
+            }),
+            new Route({
+              path: "/path/to/dev",
+              build: () => {
+                type: "target2";
+              }
+            }),
+            new Route({ path: "*", build: { type: "target3" } })
+          ]          
+        })
+      ]
+    });
+    
+    let matches = router.go("/path/to/1", {name: "name"});
+    expect(data).toEqual({"params": {"name": "1"}, "state": {"data": {"name": "name"}}});
+    expect(callCount).toBe(1);
   });
 });

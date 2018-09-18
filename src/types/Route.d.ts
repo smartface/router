@@ -1,3 +1,1 @@
-export interface Route {
-  
-}
+export interface Route {}

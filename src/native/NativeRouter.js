@@ -9,29 +9,47 @@ class NativeRouter extends Router {
    * @static
    * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0
    */
-  static of({ path = "", build = null, routes = [], exact = false, renderer= null }){
-    return new NativeRouter({path, build, routes, exact, renderer: createRenderer(new Page({ orientation: Page.Orientation.AUTO }))});
+  static of({
+    path = "",
+    build = null,
+    routes = [],
+    exact = false,
+    renderer = null
+  }) {
+    return new NativeRouter({
+      path,
+      build,
+      routes,
+      exact,
+      renderer: createRenderer(new Page({ orientation: Page.Orientation.AUTO }))
+    });
   }
-  
+
   /**
    * @constructor
    * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0
    */
-  constructor({ path = "", build = null, routes = [], exact = false, renderer= null }) {
-    super({path, build, routes, exact});
+  constructor({
+    path = "",
+    build = null,
+    routes = [],
+    exact = false,
+    renderer = null
+  }) {
+    super({ path, build, routes, exact });
     this._renderer = renderer;
     this._currentPage;
   }
 
-  render(matches) {
-    const view = super.render(matches);
-    console.log("view : "+view)
+  render(location) {
+    const view = super.render(location);
+
     if (view === this._currentPage) return;
-    
-    try{
+
+    try {
       view && this._renderer.show(view);
-    } catch(e){
-      console.log(e.message+ "" + e.stack);
+    } catch (e) {
+      console.log(e.message + "" + e.stack);
     }
   }
 }

@@ -70,9 +70,8 @@ class Route {
     };
   }
 
-  build(match) {
-    console.log(this._build && this._build());
-    return (this._build && this._build(this._props, match)) || null;
+  build(params, state) {
+    return (this._build && this._build(params, state)) || null;
   }
 
   onPrematch(match) {
@@ -88,7 +87,7 @@ class Route {
    * @param {string} url
    */
   matchPath(url) {
-    console.log("url : "+url);
+    console.log("url : " + url);
     this._match = matchPath(url, {
       path: this._path.getPath(),
       exact: this._exact,

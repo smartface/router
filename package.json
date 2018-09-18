@@ -7,7 +7,9 @@
     "test": "jest",
     "dev:link": "npm run dev:remove && npm run dev:sync",
     "dev:remove": "rm -R -f ../scripts/node_modules/@smartface/router",
-    "dev:sync": "mkdir -p ../scripts/node_modules/@smartface/router && cp -r -t ../scripts/node_modules/@smartface/router src package.json "
+    "dev:sync": "mkdir -p ../scripts/node_modules/@smartface/router && cp -r -t ../scripts/node_modules/@smartface/router src package.json ",
+    "pretty": "prettier --write src/**/**"
+    
   },
   "repository": {
     "type": "git",
