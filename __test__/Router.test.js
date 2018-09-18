@@ -1,6 +1,6 @@
 const { Router, StackRouter } = require("../src/router/Router");
 const Route = require("../src/router/Route");
-const matchRoutes = require("../src/commmon/matchRoutes");
+const matchRoutes = require("../src/common/matchRoutes");
 
 describe("Router", () => {
   it("has routes", () => {

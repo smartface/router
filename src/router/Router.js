@@ -1,8 +1,8 @@
 const Route = require("./Route");
-const createMemoryHistory = require("history/createMemoryHistory");
+const createMemoryHistory = require("../common/history");
 const mapComposer = require("../utils/map");
-const matchPath = require("../commmon/matchPath");
-const matchRoutes = require("../commmon/matchRoutes");
+const matchPath = require("../common/matchPath");
+const matchRoutes = require("../common/matchRoutes");
 
 /**
  * Router
@@ -11,7 +11,8 @@ const matchRoutes = require("../commmon/matchRoutes");
  */
 class Router extends Route {
   /**
-   * @param {{ path: string, target: object|null, routes: Array }} param0
+   * @constructor
+   * @param {{ path: string, target: object|null, routes: Array, exact: boolean }} param0
    */
   constructor({ path = "", build = null, routes = [], exact = false }) {
     super({ path, build, routes });
@@ -19,52 +20,158 @@ class Router extends Route {
     this._exact = exact;
     this._selectedRoutes = [];
     this._cache = new WeakMap();
+    this._historyUnlisten = [];
+    this._unblock = () => null;
+    
+    this._history = createMemoryHistory({
+      initialEntries: ["/"], // The initial URLs in the history stack
+      initialIndex: 0, // The starting index in the history stack
+      keyLength: 20, // The length of location.key
+      // A function to use to confirm navigation with the user. Required
+      // if you return string prompts from transition hooks (see below)
+      getUserConfirmation: (handler, callback) => {
+        this._blockPath && handler(callback, this.onBlockPath.bind(this)) || true;
+      }
+    });
+    
+    this._historyUnlisten.push(
+      /**
+       * @params {{
+            pathname: string,
+            search: string,
+            state: object
+          }} location
+       *
+       */
+      this._history.listen((location, action) => {
+        this.onHistoryChange(location, action);
+      })
+    );
+  }
+  
+  setHistory(){
+    
+  }
+  
+  setRenderer(renderer){
+    this._renderer = renderer;
+  }
+  
+  /**
+   * Blocks path handler for user inteact for example user confirmation
+   *
+   */
+  onBlockPath(fn){
+    this._blockPath = fn
+  }
+  
+  /**
+   * @params {{
+        pathname: string,
+        search: string,
+        state: object
+      }} location
+   * @params {object} action
+   */
+  onHistoryChange(location, action) {
+    this.render(location.state);
   }
 
   render(matches) {
     let view;
-    matches.map(({ match, route }) => {
-      if (match.isExact === true) view = route.build();
+    
+    matches.some(({ match, route }, index) => {
+      console.log(" route "+(route instanceof Router)+" : "+index+" "+JSON.stringify(match));
+      if(route instanceof Router){
+        
+        route.go(match.path, matches.slice(index+1, matches.length));
+        return true;
+      } else if (match.isExact === true) {
+        view = route.build();
+        return true;
+      }
     });
     
     return view;
   }
-
-  // render(match) {
-  //   const matched = this._routes.reduce((acc, _route) => {
-  //     const match = _route.matchPath(path);
-  //     match && acc.push({ match, route });
-  //     return acc;
-  //   }, []);
-  // }
-
-  go(path) {
-    // this._cache.get(path) ||
-    const matches = matchRoutes(this._routes, path);
-    // !this._cache.has(path) && this._cache.set({}, matches);
-    this.render(matches);
-
-    return matches;
+  
+    /**
+   * User block event handler for protected use
+   * 
+   * @protected
+   * @param {function} handler
+   */
+  userBlockListener(handler) {
+    this._unblock();
+    this._unblock = this._history.block((location, action) => {
+      return handler;
+    });
   }
 
+  /**
+   * Change history by specified path
+   * 
+   * @params {object|string} path - Path or matches of the route
+   * @params {boolean} [=true] addtoHistory
+   */
+  go(path, matches, addtoHistory=true) {
+    // this._cache.get(path) ||
+    const _matches = matches || matchRoutes(this._routes, path);
+
+    if(addtoHistory){
+      this._history.push(path, _matches);
+    } else {
+      this.render(_matches);
+    }
+    
+    return matches;
+  }
+  
+  /**
+   * Rewinds history
+   *
+   */
+  goBack() {
+    this._history.goBack();
+  }
+  
+  /**
+   * Forwards history
+   *
+   */
+  goForward(){
+    this._history.goForward();
+  }
+  
+  
+  /**
+   * Adds new route
+   * @params {Route} route
+   *
+   */
   add(route) {
     this._routes.push(route);
   }
-
+  
+  /**
+   * Iterate child routes
+   * 
+   * @paramms {function} fn
+   */
   map(fn) {
     return this._routes.map(fn);
   }
-
-  // static register(){
-  // }
-
-  // static use(val){
-  //   if(val instanceof Route){
-  //     routes.add(val);
-  //   } else if(typeof val === "object" && val.hasOwnProperty("provide")) {
-  //     resolveMiddleware(val);
-  //   }
-  // }
+  
+  /**
+   * Unloads the router
+   *
+   */
+  dispose() {
+    this._historyUnlisten.forEach(unlistener => unlistener());
+    this._history = null;
+    this._historyUnlisten = null;
+    this._unblock();
+  }
 }
 
 /**
@@ -82,33 +189,11 @@ class StackRouter extends Router {
     options: { initialEntries = ["/"], initialIndex = 0, keyLength = 20 },
     path = "",
     build = null,
-
     routes = []
   }) {
-    super({ path, build, routes });
-    this._unblock = function() {};
-    this._history = createMemoryHistory({
-      initialEntries: initialEntries, // The initial URLs in the history stack
-      initialIndex: initialIndex, // The starting index in the history stack
-      keyLength: keyLength, // The length of location.key
-      // A function to use to confirm navigation with the user. Required
-      // if you return string prompts from transition hooks (see below)
-      getUserConfirmation: (handler, callback) => {
-        handler(callback, this._unblock);
-      }
-    });
-    this._historyUnlisten.push(
-      history.listen((location, action) => {
-        console.log(
-          `The current URL is ${location.pathname}${location.search}${
-            location.hash
-          }`
-        );
-        console.log(`The last navigation action was ${action}`);
-      })
-    );
+    super({options: {initialEntries, initialIndex, keyLength}, path, build, routes });
   }
-
+  
   /**
    * Location change event handler
    *
@@ -117,38 +202,6 @@ class StackRouter extends Router {
    * @param {string} action
    */
   onChange(location, action) {}
-
-  unblock() {
-    this._unblock();
-  }
-
-  /**
-   * User block event handler
-   *
-   * @param {function} handler
-   */
-  userBlockListener(handler) {
-    this._unblock();
-    this._unblock = history.block((location, action) => {
-      return handler;
-    });
-  }
-  goForward() {}
-  goBack() {}
-
-  go() {
-    this._history.go();
-  }
-
-  dispose() {
-    this._historyUnlisten.forEach(unlistener => unlistener());
-    this._history = null;
-    this._historyUnlisten = null;
-    this._unblock();
-  }
 }
 
-module.exports = {
-  Router,
-  StackRouter
-};
+module.exports = Router;

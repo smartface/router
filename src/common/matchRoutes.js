@@ -22,7 +22,7 @@ const matchRoutes = (routes, pathname, /*not public API*/ branch = []) => {
 
     if (match && route.onPrematch(match)) {
       branch.push({
-        route: route.clone(),
+        route: route,
         match
       });
       const children = route.map(child => {

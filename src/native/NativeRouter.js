@@ -1,32 +1,22 @@
-const {Router} = require("../router/Router");
+const Router = require("../router/Router");
 const Route = require("../router/Route");
-const DEVICE_OS = {
-  ios: "iOS",
-  android: "Android"
-}
+const createRenderer = require("./createRenderer");
+const Page = require("sf-core/ui/page");
 
 class NativeRouter extends Router {
   /**
-   * Create NativeRouter instace by device's 
-   *
-   * @params {string} 
+   * Create OS specific NativeRouter instance
+   * @static
+   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0
    */
-  static of(deviceOS, { path = "", build = null, routes = [], exact = false, renderer= null }){
-    let Renderer;
-    switch (deviceOS) {
-      case DEVICE_OS.ios:
-        Renderer = require("./IOSRenderer");
-        break;
-      case DEVICE_OS.android:
-        Renderer = require("./AndroidRenderer");
-        break;
-      default: 
-        throw new TypeError(deviceOS+" Invalid OS definition.");
-    }
-
-    return new NativeRouter({path, build, routes, exact, renderer: new Renderer()});
+  static of({ path = "", build = null, routes = [], exact = false, renderer= null }){
+    return new NativeRouter({path, build, routes, exact, renderer: createRenderer(new Page({ orientation: Page.Orientation.AUTO }))});
   }
   
+  /**
+   * @constructor
+   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0
+   */
   constructor({ path = "", build = null, routes = [], exact = false, renderer= null }) {
     super({path, build, routes, exact});
     this._renderer = renderer;
@@ -35,6 +25,7 @@ class NativeRouter extends Router {
 
   render(matches) {
     const view = super.render(matches);
+    console.log("view : "+view)
     if (view === this._currentPage) return;
     
     try{

@@ -1,4 +1,4 @@
-const matchPath = require("../commmon/matchPath").matchPath;
+const matchPath = require("../common/matchPath").matchPath;
 const mapComposer = require("../utils/map");
 
 class RoutePath {
@@ -88,6 +88,7 @@ class Route {
    * @param {string} url
    */
   matchPath(url) {
+    console.log("url : "+url);
     this._match = matchPath(url, {
       path: this._path.getPath(),
       exact: this._exact,

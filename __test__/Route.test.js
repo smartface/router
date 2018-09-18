@@ -1,5 +1,5 @@
 const Route = require("../src/router/Route");
-const matchRoutes = require("../src/commmon/matchRoutes");
+const matchRoutes = require("../src/common/matchRoutes");
 
 describe("Route", () => {
   it("has a path", () => {
