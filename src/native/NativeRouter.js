@@ -14,8 +14,7 @@ class NativeRouter extends Router {
     build = null,
     routes = [],
     exact = false,
-    renderer = null,
-    isRoot = false
+    renderer = null
   }) {
     return new NativeRouter({
       path,
@@ -24,8 +23,7 @@ class NativeRouter extends Router {
       exact,
       renderer: createRenderer(
         new Page({ orientation: Page.Orientation.AUTO })
-      ),
-      isRoot
+      )
     });
   }
 
@@ -46,8 +44,8 @@ class NativeRouter extends Router {
     this._currentPage;
   }
 
-  render(location) {
-    const view = super.render(location);
+  renderLocation(location) {
+    const view = super.renderLocation(location);
 
     if (view === this._currentPage) return;
 

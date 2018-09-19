@@ -49,7 +49,7 @@ class NativeStackRouter extends Router {
     if (location.state === null) {
       return;
     }
-    const view = this.render(location);
+    const view = this.renderLocation(location);
     console.log("stack view : " + view + " : " + action);
     if (!view) return;
 
