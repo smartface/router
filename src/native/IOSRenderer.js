@@ -141,12 +141,8 @@ class IOSRenderer extends Renderer {
    * @params {function} fn
    */
   onNavigatorChange(fn) {
-    if (this._rootPage.onTransition) {
-      this._rootPage.onTransition = fn;
-      return () => (this._rootPage.onTransition = () => null);
-    }
-
-    return () => null;
+    this._rootPage.onTransition = fn;
+    return () => (this._rootPage.onTransition = () => null);
   }
 
   /**
@@ -196,10 +192,6 @@ class IOSRenderer extends Renderer {
    * @params {Page} page
    */
   show(page) {
-    // if (!(page instanceof Page)) {
-    //   throw new TypeError("View must be instance of sf-core/ui/page ");
-    // }
-
     if (this._currentPage === page) return;
 
     this.addPageViewController(page);

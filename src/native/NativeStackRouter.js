@@ -40,17 +40,37 @@ class NativeStackRouter extends Router {
     this._renderer = renderer;
     // this._renderer._rootPage.childControllers = this._routes.map((route) => route.build());
   }
+  
+  addNavigatorChangeListener(){
+    this._unlistener = this._renderer.onNavigatorChange((action) => {
+      if(action === 2){
+        this._skipRender = true;
+        this.goBack();
+        this._skipRender = false;
+      }
+    });
+  }
+  
+  dispose(){
+    super.dispose();
+    this._unlistener();
+  }
 
   /**
    * History change event handler
    * @protected
    */
   onHistoryChange(location, action) {
-    if (location.state === null) {
+    if (location.state === null || this._skipRender) {
       return;
     }
+    
+    if(action === "POP"){
+      this._unlistener();
+    }
+    
     const view = this.renderLocation(location);
-    console.log("stack view : " + view + " : " + action);
+
     if (!view) return;
 
     switch (action) {
@@ -61,6 +81,8 @@ class NativeStackRouter extends Router {
         this._renderer.popChild();
         break;
     }
+    
+    this.addNavigatorChangeListener();
   }
 }
 

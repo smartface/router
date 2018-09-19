@@ -43,7 +43,7 @@ class NativeRouter extends Router {
     this._renderer = renderer;
     this._currentPage;
   }
-
+  
   renderLocation(location) {
     const view = super.renderLocation(location);
 
