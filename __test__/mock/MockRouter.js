@@ -1,11 +1,8 @@
-const Router = require("../router/Router");
-const Route = require("../router/Route");
-const createRenderer = require("./createRenderer");
-const Page = require("sf-core/ui/page");
+const Router = require("../../src/router/Router");
+const Route = require("../../src/router/Route");
 
-class NativeRouter extends Router {
+class MockRouter extends Router {
   /**
-   * Create OS specific NativeRouter instance
    * @static
    * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean, isRoot: boolean }} param0
    */
@@ -22,10 +19,8 @@ class NativeRouter extends Router {
       build,
       routes,
       exact,
-      renderer: createRenderer(
-        new Page({ orientation: Page.Orientation.AUTO })
-      ),
-      isRoot
+      renderer: {},
+      isRoot = false
     });
   }
 
@@ -52,7 +47,7 @@ class NativeRouter extends Router {
     if (view === this._currentPage) return;
 
     try {
-      view && this._renderer.show(view);
+      view && (this._renderer = view);
     } catch (e) {
       console.log(e.message + "" + e.stack);
     }

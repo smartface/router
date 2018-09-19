@@ -1,3 +1,3 @@
-module.exports = function(message) {
-  console.log(message);
+module.exports = function(condition, message) {
+  !condition && console.log(message);
 };

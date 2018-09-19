@@ -12,9 +12,15 @@ const matchRoutes = require("../common/matchRoutes");
 class Router extends Route {
   /**
    * @constructor
-   * @param {{ path: string, target: object|null, routes: Array, exact: boolean }} param0
+   * @param {{ path: string, target: object|null, routes: Array, exact: boolean, isRoot: boolean }} param0
    */
-  constructor({ path = "", build = null, routes = [], exact = false }) {
+  constructor({
+    path = "",
+    build = null,
+    routes = [],
+    exact = false,
+    isRoot = false
+  }) {
     super({ path, build, routes });
 
     this._exact = exact;
@@ -22,19 +28,27 @@ class Router extends Route {
     this._cache = new WeakMap();
     this._historyUnlisten = [];
     this._unblock = () => null;
+    this._isRoot = isRoot;
 
-    this._history = createMemoryHistory({
-      initialEntries: ["/"], // The initial URLs in the history stack
-      initialIndex: 0, // The starting index in the history stack
-      keyLength: 20, // The length of location.key
-      // A function to use to confirm navigation with the user. Required
-      // if you return string prompts from transition hooks (see below)
-      getUserConfirmation: (handler, callback) => {
-        (this._blockPath && handler(callback, this.onBlockPath.bind(this))) ||
-          true;
-      }
-    });
+    this.setHistory(
+      createMemoryHistory({
+        initialEntries: [], // The initial URLs in the history stack
+        initialIndex: 0, // The starting index in the history stack
+        keyLength: 20, // The length of location.key
+        // A function to use to confirm navigation with the user. Required
+        // if you return string prompts from transition hooks (see below)
+        getUserConfirmation: (handler, callback) => {
+          (this._blockPath && handler(callback, this.onBlockPath.bind(this))) ||
+            true;
+        }
+      })
+    );
+  }
 
+  setHistory(history) {
+    this._history = history;
+
+    // if (this._isRoot)
     this._historyUnlisten.push(
       /**
        * @params {{
@@ -49,8 +63,6 @@ class Router extends Route {
       })
     );
   }
-
-  setHistory() {}
 
   addParentRenderer(parent) {
     parent && parent.show(this._renderer._rootPage);
@@ -77,28 +89,50 @@ class Router extends Route {
    * @params {object} action
    */
   onHistoryChange(location, action) {
-    this.render(location);
+    this.renderLocation(location, action);
   }
 
-  render(location) {
+  renderMatches(matches, state, action) {
+    matches.some(({ match, route }, index) => {
+      if (route instanceof Router) {
+        // move routes to child router
+        route.addParentRenderer(this._renderer);
+        route.setParent(this);
+        route.renderMatches(matches.slice(index + 1, matches.length), state);
+        return true;
+      } else if (match.isExact === true) {
+        // if route is exact then create new history
+        this._history.push(match.url, {
+          userState: state.userState,
+          matches
+        });
+        return true;
+      }
+    });
+  }
+
+  renderLocation(location) {
     let view;
     const { matches } = location.state;
 
     matches.some(({ match, route }, index) => {
-      // console.log(" route "+(route instanceof Router)+" : "+index+" "+JSON.stringify(match));
-      // if (route instanceof Router) {
-      //   route.go(location.pathname, location.state.data);
-
-      //   route.addParentRenderer(this._renderer);
-      //   return true;
-      // } else
       if (match.isExact === true) {
-        view = route.build(match.params, location.state.userState || {});
+        view = route.build(
+          match,
+          location.state.userState || {},
+          this,
+          location.state.view
+        );
+        location.state.view = view;
         return true;
       }
     });
 
     return view;
+  }
+
+  setParent(parent) {
+    this._parent = parent;
   }
 
   /**
@@ -115,38 +149,15 @@ class Router extends Route {
   }
 
   /**
+   * Goes to route for internal use
    * @protected
    */
-  _go(path, data, location = null, addtoHistory = true) {
+  _go(path, data, location = {}, addtoHistory = true) {
     const matches =
       (location && location.state && location.state.matches) ||
       matchRoutes(this._routes, path);
 
-    matches.some(({ match, route }, index) => {
-      // console.log(" route "+(route instanceof Router)+" : "+index+" "+JSON.stringify(match));
-      if (route instanceof Router) {
-        route.go(path, data);
-        route.addParentRenderer(this._renderer);
-
-        return true;
-      } else if (match.isExact === true) {
-        this._history.push(path, { userState: { data }, matches });
-        return true;
-      }
-    });
-
-    // if (addtoHistory) {
-    //   (location &&
-    //     matches &&
-    //     this._history.push(path, {
-    //       userState: Object.assign({}, location.state.userState),
-    //       matches
-    //     })) ||
-    //     (matches && this._history.push(path, { userState: { data }, matches }));
-    // } else {
-    //   this.render(location);
-    // }
-
+    this.renderMatches(matches, location.state || { userState: { data } });
     return matches;
   }
 
@@ -158,7 +169,15 @@ class Router extends Route {
    */
   go(path, data, addtoHistory = true) {
     // this._cache.get(path) ||
-    return this._go(path, data, null, addtoHistory);
+    if (path.charAt(0) !== "/") {
+      path = this._path.getPath() + "/" + path;
+      return this._go(path, data, {}, addtoHistory);
+    } else {
+      return (
+        (this._parent && this._parent.go(path, data, addtoHistory)) ||
+        this._go(path, data, {}, addtoHistory)
+      );
+    }
   }
 
   /**
@@ -166,7 +185,15 @@ class Router extends Route {
    *
    */
   goBack() {
-    this._history.goBack();
+    if (this._history.canGo(-1)) {
+      this._history.goBack();
+    } else {
+      this._parent && this._parent._history.go(0);
+    }
+  }
+
+  getLocation() {
+    return this._history.location;
   }
 
   /**
@@ -204,6 +231,7 @@ class Router extends Route {
     this._history = null;
     this._historyUnlisten = null;
     this._unblock();
+    this._parrent = null;
   }
 }
 

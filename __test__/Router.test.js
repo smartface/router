@@ -5,6 +5,7 @@ const matchRoutes = require("../src/common/matchRoutes");
 describe("Router", () => {
   it("has routes", () => {
     const router = new Router({
+      isRoot: true,
       routes: [
         new Route("/path/to/:name"),
         new Route("/path/to/:id"),
@@ -21,6 +22,7 @@ describe("Router", () => {
     const router = new Router({
       path: "/",
       exact: false,
+      isRoot: true,
       routes: [
         new Route({
           path: "/path/to/:name",
@@ -40,7 +42,11 @@ describe("Router", () => {
     // let matches = matchRoutes([router], "/path/to/1").map(
     //   ({ match, route }) => ({ match, route: route.toObject(), view: route.build() })
     // );
-    var matches = router.go("/path/to/1").map(({match, route}) => ({match, route: route.toObject(), view: route.build()}));
+    var matches = router.go("/path/to/1").map(({ match, route }) => ({
+      match,
+      route: route.toObject(),
+      view: route.build()
+    }));
 
     expect(matches).toEqual([
       {
@@ -60,6 +66,7 @@ describe("Router", () => {
   it("return false if any route doesn't be matched", () => {
     const router = new Router({
       path: "/",
+      isRoot: true,
       routes: [
         new Route({
           path: "/path/to/:name",
@@ -83,19 +90,20 @@ describe("Router", () => {
     let data;
     const router = new Router({
       path: "/",
+      isRoot: true,
       routes: [
         new Route({
           path: "/path/to/:name",
-          build: (params, state) => {
+          build: (match, state) => {
             data = {
-              params,
+              params: match.params,
               state
-            }
-            return {type: "target1"}
+            };
+            return { type: "target1" };
           }
         }),
         new Route({
-          path: "/path/to/dev",
+          path: "/path/too/:name",
           build: () => {
             type: "target2";
           }
@@ -103,43 +111,157 @@ describe("Router", () => {
         new Route({ path: "*", build: { type: "target3" } })
       ]
     });
-    let matches = router.go("/path/to/1", {name: "name"});
-    expect(data).toEqual({"params": {"name": "1"}, "state": {"data": {"name": "name"}}});
+    let matches = router.go("/path/to/1", { name: "name" });
+    expect(data).toEqual({
+      params: { name: "1" },
+      state: { data: { name: "name" } }
+    });
   });
-  it("sends data and params to nested router's route", () => {
+  it("gets history back", () => {
     let data;
     let callCount = 0;
+    var component = {};
     const router = new Router({
       path: "/",
+      isRoot: true,
       routes: [
         new Router({
-          path: '/path',
+          path: "/path",
           routes: [
             new Route({
               path: "/path/to/:name",
-              build: (params, state) => {
+              build: (match, state, router) => {
                 data = {
-                  params,
+                  params: match.params,
                   state
-                }
+                };
+
                 callCount++;
-                return {type: "target1"}
+                return { type: "target1" };
               }
             }),
             new Route({
-              path: "/path/to/dev",
-              build: () => {
-                type: "target2";
+              path: "/path/too/:name",
+              build: (params, state, router) => {
+                component.router = router;
+                return component;
               }
             }),
             new Route({ path: "*", build: { type: "target3" } })
-          ]          
+          ]
         })
       ]
     });
-    
-    let matches = router.go("/path/to/1", {name: "name"});
-    expect(data).toEqual({"params": {"name": "1"}, "state": {"data": {"name": "name"}}});
-    expect(callCount).toBe(1);
+
+    router.go("/path/to/1", { name: "name" });
+    router.go("/path/too/dev", { name: "name" });
+    component.router.goBack();
+
+    expect(data).toEqual({
+      params: { name: "1" },
+      state: { data: { name: "name" } }
+    });
+
+    expect(component.router === router).toBe(false);
+    expect(callCount).toBe(2);
+  });
+
+  it("calls back to parent if its history is empty", () => {
+    let data;
+    let callCount = 0;
+    var component = {};
+    const router = new Router({
+      path: "/",
+      isRoot: true,
+      routes: [
+        new Route({
+          path: "/path2/to/:name",
+          build: (match, state, router) => {
+            data = {
+              params: match.params,
+              state
+            };
+            // component.router = router;
+            callCount++;
+            return { type: "target1" };
+          }
+        }),
+        new Router({
+          path: "/path",
+          routes: [
+            new Route({
+              path: "/path/to/:name",
+              build: (params, state, router) => {
+                component.router = router;
+                return component;
+              }
+            }),
+            new Route({ path: "*", build: { type: "target3" } })
+          ]
+        })
+      ]
+    });
+
+    router.go("/path2/to/1", { name: "name" });
+    router.go("/path/to/dev", { name: "name" });
+    component.router.goBack();
+
+    expect(data).toEqual({
+      params: { name: "1" },
+      state: { data: { name: "name" } }
+    });
+    expect(callCount).toBe(2);
+  });
+  it("can call a relative path", () => {
+    let data;
+    let callCount = 0;
+    var component1 = {};
+    var component2 = {};
+    const router = new Router({
+      path: "/",
+      isRoot: true,
+      routes: [
+        new Route({
+          path: "/path2/to/:name",
+          build: (match, state, router) => {
+            data = {
+              params: match.params,
+              state
+            };
+            // component.router = router;
+            callCount++;
+            return { type: "target1" };
+          }
+        }),
+        new Router({
+          path: "/path",
+          routes: [
+            new Route({
+              path: "/path/to/:name([a-zA-Z]*)",
+              build: (match, state, router) => {
+                component1.router = router;
+                component1.params = match.params;
+                return component1;
+              }
+            }),
+            new Route({
+              path: "/path/to/:id",
+              build: (match, state, router, view) => {
+                component2.router = router;
+                component2.params = match.params;
+                return component2;
+              }
+            })
+          ]
+        })
+      ]
+    });
+
+    router.go("/path/to/cenk", { name: "name" });
+    component1.router.go("to/1123", { name: "name" });
+
+    expect(component1.router === router).toBe(false);
+    expect(component1.params.name).toBe("cenk");
+    expect(component2.params.id).toBe("1123");
   });
 });
