@@ -93,9 +93,7 @@ class Router extends Route {
   }
   
   renderSelf(){
-    this.addParentRenderer(this._renderer);
-    this.setParent(this);
-    Router.currentRouter = this;
+    
   }
 
   renderMatches(matches, state, action) {
@@ -103,7 +101,9 @@ class Router extends Route {
       if (route instanceof Router) {
         // move routes to child router
         route.renderMatches(matches.slice(index + 1, matches.length), state);
-        
+        route.addParentRenderer(this._renderer);
+        route.setParent(this);
+        Router.currentRouter = this;
         return true;
       } else if (match.isExact === true) {
         if(route.to){
@@ -163,12 +163,10 @@ class Router extends Route {
    * Goes to route for internal use
    * @protected
    */
-  _go(path, data, location = {}, addtoHistory = true) {
-    const matches =
-      (location && location.state && location.state.matches) ||
-      matchRoutes(this._routes, path);
+  _go(path, data, addtoHistory = true) {
+    const matches = matchRoutes(this._routes, path);
 
-    this.renderMatches(matches, location.state || { userState: { data } });
+    this.renderMatches(matches, { userState: { data } });
     return matches;
   }
 
@@ -178,7 +176,7 @@ class Router extends Route {
    * @params {object|string} path - Path or matches of the route
    * @params {boolean} [=true] addtoHistory
    */
-  go(path, data, addtoHistory = true) {
+  go(path, data, action="PUSH", addtoHistory = true) {
     // this._cache.get(path) ||
     if (path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;

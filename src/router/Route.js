@@ -38,31 +38,34 @@ class Route {
   static of({
     path = null,
     routes = [],
-    props = {},
     build = null,
     exact = false,
-    strict = false
+    strict = false,
+    onBeforeMatch = null,
+    onBeforePush = null
   }) {
-    return new Route({ path, routes, props, build, exact, strict });
+    return new Route({ path, routes, build, exact, strict, onBeforeMatch, onBeforePush });
   }
 
   constructor({
     path = null,
     to = null,
     routes = [],
-    props = {},
     build = null,
     exact = false,
-    strict = false
+    strict = false,
+    onBeforeMatch = null,
+    onBeforePush = null
   }) {
     this._exact = exact;
     this._strict = strict;
     this._build = build;
     this._path = path instanceof RoutePath ? path : new RoutePath(path);
     this._routes = routes;
-    this._props = props;
     this.map = mapComposer.call(this, this._routes);
     this._to = to;
+    this._onBeforeMatch = onBeforeMatch;
+    this._onBeforePush = onBeforePush;
   }
 
   toObject() {
@@ -77,7 +80,7 @@ class Route {
   }
 
   onPrematch(match) {
-    return true;
+    return (this._onBeforeMatch && this._onBeforeMatch(match)) || true;
   }
 
   hasPath() {

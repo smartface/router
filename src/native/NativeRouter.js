@@ -50,6 +50,7 @@ class NativeRouter extends Router {
     if (view === this._currentPage) return;
 
     try {
+      this.renderSelf && this.renderSelf();
       view && this._renderer.show(view);
     } catch (e) {
       console.log(e.message + "" + e.stack);

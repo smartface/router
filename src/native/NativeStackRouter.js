@@ -73,7 +73,7 @@ class NativeStackRouter extends Router {
 
     if (!view) return;
     
-    this.renderSelf();
+    this.renderSelf && this.renderSelf();
     
     switch (action) {
       case "PUSH":
