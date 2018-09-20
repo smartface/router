@@ -72,7 +72,9 @@ class NativeStackRouter extends Router {
     const view = this.renderLocation(location);
 
     if (!view) return;
-
+    
+    this.renderSelf();
+    
     switch (action) {
       case "PUSH":
         this._renderer.pushChild(view);

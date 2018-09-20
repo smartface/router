@@ -91,16 +91,27 @@ class Router extends Route {
   onHistoryChange(location, action) {
     this.renderLocation(location, action);
   }
+  
+  renderSelf(){
+    this.addParentRenderer(this._renderer);
+    this.setParent(this);
+    Router.currentRouter = this;
+  }
 
   renderMatches(matches, state, action) {
     matches.some(({ match, route }, index) => {
       if (route instanceof Router) {
         // move routes to child router
-        route.addParentRenderer(this._renderer);
-        route.setParent(this);
         route.renderMatches(matches.slice(index + 1, matches.length), state);
+        
         return true;
       } else if (match.isExact === true) {
+        if(route.to){
+          // redirection of a route
+          this.go(route.to);
+          
+          return true;
+        }
         // if route is exact then create new history
         this._history.push(match.url, {
           userState: state.userState,
@@ -120,10 +131,10 @@ class Router extends Route {
         view = route.build(
           match,
           location.state.userState || {},
-          this,
-          location.state.view
+          this
+          // location.state.view
         );
-        location.state.view = view;
+        // location.state.view = view;
         return true;
       }
     });
@@ -141,7 +152,7 @@ class Router extends Route {
    * @protected
    * @param {function} handler
    */
-  userBlockListener(handler) {
+  onBeforeRouteChange(handler) {
     this._unblock();
     this._unblock = this._history.block((location, action) => {
       return handler;
@@ -233,41 +244,6 @@ class Router extends Route {
     this._unblock();
     this._parrent = null;
   }
-}
-
-/**
- * StackRouter
- *
- * @class
- *
- */
-class StackRouter extends Router {
-  /**
-   * @constructor
-   * @param {{options:{initialEntries: Array, initialIndex: number, keyLength: number}}, path: string, target: string, routes: Array} param0
-   */
-  constructor({
-    options: { initialEntries = ["/"], initialIndex = 0, keyLength = 20 },
-    path = "",
-    build = null,
-    routes = []
-  }) {
-    super({
-      options: { initialEntries, initialIndex, keyLength },
-      path,
-      build,
-      routes
-    });
-  }
-
-  /**
-   * Location change event handler
-   *
-   * @event
-   * @param {string} location
-   * @param {string} action
-   */
-  onChange(location, action) {}
 }
 
 module.exports = Router;

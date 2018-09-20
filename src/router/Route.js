@@ -48,6 +48,7 @@ class Route {
 
   constructor({
     path = null,
+    to = null,
     routes = [],
     props = {},
     build = null,
@@ -61,6 +62,7 @@ class Route {
     this._routes = routes;
     this._props = props;
     this.map = mapComposer.call(this, this._routes);
+    this._to = to;
   }
 
   toObject() {
