@@ -19,9 +19,10 @@ class Router extends Route {
     build = null,
     routes = [],
     exact = false,
-    isRoot = false
+    isRoot = false,
+    to = null
   }) {
-    super({ path, build, routes });
+    super({ path, build, routes, to });
 
     this._exact = exact;
     this._selectedRoutes = [];
@@ -92,24 +93,35 @@ class Router extends Route {
     this.renderLocation(location, action);
   }
   
-  renderSelf(){
+  // renderChild(child, matches, state){
     
-  }
+  //   child.addParentRenderer(this._renderer);
+  // }
 
   renderMatches(matches, state, action) {
     matches.some(({ match, route }, index) => {
-      if (route instanceof Router) {
+    
+      if (match.isExact !== true && route instanceof Router) {
         // move routes to child router
-        route.renderMatches(matches.slice(index + 1, matches.length), state);
-        route.addParentRenderer(this._renderer);
+        if(route !== this){
+          route.renderMatches(matches.slice(index + 1, matches.length), state);
+          // route.addParentRenderer(this._renderer);
+        }
         route.setParent(this);
         Router.currentRouter = this;
         return true;
       } else if (match.isExact === true) {
-        if(route.to){
+        if(route.getRedirectto()) {
           // redirection of a route
-          this.go(route.to);
-          
+          this.go(route.getRedirectto());
+          return true;
+        }
+        
+        if (route !== this && route instanceof Router) {
+          // TODO: change this
+          Router.currentRouter = route;
+          //------<
+          route.renderMatches(matches, state);
           return true;
         }
         // if route is exact then create new history
@@ -193,9 +205,9 @@ class Router extends Route {
    * Rewinds history
    *
    */
-  goBack() {
-    if (this._history.canGo(-1)) {
-      this._history.goBack();
+  goBack(index = 1) {
+    if (this._history.canGo(-index)) {
+      this._history.go(-1 * index);
     } else {
       this._parent && this._parent._history.go(0);
     }

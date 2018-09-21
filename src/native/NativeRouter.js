@@ -14,13 +14,15 @@ class NativeRouter extends Router {
     build = null,
     routes = [],
     exact = false,
-    renderer = null
+    renderer = null,
+    to = null
   }) {
     return new NativeRouter({
       path,
       build,
       routes,
       exact,
+      to,
       renderer: createRenderer(
         new Page({ orientation: Page.Orientation.AUTO })
       )
@@ -37,9 +39,10 @@ class NativeRouter extends Router {
     routes = [],
     exact = false,
     renderer = null,
-    isRoot = false
+    isRoot = false,
+    to = null
   }) {
-    super({ path, build, routes, exact, isRoot });
+    super({ path, build, routes, exact, isRoot, to });
     this._renderer = renderer;
     this._currentPage;
   }
@@ -50,7 +53,6 @@ class NativeRouter extends Router {
     if (view === this._currentPage) return;
 
     try {
-      this.renderSelf && this.renderSelf();
       view && this._renderer.show(view);
     } catch (e) {
       console.log(e.message + "" + e.stack);

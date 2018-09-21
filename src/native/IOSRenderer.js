@@ -66,6 +66,8 @@ class Animator {
   }
 }
 
+var hasRoot = false;
+
 /**
  * Renderer for iOS
  * It encapsulates all logic to display pages on iOS
@@ -78,6 +80,10 @@ class IOSRenderer extends Renderer {
   constructor(root) {
     super(root);
     // get application native window
+    
+  }
+  
+  setasRoot(){
     var sfWindow = SF.requireClass("UIApplication").sharedApplication()
       .keyWindow;
     sfWindow.rootViewController = this._rootPage.nativeObject;
@@ -103,6 +109,7 @@ class IOSRenderer extends Renderer {
    * @params {number} [=0] options
    */
   showWithTransition(fromPage, toPage, duration = 1, options = 0 << 20) {
+    this.setasRoot();
     new Animator(this._rootPage)
       .onAnimate((container, from, to, params) => {
         this.addChild(to);
@@ -121,8 +128,8 @@ class IOSRenderer extends Renderer {
    * @params {Array.<object>} controllers
    */
   pushChild(page, animated = true) {
-    console.log("push : " + page + " " + this._rootPage);
-    this._rootPage.push && this._rootPage.push({ page, animated });
+    this.setasRoot();
+    this._rootPage.push && this._rootPage.push({ controller: page, animated });
     // this._rootPage.nativeObject.view.addFrameObserver();
     // this._rootPage.nativeObject.view.frameObserveHandler = (e) => {
     //   for (var child in this._rootPage.nativeObject.childViewControllers) {
@@ -151,6 +158,7 @@ class IOSRenderer extends Renderer {
    * @params {boolean} [=true] animated
    */
   popChild(animated = true) {
+    this.setasRoot();
     this._rootPage.pop && this._rootPage.pop({ animated });
   }
 

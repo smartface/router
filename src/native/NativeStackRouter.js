@@ -14,14 +14,16 @@ class NativeStackRouter extends Router {
     build = null,
     routes = [],
     exact = false,
-    renderer = null
+    renderer = null,
+    to = null
   }) {
     return new NativeStackRouter({
       path,
       build,
       routes,
       exact,
-      renderer: createRenderer((build && build()) || new NavigationController())
+      to,
+      renderer: createRenderer(new NavigationController())
     });
   }
 
@@ -34,9 +36,10 @@ class NativeStackRouter extends Router {
     build = null,
     routes = [],
     exact = false,
-    renderer = null
+    renderer = null,
+    to = null
   }) {
-    super({ path, build, routes, exact });
+    super({ path, build, routes, exact, to });
     this._renderer = renderer;
     // this._renderer._rootPage.childControllers = this._routes.map((route) => route.build());
   }
@@ -72,8 +75,6 @@ class NativeStackRouter extends Router {
     const view = this.renderLocation(location);
 
     if (!view) return;
-    
-    this.renderSelf && this.renderSelf();
     
     switch (action) {
       case "PUSH":

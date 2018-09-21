@@ -42,9 +42,10 @@ class Route {
     exact = false,
     strict = false,
     onBeforeMatch = null,
-    onBeforePush = null
+    onBeforePush = null,
+    to = null
   }) {
-    return new Route({ path, routes, build, exact, strict, onBeforeMatch, onBeforePush });
+    return new Route({ path, routes, build, exact, strict, onBeforeMatch, onBeforePush, to });
   }
 
   constructor({
@@ -73,6 +74,10 @@ class Route {
       path: this._path.getPath(),
       routes: this._routes.map(route => route.toObject())
     };
+  }
+  
+  getRedirectto(){
+    return this._to;
   }
 
   build(params, state, router) {
