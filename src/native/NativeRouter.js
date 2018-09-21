@@ -24,7 +24,7 @@ class NativeRouter extends Router {
       exact,
       to,
       renderer: createRenderer(
-        new Page({ orientation: Page.Orientation.AUTO })
+        Page, { orientation: Page.Orientation.AUTO }
       )
     });
   }

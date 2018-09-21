@@ -23,7 +23,7 @@ class NativeStackRouter extends Router {
       routes,
       exact,
       to,
-      renderer: createRenderer(new NavigationController())
+      renderer: createRenderer(NavigationController)
     });
   }
 
@@ -86,6 +86,14 @@ class NativeStackRouter extends Router {
     }
     
     this.addNavigatorChangeListener();
+  }
+  
+  goBackToParent(){
+    if(this._parent){
+      this._renderer.clear();
+      this._parent._renderer.activate();
+    }
+    super.goBackToParent();
   }
 }
 

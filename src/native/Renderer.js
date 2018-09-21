@@ -1,10 +1,59 @@
+const Page = require("sf-core/ui/page");
+const Application = require("sf-core/application");
+
+var rootController = new Page({ orientation: Page.Orientation.AUTO })
+Application.setRootController(rootController);
+if(Device.deviceOS === 'iOS'){
+  rootController.nativeObject.view.addFrameObserver();
+    rootController.nativeObject.view.frameObserveHandler = e => {
+      for (var child in rootController.nativeObject.childViewControllers) {
+        rootController.nativeObject.childViewControllers[child].view.frame = {
+          x: 0,
+          y: 0,
+          width: e.frame.width,
+          height: e.frame.height
+        };
+        if (
+          rootController.nativeObject.childViewControllers[child].view.yoga
+            .isEnabled
+        ) {
+          rootController.nativeObject.childViewControllers[
+            child
+          ].view.yoga.applyLayoutPreservingOrigin(true);
+        }
+      }
+    };
+}
+var currentChild;
+
+function addChildController(child){
+  rootController.nativeObject.view.addSubview(child.nativeObject.view);
+  child.nativeObject.didMoveToParentViewController(
+    rootController.nativeObject
+  );
+}
+
+function removeChildController(child){
+  child.nativeObject.removeFromParentViewController();
+  child.nativeObject.view.removeFromSuperview();
+}
+
 /**
  * Abstract Renderer
  * @abstract
  */
 class Renderer {
-  constructor(root) {
-    this._rootPage = root;
+  static setasRoot(controller){
+    currentChild && removeChildController(currentChild);
+    addChildController(controller);
+    currentChild = controller;
+  }
+  
+  constructor(Controller, params={}) {
+    this._rootController = new Controller(params);
+    Renderer.setasRoot(this._rootController);
+    
+    this.createNew = () => new Controller(params);
   }
 
   onNavigatorChange(fn) {
@@ -16,7 +65,11 @@ class Renderer {
   }
 
   show(page, animated = true) {
-    throw new Error("show method must be overridden");
+    Renderer.setasRoot(this._rootController);
+  }
+  
+  activate(){
+    Renderer.setasRoot(this._rootController);
   }
 
   removeChild(page) {
@@ -24,15 +77,20 @@ class Renderer {
   }
 
   addChild(page) {
-    throw new Error("addChild method must be overridden");
+    Renderer.setasRoot(this._rootController);
   }
 
-  push(page, animated = true) {
-    throw new Error("Push method must be overridden");
+  pushChild(page, animated = true) {
+    Renderer.setasRoot(this._rootController);
+  }
+  
+  clear(){
+    this._rootController = this.createNew();
+    Renderer.setasRoot(this._rootController);
   }
 
-  pop(page, animated = true) {
-    throw new Error("Pop method must be overridden");
+  popChild(page, animated = true) {
+    Renderer.setasRoot(this._rootController);
   }
 }
 

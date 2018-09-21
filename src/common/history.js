@@ -250,9 +250,15 @@ const createMemoryHistory = (props = {}) => {
   const goBack = () => go(-1);
 
   const goForward = () => go(1);
+  const clear = () => {
+    history.index = 0;
+    history.entries = [];
+    history.length = 0;
+  }
 
   const canGo = n => {
     const nextIndex = history.index + n;
+
     return nextIndex >= 0 && nextIndex < history.entries.length;
   };
 
@@ -270,6 +276,7 @@ const createMemoryHistory = (props = {}) => {
     push,
     replace,
     go,
+    clear,
     goBack,
     goForward,
     canGo,

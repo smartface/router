@@ -1,6 +1,6 @@
 const DeviceOS = require("../common/DeviceOS");
 
-module.exports = function createRenderer(root) {
+module.exports = function createRenderer(root, params = {}) {
   let Renderer;
   switch (Device.deviceOS) {
     case DeviceOS.ios:
@@ -13,5 +13,5 @@ module.exports = function createRenderer(root) {
       throw new TypeError(Device.deviceOS + " Invalid OS definition.");
   }
 
-  return new Renderer(root);
+  return new Renderer(root, params);
 };

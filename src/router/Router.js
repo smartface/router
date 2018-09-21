@@ -209,8 +209,14 @@ class Router extends Route {
     if (this._history.canGo(-index)) {
       this._history.go(-1 * index);
     } else {
-      this._parent && this._parent._history.go(0);
+      this.goBackToParent();
     }
+  }
+  
+  goBackToParent() {
+    // if(this._parent) {
+      this._history.clear();
+    // }
   }
 
   getLocation() {
