@@ -11,8 +11,8 @@ class AndroidRenderer extends Renderer {
    * @params {Page|NavigationController} root
    */
   constructor(rootController) {
-    super(root);
-    Renderer.setasRoot(root);
+    super(rootController);
+    Renderer.setasRoot(rootController);
   }
 
   /**
@@ -20,7 +20,7 @@ class AndroidRenderer extends Renderer {
    * @params {Array.<object>} controllers
    */
   addChildViewControllers(controllers) {
-    this._rootPage.childControllers = controllers;
+    this._rootController.childControllers = controllers;
   }
 
   /**
@@ -28,8 +28,9 @@ class AndroidRenderer extends Renderer {
    * Only use if rootpage is NavigationController
    * @params {Array.<object>} controllers
    */
-  push(page, animated = true) {
-    this._rootPage.push && this._rootPage.push({controller: page, animated: animated});
+  pushChild(page, animated = true) {
+    super.pushChild();
+    this._rootController.push && this._rootController.push({controller: page, animated: animated});
   }
 
   /**
@@ -39,9 +40,9 @@ class AndroidRenderer extends Renderer {
    * @params {function} fn
    */
   onNavigatorChange(fn) {
-    if (this._rootPage.onTransition) {
-      this._rootPage.onTransition = fn;
-      return () => (this._rootPage.onTransition = () => null);
+    if (this._rootController.onTransition) {
+      this._rootController.onTransition = fn;
+      return () => (this._rootController.onTransition = () => null);
     }
 
     return () => null;
@@ -52,8 +53,9 @@ class AndroidRenderer extends Renderer {
    *
    * @params {boolean} [=true] animated
    */
-  pop(animated = true) {
-    this._rootPage.pop && this._rootPage.pop({ animated: animated });
+  popChild(animated = true) {
+    super.popChild();
+    this._rootController.pop && this._rootController.pop({ animated: animated });
   }
 
   /**
@@ -62,6 +64,7 @@ class AndroidRenderer extends Renderer {
    * @params {NavigationController} controller
    */
   show(page) {
+    super.show();
     Application.setRootController(page);
   }
 }

@@ -80,8 +80,8 @@ class Route {
     return this._to;
   }
 
-  build(params, state, router) {
-    return (this._build && this._build(params, state, router)) || null;
+  build(params, state, router, view) {
+    return (this._build && this._build(params, state, router, view)) || null;
   }
 
   onPrematch(match) {
@@ -104,6 +104,10 @@ class Route {
     });
 
     return this._match;
+  }
+  
+  getUrlPath(){
+    return this._path.getPath();
   }
 
   /**

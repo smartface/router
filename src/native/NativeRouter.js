@@ -1,5 +1,4 @@
 const Router = require("../router/Router");
-const Route = require("../router/Route");
 const createRenderer = require("./createRenderer");
 const Page = require("sf-core/ui/page");
 
@@ -15,7 +14,8 @@ class NativeRouter extends Router {
     routes = [],
     exact = false,
     renderer = null,
-    to = null
+    to = null,
+    isRoot= false
   }) {
     return new NativeRouter({
       path,
@@ -23,6 +23,7 @@ class NativeRouter extends Router {
       routes,
       exact,
       to,
+      isRoot,
       renderer: createRenderer(
         Page, { orientation: Page.Orientation.AUTO }
       )
@@ -43,12 +44,18 @@ class NativeRouter extends Router {
     to = null
   }) {
     super({ path, build, routes, exact, isRoot, to });
+    
     this._renderer = renderer;
     this._currentPage;
   }
   
-  renderLocation(location) {
-    const view = super.renderLocation(location);
+  onRouteExit(action){
+    if(action === 'POP')
+      this._renderer.clear();
+  }
+  
+  onRouteMatch(route, match, state, action) {
+    const view = this.renderRoute(route, match, state);
 
     if (view === this._currentPage) return;
 

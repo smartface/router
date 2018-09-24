@@ -1,5 +1,5 @@
 // code fromm https://github.com/smartface/history
-const resolvePathname = require("resolve-pathname");
+const resolvePathname = require("resolve-pathname/umd/resolve-pathname");
 
 const warning = require("./warning");
 const createPath = location => {
@@ -47,7 +47,7 @@ const createLocation = (path, state, key, currentLocation) => {
     location.state = state;
   } else {
     // One-arg form: push(location)
-    location = { ...path };
+    location = Object.assign({}, path);
 
     if (location.pathname === undefined) location.pathname = "";
 

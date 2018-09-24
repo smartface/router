@@ -1,5 +1,5 @@
 const Renderer = require("./Renderer");
-
+const Animator = require("./iOSAnimator");
 
 /**
  * Renderer for iOS
@@ -83,7 +83,7 @@ class IOSRenderer extends Renderer {
    */
   popChild(animated = true) {
     super.popChild();
-    this._rootController.pop && this._rootController.pop({ animated });
+    this._rootController.pop({ animated });
   }
   
   popTo(index){

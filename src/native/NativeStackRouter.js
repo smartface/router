@@ -15,7 +15,8 @@ class NativeStackRouter extends Router {
     routes = [],
     exact = false,
     renderer = null,
-    to = null
+    to = null,
+    isRoot= false
   }) {
     return new NativeStackRouter({
       path,
@@ -23,6 +24,7 @@ class NativeStackRouter extends Router {
       routes,
       exact,
       to,
+      isRoot,
       renderer: createRenderer(NavigationController)
     });
   }
@@ -37,19 +39,19 @@ class NativeStackRouter extends Router {
     routes = [],
     exact = false,
     renderer = null,
-    to = null
+    to = null,
+    isRoot = false
   }) {
-    super({ path, build, routes, exact, to });
+    super({ path, build, routes, exact, to, isRoot });
     this._renderer = renderer;
+    this.addNavigatorChangeListener();
     // this._renderer._rootPage.childControllers = this._routes.map((route) => route.build());
   }
   
   addNavigatorChangeListener(){
     this._unlistener = this._renderer.onNavigatorChange((action) => {
       if(action === 2){
-        this._skipRender = true;
-        this.goBack();
-        this._skipRender = false;
+        this.silencePop();
       }
     });
   }
@@ -63,17 +65,8 @@ class NativeStackRouter extends Router {
    * History change event handler
    * @protected
    */
-  onHistoryChange(location, action) {
-    if (location.state === null || this._skipRender) {
-      return;
-    }
-    
-    if(action === "POP"){
-      this._unlistener();
-    }
-    
-    const view = this.renderLocation(location);
-
+  onRouteMatch(route, match, state, action) {
+    const view = this.renderRoute(route, match, state);
     if (!view) return;
     
     switch (action) {
@@ -84,16 +77,11 @@ class NativeStackRouter extends Router {
         this._renderer.popChild();
         break;
     }
-    
-    this.addNavigatorChangeListener();
   }
   
-  goBackToParent(){
-    if(this._parent){
+  onRouteExit(action){
+    if(action === 'POP')
       this._renderer.clear();
-      this._parent._renderer.activate();
-    }
-    super.goBackToParent();
   }
 }
 

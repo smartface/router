@@ -24,18 +24,23 @@ if(Device.deviceOS === 'iOS'){
       }
     };
 }
+
 var currentChild;
 
 function addChildController(child){
-  rootController.nativeObject.view.addSubview(child.nativeObject.view);
-  child.nativeObject.didMoveToParentViewController(
-    rootController.nativeObject
-  );
+  if(Device.deviceOS === 'iOS'){
+    rootController.nativeObject.view.addSubview(child.nativeObject.view);
+    child.nativeObject.didMoveToParentViewController(
+      rootController.nativeObject
+    );
+  }
 }
 
 function removeChildController(child){
-  child.nativeObject.removeFromParentViewController();
-  child.nativeObject.view.removeFromSuperview();
+  if(Device.deviceOS === 'iOS'){
+    child.nativeObject.removeFromParentViewController();
+    child.nativeObject.view.removeFromSuperview();
+  }
 }
 
 /**
@@ -44,20 +49,39 @@ function removeChildController(child){
  */
 class Renderer {
   static setasRoot(controller){
-    currentChild && removeChildController(currentChild);
-    addChildController(controller);
-    currentChild = controller;
+    if(Device.deviceOS === 'iOS'){
+      alert("controller"+ controller.constructor.name);
+      currentChild && removeChildController(currentChild);
+      addChildController(controller);
+      currentChild = controller;
+    } else {
+      Application.setRootController(controller);
+    }
   }
   
   constructor(Controller, params={}) {
     this._rootController = new Controller(params);
-    Renderer.setasRoot(this._rootController);
+    // Renderer.setasRoot(this._rootController);
     
     this.createNew = () => new Controller(params);
   }
 
   onNavigatorChange(fn) {
     throw new Error("onNavigatorChange method must be overridden");
+  }
+  
+  setTabBarItems(items){
+    this._rootController.tabBar.items = items;
+  }
+  
+  setSelectedIndex(index){
+    this._rootController.selectedIndex = index;
+    Renderer.setasRoot(this._rootController);
+    // this._rootController.hasOwnProperty('selectedIndex') ? (this._rootController.selectedIndex = index) : (this.setIndex(index));
+  }
+  
+  setChildControllers(children){
+    this._rootController.childControllers = children;
   }
 
   addChildViewControllers(controllers) {
@@ -89,7 +113,7 @@ class Renderer {
     Renderer.setasRoot(this._rootController);
   }
 
-  popChild(page, animated = true) {
+  popChild(animated = true) {
     Renderer.setasRoot(this._rootController);
   }
 }

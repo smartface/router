@@ -48,7 +48,9 @@ const matchPath = (pathname, options = {}, parent) => {
 
   if (!match) return null;
 
-  const [url, ...values] = match;
+  const url = match.shift();
+  const values = match.slice();
+  // [url, ...values] = ;
   const isExact = pathname === url;
 
   if (exact && !isExact) return null;
