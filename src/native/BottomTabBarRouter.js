@@ -1,13 +1,13 @@
 const Router = require("../router/Router");
 const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
 const createRenderer = require("./createRenderer");
-const TabBarItem = require('sf-core/ui/tabbaritem');
+const TabBarItem = require("sf-core/ui/tabbaritem");
 
-function functionMaybe(val){
-  return typeof val === 'function' ? val() : val;
+function functionMaybe(val) {
+  return typeof val === "function" ? val() : val;
 }
 
-function createTabBarItem(item){
+function createTabBarItem(item) {
   return item instanceof TabBarItem ? item : new TabBarItem(item);
 }
 
@@ -57,23 +57,25 @@ class BottomTabBarRouter extends Router {
     isRoot = false
   }) {
     super({ path, build, routes, exact, to, isRoot });
-    
+
     this._renderer = renderer;
     Object.assign(this._renderer._rootController, tabbarParams);
-    this._renderer.setChildControllers(this._routes.map(route => route.build(null, null, this)));
+    this._renderer.setChildControllers(
+      this._routes.map(route => route.build(null, null, this))
+    );
     this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem));
     this._renderer._rootController.show();
   }
-  
-  renderMatches(matches, state, action){
+
+  renderMatches(matches, state, action) {
     super.renderMatches(matches, state, action);
   }
-  
-  resolveIndex(path){
+
+  resolveIndex(path) {
     return this._routes.findIndex(route => route.getUrlPath() === path);
   }
-  
-  dispose(){
+
+  dispose() {
     super.dispose();
     this._unlistener();
   }
@@ -83,26 +85,11 @@ class BottomTabBarRouter extends Router {
    * @protected
    */
   onRouteMatch(route, match, state, action) {
-    // if(action === "POP"){
-    //   this._unlistener();
-    // }
-    
-    this._renderer.setSelectedIndex(this.resolveIndex(match.path));
-    
-    // const view = this.renderLocation(location);
+    const view = super.onRouteMatch(route, match, state);
 
-    // if (!view) return;
-    
-    // switch (action) {
-    //   case "PUSH":
-    //     this._renderer.pushChild(view);
-    //     break;
-    //   case "POP":
-    //     this._renderer.popChild();
-    //     break;
-    // }
-    
-    // this.addNavigatorChangeListener();
+    if (!view) return;
+
+    this._renderer.setSelectedIndex(this.resolveIndex(match.path));
   }
 }
 

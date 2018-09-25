@@ -16,7 +16,7 @@ class NativeStackRouter extends Router {
     exact = false,
     renderer = null,
     to = null,
-    isRoot= false
+    isRoot = false
   }) {
     return new NativeStackRouter({
       path,
@@ -47,16 +47,16 @@ class NativeStackRouter extends Router {
     this.addNavigatorChangeListener();
     // this._renderer._rootPage.childControllers = this._routes.map((route) => route.build());
   }
-  
-  addNavigatorChangeListener(){
-    this._unlistener = this._renderer.onNavigatorChange((action) => {
-      if(action === 2){
+
+  addNavigatorChangeListener() {
+    this._unlistener = this._renderer.onNavigatorChange(action => {
+      if (action === 2) {
         this.silencePop();
       }
     });
   }
-  
-  dispose(){
+
+  dispose() {
     super.dispose();
     this._unlistener();
   }
@@ -66,9 +66,10 @@ class NativeStackRouter extends Router {
    * @protected
    */
   onRouteMatch(route, match, state, action) {
-    const view = this.renderRoute(route, match, state);
+    const view = super.onRouteMatch(route, match, state);
+
     if (!view) return;
-    
+
     switch (action) {
       case "PUSH":
         this._renderer.pushChild(view);
@@ -78,10 +79,9 @@ class NativeStackRouter extends Router {
         break;
     }
   }
-  
-  onRouteExit(action){
-    if(action === 'POP')
-      this._renderer.clear();
+
+  onRouteExit(action) {
+    if (action === "POP") this._renderer.clear();
   }
 }
 

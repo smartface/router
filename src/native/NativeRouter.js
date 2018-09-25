@@ -15,7 +15,7 @@ class NativeRouter extends Router {
     exact = false,
     renderer = null,
     to = null,
-    isRoot= false
+    isRoot = false
   }) {
     return new NativeRouter({
       path,
@@ -24,9 +24,7 @@ class NativeRouter extends Router {
       exact,
       to,
       isRoot,
-      renderer: createRenderer(
-        Page, { orientation: Page.Orientation.AUTO }
-      )
+      renderer: createRenderer(Page, { orientation: Page.Orientation.AUTO })
     });
   }
 
@@ -44,18 +42,17 @@ class NativeRouter extends Router {
     to = null
   }) {
     super({ path, build, routes, exact, isRoot, to });
-    
+
     this._renderer = renderer;
     this._currentPage;
   }
-  
-  onRouteExit(action){
-    if(action === 'POP')
-      this._renderer.clear();
+
+  onRouteExit(action) {
+    if (action === "POP") this._renderer.clear();
   }
-  
+
   onRouteMatch(route, match, state, action) {
-    const view = this.renderRoute(route, match, state);
+    const view = super.onRouteMatch(route, match, state);
 
     if (view === this._currentPage) return;
 

@@ -254,7 +254,13 @@ const createMemoryHistory = (props = {}) => {
     history.index = 0;
     history.entries = [];
     history.length = 0;
-  }
+  };
+
+  const rollback = () => {
+    history.entries.pop();
+    history.length = history.length;
+    history.index -= 1;
+  };
 
   const canGo = n => {
     const nextIndex = history.index + n;
@@ -275,6 +281,7 @@ const createMemoryHistory = (props = {}) => {
     createHref,
     push,
     replace,
+    rollback,
     go,
     clear,
     goBack,

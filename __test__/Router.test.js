@@ -3,6 +3,9 @@ const Route = require("../src/router/Route");
 const matchRoutes = require("../src/common/matchRoutes");
 
 describe("Router", () => {
+  afterEach(() => {
+    Router.initializeHistory({});
+  });
   it("has routes", () => {
     const router = new Router({
       isRoot: true,
@@ -42,7 +45,7 @@ describe("Router", () => {
     // let matches = matchRoutes([router], "/path/to/1").map(
     //   ({ match, route }) => ({ match, route: route.toObject(), view: route.build() })
     // );
-    var matches = router.go("/path/to/1").map(({ match, route }) => ({
+    var matches = router.go("/path/to/1")._matches.map(({ match, route }) => ({
       match,
       route: route.toObject(),
       view: route.build()
@@ -83,7 +86,7 @@ describe("Router", () => {
         new Route({ path: "*", build: { type: "target3" } })
       ]
     });
-    let matches = router.go("/path/to");
+    let matches = router.go("/path/to")._matches;
     expect(matches).toEqual([]);
   });
   it("sends data and params to specified route", () => {
@@ -170,6 +173,7 @@ describe("Router", () => {
     let data;
     let callCount = 0;
     var component = {};
+
     const router = new Router({
       path: "/",
       isRoot: true,
@@ -217,6 +221,7 @@ describe("Router", () => {
     let callCount = 0;
     var component1 = {};
     var component2 = {};
+
     const router = new Router({
       path: "/",
       isRoot: true,
@@ -263,5 +268,54 @@ describe("Router", () => {
     expect(component1.router === router).toBe(false);
     expect(component1.params.name).toBe("cenk");
     expect(component2.params.id).toBe("1123");
+  });
+  it("can call a relative path", () => {
+    let data;
+    let callCount = 0;
+    var component1 = {};
+    var component2 = {};
+    const router = new Router({
+      path: "/",
+      isRoot: true,
+      routes: [
+        new Route({
+          path: "/path2/to/:name",
+          build: (match, state, router) => {
+            data = {
+              params: match.params,
+              state
+            };
+            // component.router = router;
+            callCount++;
+            return { type: "target1" };
+          }
+        }),
+        new Router({
+          path: "/path",
+          routes: [
+            new Route({
+              path: "/path/to/:name([a-zA-Z]*)",
+              build: (match, state, router) => {
+                component1.router = router;
+                component1.params = match.params;
+                return component1;
+              }
+            }),
+            new Route({
+              path: "/path/to/:id",
+              build: (match, state, router, view) => {
+                return null;
+              }
+            })
+          ]
+        })
+      ]
+    });
+
+    router.go("/path/to/cenk", { name: "name" });
+    component1.router.go("to/1123", { name: "name" });
+    expect(router.getHistory().entries.map(entry => entry.pathname)).toEqual([
+      "/path/to/cenk"
+    ]);
   });
 });
