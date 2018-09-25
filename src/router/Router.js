@@ -133,7 +133,6 @@ class Router extends Route {
           return true;
         }
         
-        Router.currentRouter && this != Router.currentRouter && Router.currentRouter.onRouteExit(action);
         
         Router.currentRouter = this;
         if (route !== this && route instanceof Router) {
@@ -149,8 +148,8 @@ class Router extends Route {
         // this.renderRoute(route, match, state);
         
         this.onRouteMatch(route, match, state, action);
-        Router.currentRouter.onRouteExit(action);
-        
+        Router.currentRouter && this != Router.currentRouter && Router.currentRouter.onRouteExit(action);
+
         return true;
       }
     });

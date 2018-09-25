@@ -1,28 +1,24 @@
 const Page = require("sf-core/ui/page");
 const Application = require("sf-core/application");
 
-var rootController = new Page({ orientation: Page.Orientation.AUTO })
+var rootController = new Page({ orientation: Page.Orientation.AUTO });
 Application.setRootController(rootController);
 if(Device.deviceOS === 'iOS'){
   rootController.nativeObject.view.addFrameObserver();
-    rootController.nativeObject.view.frameObserveHandler = e => {
-      for (var child in rootController.nativeObject.childViewControllers) {
-        rootController.nativeObject.childViewControllers[child].view.frame = {
-          x: 0,
-          y: 0,
-          width: e.frame.width,
-          height: e.frame.height
-        };
-        if (
-          rootController.nativeObject.childViewControllers[child].view.yoga
-            .isEnabled
-        ) {
-          rootController.nativeObject.childViewControllers[
-            child
-          ].view.yoga.applyLayoutPreservingOrigin(true);
-        }
+  rootController.nativeObject.view.frameObserveHandler = e => {
+    for (var child in rootController.nativeObject.childViewControllers) {
+      rootController.nativeObject.childViewControllers[child].view.frame = {
+        x: 0,
+        y: 0,
+        width: e.frame.width,
+        height: e.frame.height
+      };
+      
+      if (rootController.nativeObject.childViewControllers[child].view.yoga.isEnabled) {
+        rootController.nativeObject.childViewControllers[child].view.yoga.applyLayoutPreservingOrigin(true);
       }
-    };
+    }
+  };
 }
 
 var currentChild;
