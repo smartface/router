@@ -198,14 +198,14 @@ class Router extends Route {
   renderRoute(route, match, state) {
     let view;
 
-    if (match.isExact === true) {
-      view = route.build(match, state.userState || {}, this, state.view);
-      state.view = view;
+    // if (match.isExact === true) {
+    view = route.build(match, state.userState || {}, this, state.view);
+    state.view = view;
 
-      return view;
-    }
+    return view;
+    // }
 
-    return false;
+    // return false;
   }
 
   /**
