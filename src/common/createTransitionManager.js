@@ -1,4 +1,5 @@
-// code fromm https://github.com/smartface/history
+// https://github.com/ReactTraining/history
+
 const warning = require("./warning");
 
 const createTransitionManager = () => {
@@ -27,21 +28,21 @@ const createTransitionManager = () => {
       const result =
         typeof prompt === "function" ? prompt(location, action) : prompt;
 
-      if (typeof result === "string") {
-        if (typeof getUserConfirmation === "function") {
-          getUserConfirmation(result, callback);
-        } else {
-          warning(
-            false,
-            "A history needs a getUserConfirmation function in order to use a prompt message"
-          );
-
-          callback(true);
-        }
+      // if (typeof result === "string") {
+      if (typeof getUserConfirmation === "function") {
+        getUserConfirmation(result, callback);
       } else {
-        // Return false from a transition hook to cancel the transition.
-        callback(result !== false);
+        warning(
+          false,
+          "A history needs a getUserConfirmation function in order to use a prompt message"
+        );
+
+        callback(true);
       }
+      // } else {
+      //   // Return false from a transition hook to cancel the transition.
+      //   callback(result !== false);
+      // }
     } else {
       callback(true);
     }

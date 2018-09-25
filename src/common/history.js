@@ -1,4 +1,5 @@
-// code fromm https://github.com/smartface/history
+// https://github.com/ReactTraining/history
+
 const resolvePathname = require("resolve-pathname/umd/resolve-pathname");
 
 const warning = require("./warning");

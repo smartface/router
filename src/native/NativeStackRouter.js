@@ -71,6 +71,7 @@ class NativeStackRouter extends Router {
     if (!view) return;
 
     switch (action) {
+      case "REPLACE":
       case "PUSH":
         this._renderer.pushChild(view);
         break;

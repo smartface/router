@@ -8,7 +8,7 @@ const Application = require("sf-core/application");
 class AndroidRenderer extends Renderer {
   /**
    * @constructor
-   * @params {Page|NavigationController} root
+   * @param {Page|NavigationController} root
    */
   constructor(rootController) {
     super(rootController);
@@ -17,7 +17,7 @@ class AndroidRenderer extends Renderer {
 
   /**
    * Only use if rootpage is NavigationController
-   * @params {Array.<object>} controllers
+   * @param {Array.<object>} controllers
    */
   addChildViewControllers(controllers) {
     this._rootController.childControllers = controllers;
@@ -26,18 +26,19 @@ class AndroidRenderer extends Renderer {
   /**
    * Pushes a new page to rootpage which is instance of NavigationController
    * Only use if rootpage is NavigationController
-   * @params {Array.<object>} controllers
+   * @param {Array.<object>} controllers
    */
   pushChild(page, animated = true) {
     super.pushChild();
-    this._rootController.push && this._rootController.push({controller: page, animated: animated});
+    this._rootController.push &&
+      this._rootController.push({ controller: page, animated: animated });
   }
 
   /**
    * NavigationController child page is changed handler
    * Only use if rootpage is NavigationController
    *
-   * @params {function} fn
+   * @param {function} fn
    */
   onNavigatorChange(fn) {
     if (this._rootController.onTransition) {
@@ -51,17 +52,18 @@ class AndroidRenderer extends Renderer {
   /**
    * Only use if rootpage is NavigationController
    *
-   * @params {boolean} [=true] animated
+   * @param {boolean} [=true] animated
    */
   popChild(animated = true) {
     super.popChild();
-    this._rootController.pop && this._rootController.pop({ animated: animated });
+    this._rootController.pop &&
+      this._rootController.pop({ animated: animated });
   }
 
   /**
    *
    * Only use if rootpage is Page
-   * @params {NavigationController} controller
+   * @param {NavigationController} controller
    */
   show(page) {
     super.show();

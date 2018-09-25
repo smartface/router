@@ -4,7 +4,7 @@ const matchRoutes = require("../src/common/matchRoutes");
 
 describe("Router", () => {
   afterEach(() => {
-    Router.initializeHistory({});
+    Router.unloadHistory();
   });
   it("has routes", () => {
     const router = new Router({
@@ -45,11 +45,13 @@ describe("Router", () => {
     // let matches = matchRoutes([router], "/path/to/1").map(
     //   ({ match, route }) => ({ match, route: route.toObject(), view: route.build() })
     // );
-    var matches = router.go("/path/to/1")._matches.map(({ match, route }) => ({
-      match,
-      route: route.toObject(),
-      view: route.build()
-    }));
+    var matches = router
+      .push("/path/to/1")
+      ._matches.map(({ match, route }) => ({
+        match,
+        route: route.toObject(),
+        view: route.build()
+      }));
 
     expect(matches).toEqual([
       {
@@ -86,7 +88,7 @@ describe("Router", () => {
         new Route({ path: "*", build: { type: "target3" } })
       ]
     });
-    let matches = router.go("/path/to")._matches;
+    let matches = router.push("/path/to")._matches;
     expect(matches).toEqual([]);
   });
   it("sends data and params to specified route", () => {
@@ -114,7 +116,7 @@ describe("Router", () => {
         new Route({ path: "*", build: { type: "target3" } })
       ]
     });
-    let matches = router.go("/path/to/1", { name: "name" });
+    let matches = router.push("/path/to/1", { name: "name" });
     expect(data).toEqual({
       params: { name: "1" },
       state: { data: { name: "name" } }
@@ -156,8 +158,8 @@ describe("Router", () => {
       ]
     });
 
-    router.go("/path/to/1", { name: "name" });
-    router.go("/path/too/dev", { name: "name" });
+    router.push("/path/to/1", { name: "name" });
+    router.push("/path/too/dev", { name: "name" });
     component.router.goBack();
 
     expect(data).toEqual({
@@ -206,8 +208,8 @@ describe("Router", () => {
       ]
     });
 
-    router.go("/path2/to/1", { name: "name" });
-    router.go("/path/to/dev", { name: "name" });
+    router.push("/path2/to/1", { name: "name" });
+    router.push("/path/to/dev", { name: "name" });
     component.router.goBack();
 
     expect(data).toEqual({
@@ -262,8 +264,8 @@ describe("Router", () => {
       ]
     });
 
-    router.go("/path/to/cenk", { name: "name" });
-    component1.router.go("to/1123", { name: "name" });
+    router.push("/path/to/cenk", { name: "name" });
+    component1.router.push("to/1123", { name: "name" });
 
     expect(component1.router === router).toBe(false);
     expect(component1.params.name).toBe("cenk");
@@ -312,10 +314,49 @@ describe("Router", () => {
       ]
     });
 
-    router.go("/path/to/cenk", { name: "name" });
-    component1.router.go("to/1123", { name: "name" });
+    router.push("/path/to/cenk", { name: "name" });
+    component1.router.push("to/1123", { name: "name" });
     expect(router.getHistory().entries.map(entry => entry.pathname)).toEqual([
       "/path/to/cenk"
     ]);
+  });
+
+  it("can be blocked", () => {
+    let callCount = 0;
+    var component1 = {};
+    const router = new Router({
+      path: "/",
+      isRoot: true,
+      routes: [
+        new Route({
+          path: "/path/to/:name([a-zA-Z]*)",
+          build: (match, state, router) => {
+            component1.router = router;
+            component1.params = match.params;
+            return component1;
+          }
+        }),
+        new Route({
+          path: "/path/to/:id",
+          build: (match, state, router, view) => {
+            return component1;
+          }
+        })
+      ]
+    });
+
+    router.addRouteBlocker((location, action, callback) => {
+      callback(false);
+    });
+
+    router.push("/path/to/cenk", { name: "name" });
+    expect(router.getHistory().entries).toEqual([]);
+
+    router.push("/path/to/cenk", { name: "name" });
+    router.addRouteBlocker((location, action, callback) => {
+      callback(true);
+    });
+
+    expect(router.getHistory().entries[0].pathname).toBe("/path/to/cenk");
   });
 });
