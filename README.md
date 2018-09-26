@@ -56,7 +56,9 @@ const router = Router.of({
                 Route.of({
                     path: '/user/login',
                     build: (match, state, router, view) => {
-                        if(true){
+                        // if checked is false
+                        if(state.data.checked){
+                            // then blocks route
                             return null;
                         }
                         let Page2 = require("pages/page2");
