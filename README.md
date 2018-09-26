@@ -1,6 +1,6 @@
-# Smartface New Router
+# Smartface NativeRouter
 
-### Usages
+## Usages
 
 ```javascript
 const Router = require("@smartface/router/src/native/NativeRouter");
