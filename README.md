@@ -1,9 +1,7 @@
 # Smartface New Router
 
-## Simple usage
-This explains how to use router at very basic level
-### Initiation
-This happens in `app.js`
+### Usages
+
 ```javascript
 const Router = require("@smartface/router/src/native/NativeRouter");
 const RouterBase = require("@smartface/router/src/router/Router");
