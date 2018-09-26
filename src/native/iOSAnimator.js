@@ -24,7 +24,7 @@ class iOSAnimator {
       from.nativeObject,
       to.nativeObject,
       duration,
-      TransitionOptions.UIViewAnimationOptionCurveEaseOut,
+      TransitionOptions.UIViewAnimationOptionTransitionNone,
       () => {
         this._onAnimate &&
           this._onAnimate(

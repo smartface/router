@@ -25,7 +25,7 @@ class NativeStackRouter extends Router {
       exact,
       to,
       isRoot,
-      renderer: createRenderer(NavigationController)
+      renderer: createRenderer()
     });
   }
 
@@ -44,6 +44,7 @@ class NativeStackRouter extends Router {
   }) {
     super({ path, build, routes, exact, to, isRoot });
     this._renderer = renderer;
+    this._renderer.setRootController(new NavigationController());
     this.addNavigatorChangeListener();
     // this._renderer._rootPage.childControllers = this._routes.map((route) => route.build());
   }
@@ -67,8 +68,9 @@ class NativeStackRouter extends Router {
    */
   onRouteMatch(route, match, state, action) {
     const view = super.onRouteMatch(route, match, state);
-
-    if (!view) return;
+    console.log("view : "+view);
+    
+    if (!view) return false;
 
     switch (action) {
       case "REPLACE":
@@ -79,10 +81,12 @@ class NativeStackRouter extends Router {
         this._renderer.popChild();
         break;
     }
+    
+    return true;
   }
 
   onRouteExit(action) {
-    if (action === "POP") this._renderer.clear();
+    if (action === "POP") this._renderer.setRootController(new NavigationController());
   }
 }
 

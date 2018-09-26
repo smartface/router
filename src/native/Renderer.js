@@ -1,65 +1,65 @@
 const Page = require("sf-core/ui/page");
 const Application = require("sf-core/application");
 
-var rootController = new Page({ orientation: Page.Orientation.AUTO });
-Application.setRootController(rootController);
-if(Device.deviceOS === 'iOS'){
-  rootController.nativeObject.view.addFrameObserver();
-  rootController.nativeObject.view.frameObserveHandler = e => {
-    for (var child in rootController.nativeObject.childViewControllers) {
-      rootController.nativeObject.childViewControllers[child].view.frame = {
-        x: 0,
-        y: 0,
-        width: e.frame.width,
-        height: e.frame.height
-      };
-      
-      if (rootController.nativeObject.childViewControllers[child].view.yoga.isEnabled) {
-        rootController.nativeObject.childViewControllers[child].view.yoga.applyLayoutPreservingOrigin(true);
-      }
-    }
-  };
-}
+// var currentChild;
 
-var currentChild;
+// function addChildController(child){
+//   if(Device.deviceOS === 'iOS'){
+//     rootController.nativeObject.view.addSubview(child.nativeObject.view);
+//     child.nativeObject.didMoveToParentViewController(
+//       rootController.nativeObject
+//     );
+//   }
+// }
 
-function addChildController(child){
-  if(Device.deviceOS === 'iOS'){
-    rootController.nativeObject.view.addSubview(child.nativeObject.view);
-    child.nativeObject.didMoveToParentViewController(
-      rootController.nativeObject
-    );
-  }
-}
-
-function removeChildController(child){
-  if(Device.deviceOS === 'iOS'){
-    child.nativeObject.removeFromParentViewController();
-    child.nativeObject.view.removeFromSuperview();
-  }
-}
+// function removeChildController(child){
+//   if(Device.deviceOS === 'iOS'){
+//     child.nativeObject.removeFromParentViewController();
+//     child.nativeObject.view.removeFromSuperview();
+//   }
+// }
 
 /**
  * Abstract Renderer
  * @abstract
  */
 class Renderer {
-  static setasRoot(controller){
+  static setasRoot(rootController){
+    // alert("controller"+ rootController.constructor.name);
+      // currentChild && removeChildController(currentChild);
+      // addChildController(controller);
     if(Device.deviceOS === 'iOS'){
-      alert("controller"+ controller.constructor.name);
-      currentChild && removeChildController(currentChild);
-      addChildController(controller);
-      currentChild = controller;
+      var sfWindow = SF.requireClass("UIApplication").sharedApplication()
+        .keyWindow;
+      sfWindow.rootViewController = rootController.nativeObject;
+      sfWindow.makeKeyAndVisible();
+    
+      rootController.nativeObject.view.addFrameObserver();
+      rootController.nativeObject.view.frameObserveHandler = e => {
+        for (var child in rootController.nativeObject.childViewControllers) {
+          rootController.nativeObject.childViewControllers[child].view.frame = {
+            x: 0,
+            y: 0,
+            width: e.frame.width,
+            height: e.frame.height
+          };
+          
+          if (rootController.nativeObject.childViewControllers[child].view.yoga.isEnabled) {
+            rootController.nativeObject.childViewControllers[child].view.yoga.applyLayoutPreservingOrigin(true);
+          }
+        }
+      };
+      // currentChild = controller;
     } else {
-      Application.setRootController(controller);
+      Application.setRootController(rootController);
     }
   }
   
-  constructor(Controller, params={}) {
-    this._rootController = new Controller(params);
-    // Renderer.setasRoot(this._rootController);
-    
-    this.createNew = () => new Controller(params);
+  constructor() {
+  }
+  
+  setRootController(controller){
+    this._rootController = controller;
   }
 
   onNavigatorChange(fn) {
@@ -72,7 +72,6 @@ class Renderer {
   
   setSelectedIndex(index){
     this._rootController.selectedIndex = index;
-    Renderer.setasRoot(this._rootController);
     // this._rootController.hasOwnProperty('selectedIndex') ? (this._rootController.selectedIndex = index) : (this.setIndex(index));
   }
   
@@ -85,32 +84,20 @@ class Renderer {
   }
 
   show(page, animated = true) {
-    Renderer.setasRoot(this._rootController);
+    // Renderer.setasRoot(page);
   }
   
-  activate(){
-    Renderer.setasRoot(this._rootController);
-  }
-
   removeChild(page) {
     throw new Error("removeChild method must be overridden");
   }
 
   addChild(page) {
-    Renderer.setasRoot(this._rootController);
   }
 
   pushChild(page, animated = true) {
-    Renderer.setasRoot(this._rootController);
   }
   
-  clear(){
-    this._rootController = this.createNew();
-    Renderer.setasRoot(this._rootController);
-  }
-
   popChild(animated = true) {
-    Renderer.setasRoot(this._rootController);
   }
 }
 

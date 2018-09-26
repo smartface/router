@@ -3,6 +3,7 @@ const createMemoryHistory = require("../common/history");
 const mapComposer = require("../utils/map");
 const matchPath = require("../common/matchPath");
 const matchRoutes = require("../common/matchRoutes");
+let actions = [];
 
 let history;
 /**
@@ -66,6 +67,14 @@ class Router extends Route {
     this._exact = exact;
     // this._cache = new WeakMap();
     this._unblock = () => null;
+  }
+  /**
+   * @param {function}
+   * location = {"pathname","search","hash","state","key"}
+   * action = string
+   */
+  listen(fn){
+    return history.listen(fn);
   }
 
   getHistory() {
@@ -136,6 +145,8 @@ class Router extends Route {
   renderMatches(matches, state, action) {
     matches.some(({ match, route }, index) => {
       if (match.isExact !== true && route instanceof Router) {
+        // if(index > 0 && this._isRoot)
+        actions.push([this.addChildRouter.bind(this), route]);
         // move routes to child router
         if (route !== this) {
           route.renderMatches(
@@ -152,20 +163,27 @@ class Router extends Route {
       } else if (match.isExact === true) {
         // route has redirection
         if (route.getRedirectto()) {
+          actions = [];
           // redirection of a route
           this.routeRollback(); // pop current route from history
           this.push(route.getRedirectto()); // go to new route
-
           return true;
         }
-
-        Router.currentRouter = this;
-
-        this.onRouteMatch(route, match, state, action);
-        Router.currentRouter &&
-          this != Router.currentRouter &&
-          Router.currentRouter.onRouteExit(action);
-
+        
+        if(this.onRouteMatch(route, match, state, action)){
+          console.log("route is ok");
+          
+          actions.forEach(item => item[0](item[1]));
+          actions = [];
+          
+          Router.currentRouter &&
+            this != Router.currentRouter &&
+            Router.currentRouter.onRouteExit(action);
+          Router.currentRouter = this;
+        }
+        
+        actions = [];
+        
         return true;
       }
     });
@@ -182,8 +200,6 @@ class Router extends Route {
     const view = this.renderRoute(route, match, state);
     if (!view) {
       this.routeRollback();
-
-      return false;
     }
 
     return view;
@@ -253,13 +269,6 @@ class Router extends Route {
    */
   goBack() {
     this.getHistory().go(-1);
-  }
-
-  /**
-   * Activates Router view
-   */
-  activate() {
-    this._renderer.activate();
   }
 
   /**

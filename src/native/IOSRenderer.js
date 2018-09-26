@@ -10,8 +10,8 @@ class IOSRenderer extends Renderer {
    * @constructor
    * @param {Page|NavigationController} root
    */
-  constructor(root) {
-    super(root);
+  constructor() {
+    super();
     // get application native window
   }
 
@@ -32,7 +32,7 @@ class IOSRenderer extends Renderer {
    * @param {number} [=1] duration
    * @param {number} [=0] options
    */
-  showWithTransition(fromPage, toPage, duration = 1, options = 0 << 20) {
+  showWithTransition(fromPage, toPage, duration = 0, options = 0 << 20) {
     new Animator(this._rootController)
       .onAnimate((container, from, to, params) => {
         this.addChild(to);
@@ -82,7 +82,6 @@ class IOSRenderer extends Renderer {
    * @param {boolean} [=true] animated
    */
   popChild(animated = true) {
-    super.popChild();
     this._rootController.pop({ animated });
   }
 
@@ -133,24 +132,28 @@ class IOSRenderer extends Renderer {
    * @param {Page} page
    */
   show(page) {
+    console.log("enter show");
     if (this._currentPage === page) return;
-    super.show(page);
-
-    this.addPageViewController(page);
+    
+    console.log("show"+page.constructor.name);
 
     if (this._currentPage) {
-      this.showWithTransition(this._currentPage, page);
-    } else {
-      this.addChild(page);
-      page.nativeObject.didMoveToParentViewController(
-        this._rootController.nativeObject
-      );
-    }
+      // this.showWithTransition(this._currentPage, page);
+      this.removeChild(this._currentPage)
+    } 
+    // else {
+    this.addPageViewController(page);
+    this.addChild(page);
+    page.nativeObject.didMoveToParentViewController(
+      this._rootController.nativeObject
+    );
+    // }
 
     this._currentPage = page;
 
     // TODO: this part must be moved to native-layer
   }
+  
 }
 
 module.exports = IOSRenderer;

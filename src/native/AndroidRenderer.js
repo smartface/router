@@ -10,9 +10,8 @@ class AndroidRenderer extends Renderer {
    * @constructor
    * @param {Page|NavigationController} root
    */
-  constructor(rootController) {
-    super(rootController);
-    Renderer.setasRoot(rootController);
+  constructor() {
+    super();
   }
 
   /**
@@ -29,7 +28,6 @@ class AndroidRenderer extends Renderer {
    * @param {Array.<object>} controllers
    */
   pushChild(page, animated = true) {
-    super.pushChild();
     this._rootController.push &&
       this._rootController.push({ controller: page, animated: animated });
   }
@@ -55,7 +53,6 @@ class AndroidRenderer extends Renderer {
    * @param {boolean} [=true] animated
    */
   popChild(animated = true) {
-    super.popChild();
     this._rootController.pop &&
       this._rootController.pop({ animated: animated });
   }
@@ -66,7 +63,6 @@ class AndroidRenderer extends Renderer {
    * @param {NavigationController} controller
    */
   show(page) {
-    super.show();
     Application.setRootController(page);
   }
 }
