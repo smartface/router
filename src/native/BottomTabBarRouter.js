@@ -56,7 +56,6 @@ class BottomTabBarRouter extends Router {
   }) {
     super({
       path,
-      build: () => this._renderer._rootController,
       routes,
       exact,
       to,
@@ -65,20 +64,25 @@ class BottomTabBarRouter extends Router {
 
     this._renderer = renderer;
     this._renderer.setRootController(new BottomTabBarController());
+    this._visitedIndexes = {};
+    this._renderer._rootController.didSelectByIndex = ({ index }) => {
+      !this._visitedIndexes[index.toString()] &&
+        !this._isRendered &&
+        this.push(this.resolvePath(index).getUrlPath());
+      this._isRendered = false;
+      this._visitedIndexes[index.toString()] = true;
+    };
     Object.assign(this._renderer._rootController, tabbarParams);
     this._renderer.setChildControllers(
       this._routes.map(route => route.build(null, null, this))
     );
     this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem));
     this._renderer._rootController.show();
-
-    this._renderer._rootController.didSelectByIndex = ({ index }) => {
-      !this._isRendered && this.push(this.resolvePath(index));
-      this._isRendered = false;
-    };
+    this.build = () => this._renderer._rootController;
   }
 
   renderMatches(matches, state, action) {
+    console.log("didSelectByIndex : " + this._isRendered);
     this._isRendered = true;
     super.renderMatches(matches, state, action);
   }

@@ -7,7 +7,7 @@ let actions = [];
 
 let history;
 /**
- * Router
+ * Router Implementation
  *
  * @class
  */
@@ -28,10 +28,18 @@ class Router extends Route {
     });
   }
 
+  /**
+   * Adds event-listener to listen history changes
+   * @param {function} fn - Event-listener callback
+   */
   static addListener(fn) {
     return history.listen(fn);
   }
 
+  /**
+   * Sets null
+   *
+   */
   static unloadHistory() {
     history = null;
   }
@@ -81,6 +89,11 @@ class Router extends Route {
     return history.listen(fn);
   }
 
+  /**
+   * Returns the history instance
+   *
+   * @returns {object}
+   */
   getHistory() {
     return history;
   }
@@ -98,10 +111,6 @@ class Router extends Route {
 
     return unblock;
   }
-
-  // setRenderer(renderer) {
-  //   this._renderer = renderer;
-  // }
 
   /**
    * Blocks path handler for user inteact for example user confirmation
@@ -142,14 +151,14 @@ class Router extends Route {
   /**
    *
    * @param {Array.<{isExact: boolean,params: object,path: string,url: string}>} matches
-   * @param {*} state
-   * @param {*} action
+   * @param {object} state
+   * @param {string} action
    */
   renderMatches(matches, state, action) {
     matches.some(({ match, route }, index) => {
       if (match.isExact !== true && route instanceof Router) {
         // if(index > 0 && this._isRoot)
-        actions.lenght === 0 &&
+        actions.length === 0 &&
           this.addChildRouter &&
           actions.push([this.addChildRouter.bind(this), route]);
         // move routes to child router
@@ -169,15 +178,13 @@ class Router extends Route {
         // route has redirection
         if (route.getRedirectto()) {
           actions = [];
-          // redirection of a route
+          // rollback current route
           this.routeRollback(); // pop current route from history
-          this.push(route.getRedirectto()); // go to new route
+          this.push(route.getRedirectto()); // redirect to specified route
           return true;
         }
 
         if (this.onRouteMatch(route, match, state, action)) {
-          console.log("route is ok");
-
           actions.forEach(item => item[0](item[1]));
           actions = [];
 
@@ -196,6 +203,7 @@ class Router extends Route {
 
   /**
    * @event
+   * @protected
    * @param {Route} route
    * @param {{isExact: boolean, params: object, path: string, url: string}} match
    * @param {object} state
@@ -211,7 +219,9 @@ class Router extends Route {
   }
 
   /**
+   * Renders specifeid route
    *
+   * @protected
    * @param {Route} route
    * @param {{isExact: boolean, params: object,path: string, url: string}} match
    * @param {object} state
@@ -230,18 +240,10 @@ class Router extends Route {
   }
 
   /**
-   * User block event handler for protected use
+   * Pushes specified path to history
    *
-   * @protected
-   * @param {function} handler
-   */
-  onBeforeRouteChange(handler) {}
-
-  /**
-   * Change history by specified path
-   *
-   * @param {object|string} path - Path or matches of the route
-   * @param {boolean} [=true] addtoHistory
+   * @param {object} path - Path or matches of the route
+   * @param {object}  data Routing data
    */
   push(path, data) {
     // this._cache.get(path) ||
@@ -277,7 +279,8 @@ class Router extends Route {
   }
 
   /**
-   * Return last location of history
+   * Returns last location of history
+   * @returns {Location}
    */
   getLocation() {
     return this.getHistory().location;
@@ -323,7 +326,7 @@ class Router extends Route {
   }
 
   /**
-   * Unloads the router
+   * Unloads the router instance
    *
    */
   dispose() {

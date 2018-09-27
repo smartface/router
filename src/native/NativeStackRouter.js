@@ -41,7 +41,6 @@ class NativeStackRouter extends Router {
   }) {
     super({
       path,
-      build: () => this._renderer._rootController,
       routes,
       exact,
       to,
@@ -50,6 +49,7 @@ class NativeStackRouter extends Router {
     this._renderer = renderer;
     this._renderer.setRootController(new NavigationController());
     this.addNavigatorChangeListener();
+    this.build = () => this._renderer._rootController;
     // this._renderer._rootPage.childControllers = this._routes.map((route) => route.build());
   }
 
