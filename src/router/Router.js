@@ -149,7 +149,9 @@ class Router extends Route {
     matches.some(({ match, route }, index) => {
       if (match.isExact !== true && route instanceof Router) {
         // if(index > 0 && this._isRoot)
-        actions.push([this.addChildRouter.bind(this), route]);
+        actions.lenght === 0 &&
+          this.addChildRouter &&
+          actions.push([this.addChildRouter.bind(this), route]);
         // move routes to child router
         if (route !== this) {
           route.renderMatches(

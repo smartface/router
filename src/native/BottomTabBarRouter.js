@@ -1,4 +1,4 @@
-"strict mode"
+"strict mode";
 
 const Router = require("../router/Router");
 const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
@@ -21,10 +21,8 @@ class BottomTabBarRouter extends Router {
    */
   static of({
     path = "",
-    build = null,
     routes = [],
     exact = false,
-    renderer = null,
     to = null,
     items = [],
     tabbarParams = {},
@@ -32,7 +30,6 @@ class BottomTabBarRouter extends Router {
   }) {
     return new BottomTabBarRouter({
       path,
-      build,
       routes,
       exact,
       to,
@@ -45,11 +42,10 @@ class BottomTabBarRouter extends Router {
 
   /**
    * @constructor
-   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0
+   * @param {{ path: string, target:object|null, routes: Array, exact: boolean }} param0
    */
   constructor({
     path = "",
-    build = null,
     routes = [],
     exact = false,
     renderer = null,
@@ -58,7 +54,14 @@ class BottomTabBarRouter extends Router {
     items = [],
     isRoot = false
   }) {
-    super({ path, build, routes, exact, to, isRoot });
+    super({
+      path,
+      build: () => this._renderer._rootController,
+      routes,
+      exact,
+      to,
+      isRoot
+    });
 
     this._renderer = renderer;
     this._renderer.setRootController(new BottomTabBarController());
@@ -68,16 +71,15 @@ class BottomTabBarRouter extends Router {
     );
     this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem));
     this._renderer._rootController.show();
-    // this._renderer._rootController.shouldSelectByIndex = (params) => {
-    //   this._skipRender = true;
-    //   this.getHistory().push(this.resolvePath(params.index).getUrlPath());
-    //   this._skipRender = false;
-      
-    //   return true;
-    // };
+
+    this._renderer._rootController.didSelectByIndex = ({ index }) => {
+      !this._isRendered && this.push(this.resolvePath(index));
+      this._isRendered = false;
+    };
   }
 
   renderMatches(matches, state, action) {
+    this._isRendered = true;
     super.renderMatches(matches, state, action);
   }
 
@@ -92,6 +94,7 @@ class BottomTabBarRouter extends Router {
   dispose() {
     super.dispose();
     this._unlistener();
+    this._renderer._rootController.didSelectByIndex = () => null;
   }
 
   /**
@@ -102,9 +105,11 @@ class BottomTabBarRouter extends Router {
     const view = super.onRouteMatch(route, match, state);
     if (!view) return false;
 
-    this._renderer._rootController.selectedIndex = this._renderer.setSelectedIndex(this.resolveIndex(match.path));
+    this._renderer._rootController.selectedIndex = this._renderer.setSelectedIndex(
+      this.resolveIndex(match.path)
+    );
     this._renderer._rootController.show();
-    
+
     return true;
   }
 }
