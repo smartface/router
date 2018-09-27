@@ -28,6 +28,10 @@ class Router extends Route {
     });
   }
 
+  static addListener(fn) {
+    return history.listen(fn);
+  }
+
   static unloadHistory() {
     history = null;
   }
@@ -73,7 +77,7 @@ class Router extends Route {
    * location = {"pathname","search","hash","state","key"}
    * action = string
    */
-  listen(fn){
+  listen(fn) {
     return history.listen(fn);
   }
 
@@ -89,8 +93,7 @@ class Router extends Route {
    */
   addRouteBlocker(fn) {
     const unblock = history.block((location, action) => callback => {
-      unblock();
-      fn(location, action, callback);
+      fn(location, action, callback, this, unblock);
     });
 
     return unblock;
@@ -169,21 +172,21 @@ class Router extends Route {
           this.push(route.getRedirectto()); // go to new route
           return true;
         }
-        
-        if(this.onRouteMatch(route, match, state, action)){
+
+        if (this.onRouteMatch(route, match, state, action)) {
           console.log("route is ok");
-          
+
           actions.forEach(item => item[0](item[1]));
           actions = [];
-          
+
           Router.currentRouter &&
             this != Router.currentRouter &&
             Router.currentRouter.onRouteExit(action);
           Router.currentRouter = this;
         }
-        
+
         actions = [];
-        
+
         return true;
       }
     });
