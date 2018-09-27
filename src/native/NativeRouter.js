@@ -41,14 +41,7 @@ class NativeRouter extends Router {
     isRoot = false,
     to = null
   }) {
-    super({
-      path,
-      build: () => this._renderer._rootController,
-      routes,
-      exact,
-      isRoot,
-      to
-    });
+    super({ path, build, routes, exact, isRoot, to });
 
     this._renderer = renderer;
     this._renderer.setRootController(

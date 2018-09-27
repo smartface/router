@@ -11,7 +11,6 @@ class NativeStackRouter extends Router {
    */
   static of({
     path = "",
-    build = null,
     routes = [],
     exact = false,
     renderer = null,
@@ -20,7 +19,6 @@ class NativeStackRouter extends Router {
   }) {
     return new NativeStackRouter({
       path,
-      build,
       routes,
       exact,
       to,
@@ -35,14 +33,13 @@ class NativeStackRouter extends Router {
    */
   constructor({
     path = "",
-    build = null,
     routes = [],
     exact = false,
     renderer = null,
     to = null,
     isRoot = false
   }) {
-    super({ path, build, routes, exact, to, isRoot });
+    super({ path, build: () => this._renderer._rootController,, routes, exact, to, isRoot });
     this._renderer = renderer;
     this._renderer.setRootController(new NavigationController());
     this.addNavigatorChangeListener();
