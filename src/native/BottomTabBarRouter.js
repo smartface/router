@@ -144,8 +144,10 @@ class BottomTabBarRouter extends Router {
     this._renderer.setSelectedIndex(index);
     this._renderer._rootController.show();
     const route = this.resolveRoute(index);
-    const path = route.getRedirectto() || route.getPathUrl();
-    this.push(path);
+    if(route instanceof Router){
+      const path = route.getRedirectto() || route.getPathUrl();
+      this.push(path);
+    }
   }
 }
 
