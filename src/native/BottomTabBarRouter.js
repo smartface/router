@@ -65,12 +65,19 @@ class BottomTabBarRouter extends Router {
     this._renderer = renderer;
     this._renderer.setRootController(new BottomTabBarController());
     this._visitedIndexes = {};
-    this._renderer._rootController.didSelectByIndex = ({ index }) => {
-      !this._visitedIndexes[index.toString()] &&
-        !this._isRendered &&
-        this.push(this.resolvePath(index).getUrlPath());
-      this._isRendered = false;
-      this._visitedIndexes[index.toString()] = true;
+    this._renderer._rootController.shouldSelectByIndex = ({ index }) => {
+      console.log("shouldSelectByIndex  : "+index+" : "+this.resolveRoute(index).getUrlPath());
+      // if(!this._visitedIndexes[index.toString()] && !this._isRendered){
+      //   let route = this.resolveRoute(index);
+      //   console.log("route.getRedirectto() : "+ route.getRedirectto())
+      //   this._visitedIndexes[index.toString()] = true;
+      //   this.push(route.getRedirectto() || route.getUrlPath());
+      // }
+        
+      // this._isRendered = false;
+      const visited = this._visitedIndexes[index];
+      !visited && this.routetoIndex(index);
+      return visited;
     };
     Object.assign(this._renderer._rootController, tabbarParams);
     this._renderer.setChildControllers(
@@ -82,16 +89,21 @@ class BottomTabBarRouter extends Router {
   }
 
   renderMatches(matches, state, action) {
-    console.log("didSelectByIndex : " + this._isRendered);
-    this._isRendered = true;
+    console.log("renderMatches :");
+    // !this._isRendered && (this._isRendered = true);
     super.renderMatches(matches, state, action);
+  }
+  
+  push(path, data){
+    console.log("push : "+path);
+    super.push(path, data);
   }
 
   resolveIndex(path) {
     return this._routes.findIndex(route => route.getUrlPath() === path);
   }
 
-  resolvePath(index) {
+  resolveRoute(index) {
     return this._routes.find((route, ind) => ind === index);
   }
 
@@ -105,16 +117,35 @@ class BottomTabBarRouter extends Router {
    * History change event handler
    * @protected
    */
-  onRouteMatch(route, match, state, action) {
+  onRouteMatch(route, match, state, action, isExact) {
+    console.log("onRouteMatch ")
+    if(!match.isExact){
+      //TODO: make more performance
+      const index = this.resolveIndex(match.path);
+      console.log("onRouteMatch "+match.path+" : "+match.url+" : "+index);
+      if(index >-1){
+        this._visitedIndexes[index] = true;
+      }
+      !this._isRendered && (this._isRendered = true);
+      return;
+    }
+    
     const view = super.onRouteMatch(route, match, state);
+    
     if (!view) return false;
-
-    this._renderer._rootController.selectedIndex = this._renderer.setSelectedIndex(
-      this.resolveIndex(match.path)
-    );
-    this._renderer._rootController.show();
-
+    this.routetoIndex(this.resolveIndex(match.path));
     return true;
+  }
+  
+  routetoIndex(index){
+    index = index < 0 ? 0 : index;
+    console.log("routetoIndex : "+index);
+    this._visitedIndexes[index] = true;
+    this._renderer.setSelectedIndex(index);
+    this._renderer._rootController.show();
+    const route = this.resolveRoute(index);
+    const path = route.getRedirectto() || route.getPathUrl();
+    this.push(path);
   }
 }
 
