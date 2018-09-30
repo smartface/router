@@ -55,6 +55,18 @@ describe("Router", () => {
 
     expect(matches).toEqual([
       {
+        match: { isExact: false, params: {}, path: "/", url: "/" },
+        route: {
+          path: "/",
+          routes: [
+            { path: "/path/to/:name", routes: [] },
+            { path: "/path/to/:id", routes: [] },
+            { path: "*", routes: [] }
+          ]
+        },
+        view: null
+      },
+      {
         match: {
           isExact: true,
           params: { name: "1" },
@@ -62,13 +74,11 @@ describe("Router", () => {
           url: "/path/to/1"
         },
         route: { path: "/path/to/:name", routes: [] },
-        view: {
-          type: "target1"
-        }
+        view: { type: "target1" }
       }
     ]);
   });
-  it("return false if any route doesn't be matched", () => {
+  it("return only root path if any route doesn't be matched", () => {
     const router = new Router({
       path: "/",
       isRoot: true,
@@ -88,9 +98,18 @@ describe("Router", () => {
         new Route({ path: "*", build: { type: "target3" } })
       ]
     });
+
     let matches = router.push("/path/to")._matches;
-    expect(matches).toEqual([]);
+    expect(matches.map(({ match }) => match)).toEqual([
+      {
+        isExact: false,
+        params: {},
+        path: "/",
+        url: "/"
+      }
+    ]);
   });
+
   it("sends data and params to specified route", () => {
     let data;
     const router = new Router({
