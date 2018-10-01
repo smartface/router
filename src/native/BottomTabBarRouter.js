@@ -64,49 +64,127 @@ class BottomTabBarRouter extends Router {
 
     this._renderer = renderer;
     this._renderer.setRootController(new BottomTabBarController());
-    this._visitedIndexes = {};
-    this._renderer._rootController.shouldSelectByIndex = ({ index }) => {
-      console.log("shouldSelectByIndex  : "+index+" : "+this.resolveRoute(index).getUrlPath());
-      // if(!this._visitedIndexes[index.toString()] && !this._isRendered){
-      //   let route = this.resolveRoute(index);
-      //   console.log("route.getRedirectto() : "+ route.getRedirectto())
-      //   this._visitedIndexes[index.toString()] = true;
-      //   this.push(route.getRedirectto() || route.getUrlPath());
-      // }
-        
-      // this._isRendered = false;
-      const visited = this._visitedIndexes[index];
-      !visited && this.routetoIndex(index);
-      return visited;
+    this._visitedIndexes = {length: 0};
+    this._fromRouter = false;
+    
+    this._renderer._rootController.shouldSelectByIndex = ({ index }) => { // TabbarItem should be changed
+      console.log("shouldSelectByIndex  : "+index+" : "+this.resolveRoute(index).getUrlPath()+" : "+this.isVisited(index));
+      
+      //if specified index has already visited then skip routing
+      !this.isVisited(index) && this.routetoIndex(index);
+    
+      this._skipRender = true;
+      this.push(this.resolveRoute(index).getUrlPath());
+      // alert(" last history: "+JSON.stringify(this.getHistoryasArray()));
+      this._skipRender = false;
+      // this._skipRender = true;
+      // this.push();
+      return this.isVisited(index);
     };
+    
+    this._renderer._rootController.didSelectByIndex = ({ index }) => { // TabbarItem should be changed
+      console.log("didSelectByIndex  : "+index+" : "+this.resolveRoute(index).getUrlPath()+" : "+this.isVisited(index));
+      
+      //if specified index has already visited then skip routing
+      // !this.isVisited(index) && this.routetoIndex(index);
+      // 
+      
+      // alert(this._fromRouter);
+        // alert("last history : "+this.resolveRoute(index).getUrlPath());
+      // if(!this._fromRouter){
+        
+      // }
+      this._fromRouter = false;
+    };
+    
+    // Assigns BottomTabBar props
     Object.assign(this._renderer._rootController, tabbarParams);
+    //Clears child routers onRouteExit because of NatveStackRouter creates new NavigationController to clear all children.
+    this._routes.map(route => {
+      route.onRouteExit && (route.onRouteExit = () => null);
+    });
+    // Initilaze BottomTabBarController's child controllers
     this._renderer.setChildControllers(
       this._routes.map(route => route.build(null, null, this))
     );
+    // Initilaze BottomTabBarController's TabBarItems
     this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem));
     this._renderer._rootController.show();
+    // Overrides build method
     this.build = () => this._renderer._rootController;
   }
-
+  
+  /**
+   * @override
+   */
   renderMatches(matches, state, action) {
     console.log("renderMatches :");
+    this._fromRouter = true;
+    // alert(JSON.stringify(matches.map(({match}) => match)));
+
+    if(matches.length > 1){
+      const next = matches[1];
+      // alert(JSON.stringify(next.match));
+      //TODO: make more performance
+      const index = this.resolveIndex(next.match.path);
+      this.setVisited(index);
+
+      this._renderer.setSelectedIndex(index);
+      this._renderer._rootController.show();
+    }
+    
     // !this._isRendered && (this._isRendered = true);
     super.renderMatches(matches, state, action);
   }
   
+  /**
+   * Sets TabBarItems visited by TabBarItem index
+   * 
+   * @param {number} index
+   */
+  setVisited(index){
+    if(index < 0 || this.isVisited(index))
+      return;
+    this._visitedIndexes[index] = true;
+    this._visitedIndexes.length++; 
+  }
+  
+  /**
+   * CHecks if TabBarItem is visited before
+   * @param {number} index
+   * @returns {boolean}
+   */
+  isVisited(index){
+    return !!this._visitedIndexes[index];
+  }
+  
+  /**
+   * @override
+   */
   push(path, data){
     console.log("push : "+path);
     super.push(path, data);
   }
 
+  /**
+   * Finds child route's index by path
+   * @param {string} path
+   */
   resolveIndex(path) {
     return this._routes.findIndex(route => route.getUrlPath() === path);
   }
 
+  /**
+   * Finds child route by index
+   * @param {number} index
+   */
   resolveRoute(index) {
     return this._routes.find((route, ind) => ind === index);
   }
-
+  
+  /**
+   * @override
+   */
   dispose() {
     super.dispose();
     this._unlistener();
@@ -118,35 +196,53 @@ class BottomTabBarRouter extends Router {
    * @protected
    */
   onRouteMatch(route, match, state, action, isExact) {
-    console.log("onRouteMatch ")
+    console.log("onRouteMatch ");
     if(!match.isExact){
       //TODO: make more performance
-      const index = this.resolveIndex(match.path);
-      console.log("onRouteMatch "+match.path+" : "+match.url+" : "+index);
-      if(index >-1){
-        this._visitedIndexes[index] = true;
-      }
-      !this._isRendered && (this._isRendered = true);
-      return;
+      // const index = this.resolveIndex(match.path);
+      // console.log("onRouteMatch "+match.path+" : "+match.url+" : "+index);
+      // this.setVisited(index);
+      
+      return false;
     }
-    
+    console.log("exact onRouteMatch "+match.path+" : "+match.url+" : ");
     const view = super.onRouteMatch(route, match, state);
     
     if (!view) return false;
-    this.routetoIndex(this.resolveIndex(match.path));
-    return true;
+    
+    //if the path has already opened then skip routing
+    if(!this.isInitialPath(match.path)){
+      this.routetoIndex(this.resolveIndex(match.path));
+      return true;
+    }
+    return false;
   }
   
+  /**
+   * Checks specified path is currently opened path
+   * @param {stirng} path - Route path
+   * @returns {boolean}
+   */
+  isInitialPath(path){
+    return (path === this.getRedirectto() || path === this.getUrlPath()) && !this.isVisited(0);
+  }
+  
+  /**
+   * Pushes a new route by index 
+   * 
+   * @param {number} index
+   */
   routetoIndex(index){
     index = index < 0 ? 0 : index;
     console.log("routetoIndex : "+index);
-    this._visitedIndexes[index] = true;
+    this.setVisited(index);
     this._renderer.setSelectedIndex(index);
     this._renderer._rootController.show();
     const route = this.resolveRoute(index);
     if(route instanceof Router){
-      const path = route.getRedirectto() || route.getPathUrl();
-      this.push(path);
+      route.getRedirectto() 
+        ? this.redirectRoute(route)
+        : this.push(route.getUrlPath());
     }
   }
 }

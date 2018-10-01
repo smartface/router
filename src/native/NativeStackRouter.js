@@ -69,7 +69,7 @@ class NativeStackRouter extends Router {
    */
   onRouteMatch(route, match, state, action) {
     const view = super.onRouteMatch(route, match, state);
-    console.log("view : "+view);
+    console.log("view : "+view+" : "+action);
     
     if (!view) return false;
 

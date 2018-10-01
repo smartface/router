@@ -130,6 +130,7 @@ const createMemoryHistory = (props = {}) => {
     history.length = history.entries.length;
 
     transitionManager.notifyListeners(history.location, history.action);
+    
   };
 
   const createKey = () =>
@@ -159,6 +160,8 @@ const createMemoryHistory = (props = {}) => {
       "You should avoid providing a 2nd state argument to push when the 1st " +
         "argument is a location-like object that already has state; it is ignored"
     );
+    
+    alert("new push path : "+path);
 
     const action = "PUSH";
     const location = createLocation(path, state, createKey(), history.location);
