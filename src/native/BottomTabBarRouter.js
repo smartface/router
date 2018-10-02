@@ -1,4 +1,4 @@
-"strict mode";
+'use strict';
 
 const Router = require("../router/Router");
 const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
@@ -68,40 +68,27 @@ class BottomTabBarRouter extends Router {
     this._fromRouter = false;
     
     this._renderer._rootController.shouldSelectByIndex = ({ index }) => { // TabbarItem should be changed
-      console.log("shouldSelectByIndex  : "+index+" : "+this.resolveRoute(index).getUrlPath()+" : "+this.isVisited(index));
-      
-      //if specified index has already visited then skip routing
-      !this.isVisited(index) && this.routetoIndex(index);
-    
-      this._skipRender = true;
-      this.push(this.resolveRoute(index).getUrlPath());
-      // alert(" last history: "+JSON.stringify(this.getHistoryasArray()));
-      this._skipRender = false;
-      // this._skipRender = true;
-      // this.push();
-      return this.isVisited(index);
+      this._currentIndex = index;
+      return true;
     };
     
     this._renderer._rootController.didSelectByIndex = ({ index }) => { // TabbarItem should be changed
-      console.log("didSelectByIndex  : "+index+" : "+this.resolveRoute(index).getUrlPath()+" : "+this.isVisited(index));
-      
-      //if specified index has already visited then skip routing
-      // !this.isVisited(index) && this.routetoIndex(index);
-      // 
-      
-      // alert(this._fromRouter);
-        // alert("last history : "+this.resolveRoute(index).getUrlPath());
-      // if(!this._fromRouter){
-        
-      // }
-      this._fromRouter = false;
+      console.log("didSelectByIndex  : "+index+" : "+this+" : "+this.isVisited(index));
+      if(this._fromRouter != true){
+        const route = this.resolveRoute(index);
+        if(route instanceof Router){
+          route.onRouteEnter();
+        }
+      } else {
+        !this.isVisited(index) && this.routetoIndex(index);
+      }
     };
     
     // Assigns BottomTabBar props
     Object.assign(this._renderer._rootController, tabbarParams);
     //Clears child routers onRouteExit because of NatveStackRouter creates new NavigationController to clear all children.
     this._routes.map(route => {
-      route.onRouteExit && (route.onRouteExit = () => null);
+      route.onRouterExit && (route.onRouteExit = () => null);
     });
     // Initilaze BottomTabBarController's child controllers
     this._renderer.setChildControllers(
@@ -114,23 +101,34 @@ class BottomTabBarRouter extends Router {
     this.build = () => this._renderer._rootController;
   }
   
+  setCurrentUrl(url){
+    this._visitedIndexes[this._currentIndex] = {
+      url
+    };
+  }
+
   /**
    * @override
    */
   renderMatches(matches, state, action) {
-    console.log("renderMatches :");
     this._fromRouter = true;
     // alert(JSON.stringify(matches.map(({match}) => match)));
 
     if(matches.length > 1){
-      const next = matches[1];
-      // alert(JSON.stringify(next.match));
-      //TODO: make more performance
-      const index = this.resolveIndex(next.match.path);
+      const {match: next} = matches[matches.length - 1];
+      const index = this.resolveIndex(next.path);
+      // if(index != this._currentIndex && action === 'POP'){
+      //   return;
+      // }
+      // sets taraet as visited.
       this.setVisited(index);
-
+      // selects target tabbaritem by index
       this._renderer.setSelectedIndex(index);
       this._renderer._rootController.show();
+      this._currentPath = next.path;
+      console.log(`renderMatches ${next.path}`);
+      // if(this.isInitialPath(next.path))
+      //   return;
     }
     
     // !this._isRendered && (this._isRendered = true);
@@ -158,14 +156,6 @@ class BottomTabBarRouter extends Router {
     return !!this._visitedIndexes[index];
   }
   
-  /**
-   * @override
-   */
-  push(path, data){
-    console.log("push : "+path);
-    super.push(path, data);
-  }
-
   /**
    * Finds child route's index by path
    * @param {string} path
@@ -195,17 +185,16 @@ class BottomTabBarRouter extends Router {
    * History change event handler
    * @protected
    */
-  onRouteMatch(route, match, state, action, isExact) {
-    console.log("onRouteMatch ");
-    if(!match.isExact){
-      //TODO: make more performance
-      // const index = this.resolveIndex(match.path);
-      // console.log("onRouteMatch "+match.path+" : "+match.url+" : "+index);
-      // this.setVisited(index);
+  onRouteMatch(route, match, state, action) {
+    // if(!match.isExact){
+    //   //TODO: make more performance
+    //   // const index = this.resolveIndex(match.path);
+    //   // console.log("onRouteMatch "+match.path+" : "+match.url+" : "+index);
+    //   // this.setVisited(index);
       
-      return false;
-    }
-    console.log("exact onRouteMatch "+match.path+" : "+match.url+" : ");
+    //   return false;
+    // }
+    
     const view = super.onRouteMatch(route, match, state);
     
     if (!view) return false;
@@ -224,7 +213,8 @@ class BottomTabBarRouter extends Router {
    * @returns {boolean}
    */
   isInitialPath(path){
-    return (path === this.getRedirectto() || path === this.getUrlPath()) && !this.isVisited(0);
+    console.log(`isInitialPath : ${path} : redirection : ${this.getRedirectto()} : url : ${this.getUrlPath()}`);
+    return (path === this.getRedirectto() || path === this.getUrlPath());
   }
   
   /**
@@ -239,11 +229,7 @@ class BottomTabBarRouter extends Router {
     this._renderer.setSelectedIndex(index);
     this._renderer._rootController.show();
     const route = this.resolveRoute(index);
-    if(route instanceof Router){
-      route.getRedirectto() 
-        ? this.redirectRoute(route)
-        : this.push(route.getUrlPath());
-    }
+    (route instanceof Router) && this.pushRoute(route)
   }
 }
 

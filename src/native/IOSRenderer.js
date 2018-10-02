@@ -1,3 +1,5 @@
+'use strict';
+
 const Renderer = require("./Renderer");
 const Animator = require("./iOSAnimator");
 
@@ -82,7 +84,8 @@ class IOSRenderer extends Renderer {
    * @param {boolean} [=true] animated
    */
   popChild(animated = true) {
-    this._rootController.pop({ animated });
+    if(this._rootController.childControllers.length > 1)
+      this._rootController.pop({ animated });
   }
 
   popTo(index) {
@@ -139,8 +142,8 @@ class IOSRenderer extends Renderer {
 
     if (this._currentPage) {
       // this.showWithTransition(this._currentPage, page);
-      this.removeChild(this._currentPage)
-    } 
+      this.removeChild(this._currentPage);
+    }
     // else {
     this.addPageViewController(page);
     this.addChild(page);

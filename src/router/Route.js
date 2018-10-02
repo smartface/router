@@ -1,3 +1,5 @@
+'use strict';
+
 const matchPath = require("../common/matchPath").matchPath;
 const mapComposer = require("../utils/map");
 
@@ -76,6 +78,14 @@ class Route {
     };
   }
   
+  toString(){
+    return `[${this.constructor.name} path= ${this.getUrlPath()}]`;
+  }
+  
+  get routePath(){
+    return this.getRedirectto() || this.getUrlPath();
+  }
+
   getRedirectto(){
     return this._to;
   }

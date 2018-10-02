@@ -1,3 +1,5 @@
+'use strict';
+
 const Router = require("../router/Router");
 const NavigationController = require("sf-core/ui/navigationcontroller");
 const createRenderer = require("./createRenderer");
@@ -47,17 +49,28 @@ class NativeStackRouter extends Router {
     this._renderer.setRootController(new NavigationController());
     this.addNavigatorChangeListener();
     this.build = () => this._renderer._rootController;
-    // this._renderer._rootPage.childControllers = this._routes.map((route) => route.build());
   }
 
+  /**
+   * Add new listener to listen NavigationController transitions.
+   */
   addNavigatorChangeListener() {
     this._unlistener = this._renderer.onNavigatorChange(action => {
-      if (action === 2) {
-        this.silencePop();
+      alert(action.operation);
+      // if user presses backbutton or uses gesture to back
+      if (action.operation === NavigationController.OperationType.POP) { 
+        // set Router to skip next history change
+        Router.skipRender();
+        // and history goes back.
+        this.goBack();
       }
     });
   }
 
+  /**
+   * @override
+   *
+   */
   dispose() {
     super.dispose();
     this._unlistener();
@@ -69,8 +82,7 @@ class NativeStackRouter extends Router {
    */
   onRouteMatch(route, match, state, action) {
     const view = super.onRouteMatch(route, match, state);
-    console.log("view : "+view+" : "+action);
-    
+
     if (!view) return false;
 
     switch (action) {
@@ -79,15 +91,22 @@ class NativeStackRouter extends Router {
         this._renderer.pushChild(view);
         break;
       case "POP":
-        this._renderer.popChild();
+        if(Router.currentRouter === this)
+          this._renderer.popChild();
         break;
     }
     
     return true;
   }
-
-  onRouteExit(action) {
+  
+  /**
+   * Current router is changed
+   * @event
+   * @param {string} action
+   */
+  onRouterExit(action) {
     if (action === "POP") this._renderer.setRootController(new NavigationController());
+    console.log(`onRouterExit ${this}`);
   }
 }
 

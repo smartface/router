@@ -1,4 +1,5 @@
 // https://github.com/ReactTraining/history
+'use strict';
 
 const resolvePathname = require("resolve-pathname/umd/resolve-pathname");
 
@@ -161,8 +162,6 @@ const createMemoryHistory = (props = {}) => {
         "argument is a location-like object that already has state; it is ignored"
     );
     
-    alert("new push path : "+path);
-
     const action = "PUSH";
     const location = createLocation(path, state, createKey(), history.location);
 
@@ -263,8 +262,17 @@ const createMemoryHistory = (props = {}) => {
   const rollback = () => {
     history.entries.pop();
     history.length = history.length;
-    history.index -= 1;
+    history.index--;
   };
+  
+  const silencePush = (path, state) => {
+    const action = "PUSH";
+    const location = createLocation(path, state, createKey(), history.location);
+    
+    history.entries.push(location);
+    history.length = history.length;
+    history.index++;
+  }
 
   const canGo = n => {
     const nextIndex = history.index + n;
@@ -284,6 +292,7 @@ const createMemoryHistory = (props = {}) => {
     entries,
     createHref,
     push,
+    silencePush,
     replace,
     rollback,
     go,
