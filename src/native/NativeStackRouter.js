@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const Router = require("../router/Router");
 const NavigationController = require("sf-core/ui/navigationcontroller");
@@ -57,7 +57,7 @@ class NativeStackRouter extends Router {
   addNavigatorChangeListener() {
     this._unlistener = this._renderer.onNavigatorChange(action => {
       // if user presses backbutton or uses gesture to back
-      if (action.operation === NavigationController.OperationType.POP) { 
+      if (action.operation === NavigationController.OperationType.POP) {
         // set Router to skip next history change
         Router.skipRender();
         // and history goes back.
@@ -90,21 +90,21 @@ class NativeStackRouter extends Router {
         this._renderer.pushChild(view);
         break;
       case "POP":
-        if(Router.currentRouter === this)
-          this._renderer.popChild();
+        if (Router.currentRouter === this) this._renderer.popChild();
         break;
     }
-    
+
     return true;
   }
-  
+
   /**
    * Current router is changed
    * @event
    * @param {string} action
    */
   onRouterExit(action) {
-    if (action === "POP") this._renderer.setRootController(new NavigationController());
+    if (action === "POP")
+      this._renderer.setRootController(new NavigationController());
     console.log(`onRouterExit ${this}`);
   }
 }

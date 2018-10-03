@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const Renderer = require("./Renderer");
 const Animator = require("./iOSAnimator");
@@ -84,7 +84,7 @@ class IOSRenderer extends Renderer {
    * @param {boolean} [=true] animated
    */
   popChild(animated = true) {
-    if(this._rootController.childControllers.length > 1)
+    if (this._rootController.childControllers.length > 1)
       this._rootController.pop({ animated });
   }
 
@@ -137,8 +137,8 @@ class IOSRenderer extends Renderer {
   show(page) {
     console.log("enter show");
     if (this._currentPage === page) return;
-    
-    console.log("show"+page.constructor.name);
+
+    console.log("show" + page.constructor.name);
 
     if (this._currentPage) {
       // this.showWithTransition(this._currentPage, page);
@@ -156,7 +156,6 @@ class IOSRenderer extends Renderer {
 
     // TODO: this part must be moved to native-layer
   }
-  
 }
 
 module.exports = IOSRenderer;

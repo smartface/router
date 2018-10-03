@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const matchPath = require("../common/matchPath").matchPath;
 const mapComposer = require("../utils/map");
@@ -47,7 +47,16 @@ class Route {
     onBeforePush = null,
     to = null
   }) {
-    return new Route({ path, routes, build, exact, strict, onBeforeMatch, onBeforePush, to });
+    return new Route({
+      path,
+      routes,
+      build,
+      exact,
+      strict,
+      onBeforeMatch,
+      onBeforePush,
+      to
+    });
   }
 
   constructor({
@@ -77,16 +86,16 @@ class Route {
       routes: this._routes.map(route => route.toObject())
     };
   }
-  
-  toString(){
-    return `[${this.constructor.name} path= ${this.getUrlPath()}]`;
+
+  toString() {
+    return `[object ${this.constructor.name}, path: ${this.getUrlPath()}]`;
   }
-  
-  get routePath(){
+
+  get routePath() {
     return this.getRedirectto() || this.getUrlPath();
   }
 
-  getRedirectto(){
+  getRedirectto() {
     return this._to;
   }
 
@@ -115,8 +124,8 @@ class Route {
 
     return this._match;
   }
-  
-  getUrlPath(){
+
+  getUrlPath() {
     return this._path.getPath();
   }
 

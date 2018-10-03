@@ -1,5 +1,5 @@
 // https://github.com/ReactTraining/history
-'use strict';
+"use strict";
 
 const resolvePathname = require("resolve-pathname/umd/resolve-pathname");
 
@@ -131,7 +131,6 @@ const createMemoryHistory = (props = {}) => {
     history.length = history.entries.length;
 
     transitionManager.notifyListeners(history.location, history.action);
-    
   };
 
   const createKey = () =>
@@ -161,7 +160,7 @@ const createMemoryHistory = (props = {}) => {
       "You should avoid providing a 2nd state argument to push when the 1st " +
         "argument is a location-like object that already has state; it is ignored"
     );
-    
+
     const action = "PUSH";
     const location = createLocation(path, state, createKey(), history.location);
 
@@ -264,15 +263,15 @@ const createMemoryHistory = (props = {}) => {
     history.length = history.length;
     history.index--;
   };
-  
+
   const silencePush = (path, state) => {
     const action = "PUSH";
     const location = createLocation(path, state, createKey(), history.location);
-    
+
     history.entries.push(location);
     history.length = history.length;
     history.index++;
-  }
+  };
 
   const canGo = n => {
     const nextIndex = history.index + n;

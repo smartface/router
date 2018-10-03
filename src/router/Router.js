@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const Route = require("./Route");
 const createMemoryHistory = require("../common/history");
@@ -31,12 +31,12 @@ class Router extends Route {
       getUserConfirmation: getUserConfirmation
     });
   }
-  
-  static skipRender(){
+
+  static skipRender() {
     _skipRender = true;
   }
-  
-  static getHistory(){
+
+  static getHistory() {
     return history;
   }
 
@@ -56,7 +56,7 @@ class Router extends Route {
     to = null
   }) {
     super({ path, build, routes, to });
-    
+
     if (!history) {
       Router.initializeHistory({
         getUserConfirmation: (blockerFn, callback) => {
@@ -68,10 +68,17 @@ class Router extends Route {
     this._historyUnlisten = () => null;
     if (isRoot) {
       this._historyUnlisten = history.listen((location, action) => {
-        if(_skipRender !== true){
-          this.onHistoryChange(location, action);
-        }
-        _skipRender = false;
+        console.log(`History is changed ${_skipRender}`);
+          try {
+            if (_skipRender === false) {
+                this.onHistoryChange(location, action);
+            }
+          } catch(e) {
+            throw e;
+          } finally {
+            _skipRender = false;
+          }
+        
         // ["pathname","search","hash","state","key"]
         // console.log(JSON.stringify(history.entries.map(entry => entry.pathname)));
       });
@@ -82,6 +89,7 @@ class Router extends Route {
     // this._cache = new WeakMap();
     this._unblock = () => null;
   }
+  
   /**
    * @param {function}
    * location = {"pathname","search","hash","state","key"}
@@ -131,11 +139,6 @@ class Router extends Route {
    * @param {object} action
    */
   onHistoryChange(location, action) {
-    if (this._skipRender) {
-      this._skipRender = false;
-      return true;
-    }
-    
     this._matches = matchRoutes([this].concat(this._routes), location.pathname);
 
     this.renderMatches(this._matches, location.state, action);
@@ -148,13 +151,9 @@ class Router extends Route {
   routeRollback() {
     this.getHistory().rollback();
   }
-  
-  toString(){
-    return `[${this.constructor.name}, path: ${this.getUrlPath()}]`;
-  }
 
   /**
-   * 
+   *
    * @param {Array.<{isExact: boolean,params: object,path: string,url: string}>} matches
    * @param {*} state
    * @param {*} action
@@ -165,7 +164,8 @@ class Router extends Route {
       if (route !== this && route instanceof Router) {
         console.log("not exact match : " + this);
         // if(index > 0 && this._isRoot)
-        this.addChildRouter && actions.push([this.addChildRouter.bind(this), route]);
+        this.addChildRouter &&
+          actions.push([this.addChildRouter.bind(this), route]);
         // move routes to child router
         route.renderMatches(
           matches.slice(index, matches.length),
@@ -174,9 +174,8 @@ class Router extends Route {
         );
 
         return true;
-      }
-      else if (match.isExact === true) {
-        console.log("exact match : " + this +" : "+route.getRedirectto());
+      } else if (match.isExact === true) {
+        console.log("exact match : " + this + " : " + route.getRedirectto());
         // route has redirection
         if (route.getRedirectto()) {
           actions = [];
@@ -194,8 +193,8 @@ class Router extends Route {
       }
     });
   }
-  
-  onRouterEnter(action=null){
+
+  onRouterEnter(action = null) {
     this.setasActiveRouter(action);
   }
 
@@ -209,11 +208,11 @@ class Router extends Route {
       Router.currentRouter.onRouterExit(action);
     Router.currentRouter = this;
   }
-  
-  routeRedirectMaybe(route){
-      route.getRedirectto() 
-        ? this.redirectRoute(route)
-        : this.push(route.getUrlPath());
+
+  routeRedirectMaybe(route) {
+    route.getRedirectto()
+      ? this.redirectRoute(route)
+      : this.push(route.getUrlPath());
   }
 
   redirectRoute(route, action) {
@@ -246,32 +245,27 @@ class Router extends Route {
    * @param {object} state
    */
   renderRoute(route, match, state) {
-    let view;
-
-    // if (match.isExact === true) {
-    view = route.build(match, state.routeState || {}, this, state.view);
+    let view = route.build(match, state.routeState || {}, this, state.view);
     state.view = view;
 
     return view;
-    // }
-
-    // return false;
   }
 
-  /**
-   * User block event handler for protected use
-   *
-   * @protected
-   * @param {function} handler
-   */
-  onBeforeRouteChange(handler) {}
-  
+  // /**
+  // * User block event handler for protected use
+  // *
+  // * @protected
+  // * @param {function} handler
+  // */
+  // onBeforeRouteChange(handler) {}
+
   /**
    * Helper method that pushes the route's url to history
-   * 
+   *
    * @param {Route}
    */
-  pushRoute(route){
+  pushRoute(route) {
+    console.log(`Push router ${route}`);
     this.push(route.getUrlPath());
   }
 
@@ -281,15 +275,10 @@ class Router extends Route {
    * @param {object|string} path - Path or matches of the route
    * @param {boolean} [=true] addtoHistory
    */
-  push(path, data={}) {
+  push(path, data = {}) {
     // this._cache.get(path) ||
     if (path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;
-      // } else {
-      //   return (
-      //     // (this._parent && this._parent.go(path, data, addtoHistory)) ||
-      //     this._go(path, data, addtoHistory)
-      //   );
     }
 
     this.getHistory().push(path, { routeState: { data } });
@@ -299,7 +288,7 @@ class Router extends Route {
 
   /**
    * Replaces specified path's state
-   * 
+   *
    * @param {string} path
    * @param {data} data
    */
@@ -321,8 +310,8 @@ class Router extends Route {
   getLocation() {
     return this.getHistory().location;
   }
-  
-  getHistoryasArray(){
+
+  getHistoryasArray() {
     return history.entries.map(item => item.pathname);
   }
 

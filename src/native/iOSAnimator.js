@@ -1,6 +1,5 @@
 const TransitionOptions = require("./IOSTransitions");
 
-
 class iOSAnimator {
   constructor(containerView) {
     this._containerView = containerView;
