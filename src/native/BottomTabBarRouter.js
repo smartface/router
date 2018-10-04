@@ -13,11 +13,16 @@ function createTabBarItem(item) {
   return item instanceof TabBarItem ? item : new TabBarItem(item);
 }
 
+/**
+ * @class
+ * @extends {Router}
+ */
 class BottomTabBarRouter extends Router {
   /**
    * Builds OS specific NaitveRouter
+   * 
    * @static
-   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0
+   * @param {RouteParams} param
    */
   static of({
     path = "",

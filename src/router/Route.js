@@ -1,15 +1,15 @@
 "use strict";
 
 /**
- * @typedef {object} RouteMatch
+ * @typedef {Object} RouteMatch
  * @property {boolean} isExact
- * @property {object} params
+ * @property {Object} params
  * @property {string} path
  * @property {string} url
  */
 
 /**
- * @typedef {object} RouteLocation
+ * @typedef {Object} RouteLocation
  * @property {string} pathname
  * @property {string} search
  * @property {string} hash
@@ -18,7 +18,7 @@
  */
 
 /**
- * @typedef {object} RouteParams
+ * @typedef {Object} RouteParams
  * @property {string} path
  * @property {Array<Route>} routes
  * @property {boolean} exact
@@ -27,9 +27,9 @@
  */
  
 /**
- * @typedef {object} RouteState
+ * @typedef {Object} RouteState
  * @property {objec} userState
- * @property {object} view
+ * @property {Object} view
  */
  
 /**
@@ -79,7 +79,7 @@ class RoutePath {
   }
 
   /**
-   * @returns {object}
+   * @returns {Object}
    */
   toObject() {
     return {
@@ -159,7 +159,7 @@ class Route {
   }
 
   /**
-   * @return {object}
+   * @return {Object}
    */
   toObject() {
     return {
@@ -200,7 +200,7 @@ class Route {
    *
    * @param {RouteMatch} match
    * @param {RouteState} state
-   * @param {Route} route
+   * @param {Router} router
    * @param {Page} view
    */
   build(match, state, router, view) {
@@ -213,8 +213,8 @@ class Route {
    * and onBeforeMatch returns 'true' then match happends
    * or onBeforeMatch returns 'false' then match is blocked
    *
-   * @protected
-   * @param {RouteMatch} mmatch
+   * @param {RouteMatch} match
+   * @return {boolean}
    */
   onPrematch(match) {
     return (this._onBeforeMatch && this._onBeforeMatch(match)) || true;

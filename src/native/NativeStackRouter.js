@@ -5,11 +5,16 @@ const NavigationController = require("sf-core/ui/navigationcontroller");
 const createRenderer = require("./createRenderer");
 const Page = require("sf-core/ui/page");
 
+/**
+ * @class
+ * @extends {Router}
+ */
 class NativeStackRouter extends Router {
   /**
    * Builds OS specific NaitveRouter
+   * 
    * @static
-   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0
+   * @param {RouterParams} param
    */
   static of({
     path = "",

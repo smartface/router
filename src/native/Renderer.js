@@ -75,8 +75,8 @@ class Renderer {
    * @protected
    * @param {Page} fromPage
    * @param {Page} toPage
-   * @param {number} [=0] duration
-   * @param {number} [=0] options
+   * @param {number} [duration=0] duration
+   * @param {number} [options=0] options
    */
   showWithTransition(fromPage, toPage, duration = 0, options = 0) {
     throw new Error("onNavigatorChange method must be overridden");
@@ -155,7 +155,7 @@ class Renderer {
    * Must be implemented.
    * 
    * @param {Page} page
-   * @param {boolean} [=true] animmated
+   * @param {boolean} [animated=true] animmated
    */
   pushChild(page, animated = true) {
     throw new Error("pushChild must be overridden");
@@ -165,7 +165,7 @@ class Renderer {
    * Pop child from root NavigationController.
    * Must be implemented.
    * 
-   * @param {boolean} [=true] animmated
+   * @param {boolean} [animated=true] animmated
    */
   popChild(animated = true) {
     throw new Error("popChild must be overridden");

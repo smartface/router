@@ -24,6 +24,7 @@ let _skipRender = false;
  * Router Base
  *
  * @class
+ * @extends {Route}
  */
 class Router extends Route {
   static initializeHistory({
@@ -55,7 +56,7 @@ class Router extends Route {
   }
   /**
    * @constructor
-   * @param {{ path: string, target: object|null, routes: Array, exact: boolean, isRoot: boolean }} param0
+   * @param {{ path: string, target: object|null, routes: Array, exact: boolean, isRoot: boolean }} param
    */
   constructor({
     path = "",
@@ -106,7 +107,10 @@ class Router extends Route {
   listen(fn) {
     return history.listen(fn);
   }
-
+  
+  /**
+   * @return {Object}
+   */
   getHistory() {
     return history;
   }
@@ -115,7 +119,7 @@ class Router extends Route {
    * Adds route block handler to history. When history is changed in anywhere
    * then the handler intercepts before history is changed.
    *
-   * @param {function} fn
+   * @param {RouterBlockHandler} fn
    */
   addRouteBlocker(fn) {
     const unblock = history.block((location, action) => callback => {
@@ -128,15 +132,15 @@ class Router extends Route {
 
   /**
    * Triggered when the current route's parent is another router.
-   *
-   * @event
+   * 
+   * @protected
    * @param {string} action
    */
   onRouteExit(action) {}
 
   /**
    * @param {{ pathname: string, search: string, state: object }} location
-   * @param {object} action
+   * @param {Object} action
    */
   onHistoryChange(location, action) {
     this._matches = matchRoutes([this].concat(this._routes), location.pathname);
@@ -196,9 +200,9 @@ class Router extends Route {
 
   /**
    * Router is activated event handler
-   * @event
+   * 
    * @protected
-   * @param {string} [=null] action
+   * @param {?string} [action=null] action
    */
   onRouterEnter(action = null) {
     this.setasActiveRouter(action);
@@ -206,6 +210,7 @@ class Router extends Route {
 
   /**
    * Sets the router statically as active router
+   * 
    * @protected
    * @param {string} action
    */
@@ -216,12 +221,6 @@ class Router extends Route {
       Router.currentRouter.onRouterExit(action);
     Router.currentRouter = this;
   }
-
-  // routeRedirectMaybe(route) {
-  //   route.getRedirectto()
-  //     ? this.redirectRoute(route)
-  //     : this.push(route.getUrlPath());
-  // }
 
   /**
    * Redirects route and removes last route record from history
@@ -237,10 +236,10 @@ class Router extends Route {
   /**
    * Route is matched event handler
    *
-   * @event
+   * @protected
    * @param {Route} route
    * @param {{isExact: boolean, params: object, path: string, url: string}} match
-   * @param {object} state
+   * @param {Object} state
    * @param {string} action
    */
   onRouteMatch(route, match, state, action) {
@@ -253,10 +252,11 @@ class Router extends Route {
   }
 
   /**
-   *
+   * Render route
+   * 
    * @param {Route} route
-   * @param {{isExact: boolean, params: object,path: string, url: string}} match
-   * @param {object} state
+   * @param {RouteMatch} match
+   * @param {RouteState} state
    */
   renderRoute(route, match, state) {
     let view = route.build(match, state.routeState || {}, this, state.view);
@@ -278,8 +278,9 @@ class Router extends Route {
   /**
    * Change history by specified path
    *
-   * @param {object|string} path - Path or matches of the route
-   * @param {boolean} [=true] addtoHistory
+   * @param {Object|string} path - Path or matches of the route
+   * @param {!Object} [data={}] data
+   * @return {Router}
    */
   push(path, data = {}) {
     // this._cache.get(path) ||
@@ -312,18 +313,22 @@ class Router extends Route {
 
   /**
    * Return last location of history
+   * 
+   * @return {RouteLocation}
    */
   getLocation() {
     return this.getHistory().location;
   }
 
+  /**
+   * @return {Array<string>}
+   */
   getHistoryasArray() {
     return history.entries.map(item => item.pathname);
   }
 
   /**
    * Forwards history
-   *
    */
   goForward() {
     this.getHistory().goForward();
@@ -331,7 +336,9 @@ class Router extends Route {
 
   /**
    * Changes route by history index.
+   * 
    * @param {number} index
+   * @return {boolean}
    */
   go(index) {
     if (this.getHistory().canGo(index)) {
@@ -344,8 +351,8 @@ class Router extends Route {
 
   /**
    * Adds new route
+   * 
    * @param {Route} route
-   *
    */
   add(route) {
     this._routes.push(route);
@@ -355,6 +362,7 @@ class Router extends Route {
    * Iterates child routes
    *
    * @paramms {function} fn
+   * @return {Array}
    */
   map(fn) {
     return this._routes.map(fn);

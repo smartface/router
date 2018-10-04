@@ -1415,7 +1415,7 @@
     "__docId__": 83,
     "kind": "file",
     "name": "src/native/BottomTabBarRouter.js",
-    "content": "\"use strict\";\n\nconst Router = require(\"../router/Router\");\nconst BottomTabBarController = require(\"sf-core/ui/bottomtabbarcontroller\");\nconst createRenderer = require(\"./createRenderer\");\nconst TabBarItem = require(\"sf-core/ui/tabbaritem\");\n\nfunction functionMaybe(val) {\n  return typeof val === \"function\" ? val() : val;\n}\n\nfunction createTabBarItem(item) {\n  return item instanceof TabBarItem ? item : new TabBarItem(item);\n}\n\nclass BottomTabBarRouter extends Router {\n  /**\n   * Builds OS specific NaitveRouter\n   * @static\n   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0\n   */\n  static of({\n    path = \"\",\n    routes = [],\n    exact = false,\n    to = null,\n    items = [],\n    tabbarParams = {},\n    isRoot = false\n  }) {\n    return new BottomTabBarRouter({\n      path,\n      routes,\n      exact,\n      to,\n      items,\n      tabbarParams,\n      isRoot,\n      renderer: createRenderer()\n    });\n  }\n\n  /**\n   * @constructor\n   * @param {{ path: string, target:object|null, routes: Array, exact: boolean }} param0\n   */\n  constructor({\n    path = \"\",\n    routes = [],\n    exact = false,\n    renderer = null,\n    to = null,\n    tabbarParams = {},\n    items = [],\n    isRoot = false\n  }) {\n    super({\n      path,\n      routes,\n      exact,\n      to,\n      isRoot\n    });\n\n    this._renderer = renderer;\n    this._renderer.setRootController(new BottomTabBarController());\n    this._visitedIndexes = { length: 0 };\n    this._fromRouter = false;\n\n    this._renderer._rootController.shouldSelectByIndex = ({ index }) => {\n      // TabbarItem should be changed\n      this._currentIndex = index;\n      return true;\n    };\n\n    this._renderer._rootController.didSelectByIndex = ({ index }) => {\n      // TabbarItem did change\n      console.log(\"didSelectByIndex  : \" + index + \" : \" + this._fromRouter);\n      if (this._fromRouter === false) {\n        const route = this.resolveRoute(index);\n        if (this.isVisited(index)) {\n          // Will Not trigger next history change\n          Router.skipRender();\n          this.push(this._visitedIndexes[index].path);\n        }\n        if (route instanceof Router) {\n          route.onRouterEnter(\"PUSH\");\n        }\n      }\n\n      !this.isVisited(index) && this.routetoIndex(index);\n    };\n\n    // Assigns BottomTabBar props\n    Object.assign(this._renderer._rootController, tabbarParams);\n    //Clears child routers onRouteExit because of NatveStackRouter creates new NavigationController to clear all children.\n    this._routes.map(route => {\n      route.onRouterExit && (route.onRouteExit = () => null);\n    });\n    // Initilaze BottomTabBarController's child controllers\n    this._renderer.setChildControllers(\n      this._routes.map(route => route.build(null, null, this))\n    );\n    // Initilaze BottomTabBarController's TabBarItems\n    this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem));\n    this._renderer._rootController.show();\n    // Overrides build method\n    this.build = () => this._renderer._rootController;\n  }\n\n  /**\n   * @override\n   */\n  renderMatches(matches, state, action) {\n    this._fromRouter = true;\n\n    if (matches.length > 0) {\n      console.log(`Render matches`);\n      const { match: next } = matches[matches.length - 1];\n      const { match } = matches[1];\n      const lastIndex = this.resolveIndex(next.path);\n      const index = this.resolveIndex(match.path);\n      // sets target tabbar item as visited.\n      // selects target tabbaritem by index\n      this._renderer.setSelectedIndex(index);\n      this._renderer._rootController.show();\n      console.log(`current : ${match.path} - next : ${next.path}`);\n      this.setVisited(index, next.path);\n    }\n\n    super.renderMatches(matches, state, action);\n\n    this._fromRouter = false;\n  }\n\n  /**\n   * Sets TabBarItems visited by TabBarItem index\n   *\n   * @param {number} index\n   */\n  setVisited(index, path) {\n    console.log(`setVisited ${index} ${path}`);\n    if (index < 0) return;\n    this._visitedIndexes[index] = {\n      path\n    };\n    this._visitedIndexes.length++;\n  }\n\n  /**\n   * CHecks if TabBarItem is visited before\n   * @param {number} index\n   * @returns {boolean}\n   */\n  isVisited(index) {\n    return !!this._visitedIndexes[index];\n  }\n\n  /**\n   * Finds child route's index by path\n   * @param {string} path\n   */\n  resolveIndex(path) {\n    return this._routes.findIndex(route => route.getUrlPath() === path);\n  }\n\n  /**\n   * Finds child route by index\n   * @param {number} index\n   */\n  resolveRoute(index) {\n    return this._routes.find((route, ind) => ind === index);\n  }\n\n  /**\n   * @override\n   */\n  dispose() {\n    super.dispose();\n    this._unlistener();\n    this._renderer._rootController.didSelectByIndex = () => null;\n  }\n\n  /**\n   * @override\n   * @event\n   * @protected\n   */\n  onRouteMatch(route, match, state, action) {\n    const view = super.onRouteMatch(route, match, state);\n\n    if (!view) return false;\n\n    //if the path has already opened then skip routing\n    if (!this.isInitialPath(match.path)) {\n      this.routetoIndex(this.resolveIndex(match.path));\n      return true;\n    }\n    return false;\n  }\n\n  /**\n   * Checks specified path is currently opened path\n   * @param {stirng} path - Route path\n   * @returns {boolean}\n   */\n  isInitialPath(path) {\n    console.log(\n      `isInitialPath : ${path} : redirection : ${this.getRedirectto()} : url : ${this.getUrlPath()}`\n    );\n    return path === this.getRedirectto() || path === this.getUrlPath();\n  }\n\n  /**\n   * Pushes a new route by index\n   *\n   * @param {number} index\n   */\n  routetoIndex(index) {\n    index = index < 0 ? 0 : index;\n    console.log(\"routetoIndex : \" + index);\n    // this.setVisited(index);\n    this._renderer.setSelectedIndex(index);\n    this._renderer._rootController.show();\n    const route = this.resolveRoute(index);\n    route instanceof Router && this.pushRoute(route);\n    console.log(\"end of routetoIndex : \" + route);\n  }\n}\n\nmodule.exports = BottomTabBarRouter;\n",
+    "content": "\"use strict\";\n\nconst Router = require(\"../router/Router\");\nconst BottomTabBarController = require(\"sf-core/ui/bottomtabbarcontroller\");\nconst createRenderer = require(\"./createRenderer\");\nconst TabBarItem = require(\"sf-core/ui/tabbaritem\");\n\nfunction functionMaybe(val) {\n  return typeof val === \"function\" ? val() : val;\n}\n\nfunction createTabBarItem(item) {\n  return item instanceof TabBarItem ? item : new TabBarItem(item);\n}\n\n/**\n * @class\n * @extends {Router}\n */\nclass BottomTabBarRouter extends Router {\n  /**\n   * Builds OS specific NaitveRouter\n   * \n   * @static\n   * @param {RouteParams} param\n   */\n  static of({\n    path = \"\",\n    routes = [],\n    exact = false,\n    to = null,\n    items = [],\n    tabbarParams = {},\n    isRoot = false\n  }) {\n    return new BottomTabBarRouter({\n      path,\n      routes,\n      exact,\n      to,\n      items,\n      tabbarParams,\n      isRoot,\n      renderer: createRenderer()\n    });\n  }\n\n  /**\n   * @constructor\n   * @param {{ path: string, target:object|null, routes: Array, exact: boolean }} param0\n   */\n  constructor({\n    path = \"\",\n    routes = [],\n    exact = false,\n    renderer = null,\n    to = null,\n    tabbarParams = {},\n    items = [],\n    isRoot = false\n  }) {\n    super({\n      path,\n      routes,\n      exact,\n      to,\n      isRoot\n    });\n\n    this._renderer = renderer;\n    this._renderer.setRootController(new BottomTabBarController());\n    this._visitedIndexes = { length: 0 };\n    this._fromRouter = false;\n\n    this._renderer._rootController.shouldSelectByIndex = ({ index }) => {\n      // TabbarItem should be changed\n      this._currentIndex = index;\n      return true;\n    };\n\n    this._renderer._rootController.didSelectByIndex = ({ index }) => {\n      // TabbarItem did change\n      console.log(\"didSelectByIndex  : \" + index + \" : \" + this._fromRouter);\n      if (this._fromRouter === false) {\n        const route = this.resolveRoute(index);\n        if (this.isVisited(index)) {\n          // Will Not trigger next history change\n          Router.skipRender();\n          this.push(this._visitedIndexes[index].path);\n        }\n        if (route instanceof Router) {\n          route.onRouterEnter(\"PUSH\");\n        }\n      }\n\n      !this.isVisited(index) && this.routetoIndex(index);\n    };\n\n    // Assigns BottomTabBar props\n    Object.assign(this._renderer._rootController, tabbarParams);\n    //Clears child routers onRouteExit because of NatveStackRouter creates new NavigationController to clear all children.\n    this._routes.map(route => {\n      route.onRouterExit && (route.onRouteExit = () => null);\n    });\n    // Initilaze BottomTabBarController's child controllers\n    this._renderer.setChildControllers(\n      this._routes.map(route => route.build(null, null, this))\n    );\n    // Initilaze BottomTabBarController's TabBarItems\n    this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem));\n    this._renderer._rootController.show();\n    // Overrides build method\n    this.build = () => this._renderer._rootController;\n  }\n\n  /**\n   * @override\n   */\n  renderMatches(matches, state, action) {\n    this._fromRouter = true;\n\n    if (matches.length > 0) {\n      console.log(`Render matches`);\n      const { match: next } = matches[matches.length - 1];\n      const { match } = matches[1];\n      const lastIndex = this.resolveIndex(next.path);\n      const index = this.resolveIndex(match.path);\n      // sets target tabbar item as visited.\n      // selects target tabbaritem by index\n      this._renderer.setSelectedIndex(index);\n      this._renderer._rootController.show();\n      console.log(`current : ${match.path} - next : ${next.path}`);\n      this.setVisited(index, next.path);\n    }\n\n    super.renderMatches(matches, state, action);\n\n    this._fromRouter = false;\n  }\n\n  /**\n   * Sets TabBarItems visited by TabBarItem index\n   *\n   * @param {number} index\n   * @param {string} path\n   */\n  setVisited(index, path) {\n    console.log(`setVisited ${index} ${path}`);\n    if (index < 0) return;\n    this._visitedIndexes[index] = {\n      path\n    };\n    this._visitedIndexes.length++;\n  }\n\n  /**\n   * CHecks if TabBarItem is visited before\n   * @param {number} index\n   * @returns {boolean}\n   */\n  isVisited(index) {\n    return !!this._visitedIndexes[index];\n  }\n\n  /**\n   * Finds child route's index by path\n   * @param {string} path\n   */\n  resolveIndex(path) {\n    return this._routes.findIndex(route => route.getUrlPath() === path);\n  }\n\n  /**\n   * Finds child route by index\n   * @param {number} index\n   */\n  resolveRoute(index) {\n    return this._routes.find((route, ind) => ind === index);\n  }\n\n  /**\n   * @override\n   */\n  dispose() {\n    super.dispose();\n    this._unlistener();\n    this._renderer._rootController.didSelectByIndex = () => null;\n  }\n\n  /**\n   * @override\n   * @event\n   * @protected\n   */\n  onRouteMatch(route, match, state, action) {\n    const view = super.onRouteMatch(route, match, state);\n\n    if (!view) return false;\n\n    //if the path has already opened then skip routing\n    if (!this.isInitialPath(match.path)) {\n      this.routetoIndex(this.resolveIndex(match.path));\n      return true;\n    }\n    return false;\n  }\n\n  /**\n   * Checks specified path is currently opened path\n   * @param {stirng} path - Route path\n   * @returns {boolean}\n   */\n  isInitialPath(path) {\n    console.log(\n      `isInitialPath : ${path} : redirection : ${this.getRedirectto()} : url : ${this.getUrlPath()}`\n    );\n    return path === this.getRedirectto() || path === this.getUrlPath();\n  }\n\n  /**\n   * Pushes a new route by index\n   *\n   * @param {number} index\n   */\n  routetoIndex(index) {\n    index = index < 0 ? 0 : index;\n    console.log(\"routetoIndex : \" + index);\n    // this.setVisited(index);\n    this._renderer.setSelectedIndex(index);\n    this._renderer._rootController.show();\n    const route = this.resolveRoute(index);\n    route instanceof Router && this.pushRoute(route);\n    console.log(\"end of routetoIndex : \" + route);\n  }\n}\n\nmodule.exports = BottomTabBarRouter;\n",
     "static": true,
     "longname": "/home/ubuntu/workspace/router/src/native/BottomTabBarRouter.js",
     "access": "public",
@@ -1579,9 +1579,14 @@
     "export": false,
     "importPath": "@smartface/router/src/native/BottomTabBarRouter.js",
     "importStyle": null,
-    "description": null,
-    "lineNumber": 16,
-    "undocument": true,
+    "description": "",
+    "lineNumber": 20,
+    "unknown": [
+      {
+        "tagName": "@class",
+        "tagValue": ""
+      }
+    ],
     "interface": false,
     "extends": [
       "Router"
@@ -1599,16 +1604,16 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter.of",
     "access": "public",
     "description": "Builds OS specific NaitveRouter",
-    "lineNumber": 22,
+    "lineNumber": 27,
     "params": [
       {
         "nullable": null,
         "types": [
-          "{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }"
+          "RouteParams"
         ],
         "spread": false,
         "optional": false,
-        "name": "param0",
+        "name": "param",
         "description": ""
       }
     ],
@@ -1629,7 +1634,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#constructor",
     "access": "public",
     "description": "",
-    "lineNumber": 47,
+    "lineNumber": 52,
     "unknown": [
       {
         "tagName": "@constructor",
@@ -1658,7 +1663,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#_renderer",
     "access": "private",
     "description": null,
-    "lineNumber": 65,
+    "lineNumber": 70,
     "undocument": true,
     "type": {
       "types": [
@@ -1675,7 +1680,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#_visitedIndexes",
     "access": "private",
     "description": null,
-    "lineNumber": 67,
+    "lineNumber": 72,
     "undocument": true,
     "type": {
       "types": [
@@ -1692,7 +1697,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#_fromRouter",
     "access": "private",
     "description": null,
-    "lineNumber": 68,
+    "lineNumber": 73,
     "undocument": true,
     "type": {
       "types": [
@@ -1709,7 +1714,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#_currentIndex",
     "access": "private",
     "description": null,
-    "lineNumber": 72,
+    "lineNumber": 77,
     "undocument": true,
     "type": {
       "types": [
@@ -1726,7 +1731,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#build",
     "access": "public",
     "description": null,
-    "lineNumber": 108,
+    "lineNumber": 113,
     "undocument": true,
     "type": {
       "types": [
@@ -1745,7 +1750,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#renderMatches",
     "access": "public",
     "description": "",
-    "lineNumber": 114,
+    "lineNumber": 119,
     "override": true,
     "params": [
       {
@@ -1780,7 +1785,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#setVisited",
     "access": "public",
     "description": "Sets TabBarItems visited by TabBarItem index",
-    "lineNumber": 141,
+    "lineNumber": 147,
     "params": [
       {
         "nullable": null,
@@ -1790,6 +1795,16 @@
         "spread": false,
         "optional": false,
         "name": "index",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "path",
         "description": ""
       }
     ],
@@ -1806,7 +1821,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#isVisited",
     "access": "public",
     "description": "CHecks if TabBarItem is visited before",
-    "lineNumber": 155,
+    "lineNumber": 161,
     "unknown": [
       {
         "tagName": "@returns",
@@ -1845,7 +1860,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#resolveIndex",
     "access": "public",
     "description": "Finds child route's index by path",
-    "lineNumber": 163,
+    "lineNumber": 169,
     "params": [
       {
         "nullable": null,
@@ -1875,7 +1890,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#resolveRoute",
     "access": "public",
     "description": "Finds child route by index",
-    "lineNumber": 171,
+    "lineNumber": 177,
     "params": [
       {
         "nullable": null,
@@ -1905,7 +1920,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#dispose",
     "access": "public",
     "description": "",
-    "lineNumber": 178,
+    "lineNumber": 184,
     "override": true,
     "params": [],
     "return": null
@@ -1921,7 +1936,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#onRouteMatch",
     "access": "protected",
     "description": "",
-    "lineNumber": 189,
+    "lineNumber": 195,
     "unknown": [
       {
         "tagName": "@event",
@@ -1972,7 +1987,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#isInitialPath",
     "access": "public",
     "description": "Checks specified path is currently opened path",
-    "lineNumber": 207,
+    "lineNumber": 213,
     "unknown": [
       {
         "tagName": "@returns",
@@ -2011,7 +2026,7 @@
     "longname": "src/native/BottomTabBarRouter.js~BottomTabBarRouter#routetoIndex",
     "access": "public",
     "description": "Pushes a new route by index",
-    "lineNumber": 219,
+    "lineNumber": 225,
     "params": [
       {
         "nullable": null,
@@ -2685,7 +2700,7 @@
     "__docId__": 137,
     "kind": "file",
     "name": "src/native/NativeStackRouter.js",
-    "content": "\"use strict\";\n\nconst Router = require(\"../router/Router\");\nconst NavigationController = require(\"sf-core/ui/navigationcontroller\");\nconst createRenderer = require(\"./createRenderer\");\nconst Page = require(\"sf-core/ui/page\");\n\nclass NativeStackRouter extends Router {\n  /**\n   * Builds OS specific NaitveRouter\n   * @static\n   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0\n   */\n  static of({\n    path = \"\",\n    build = null,\n    routes = [],\n    exact = false,\n    renderer = null,\n    to = null,\n    isRoot = false\n  }) {\n    return new NativeStackRouter({\n      path,\n      build,\n      routes,\n      exact,\n      to,\n      isRoot,\n      renderer: createRenderer()\n    });\n  }\n\n  /**\n   * @constructor\n   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0\n   */\n  constructor({\n    path = \"\",\n    build = null,\n    routes = [],\n    exact = false,\n    renderer = null,\n    to = null,\n    isRoot = false\n  }) {\n    super({ path, build, routes, exact, to, isRoot });\n    this._renderer = renderer;\n    this._renderer.setRootController(new NavigationController());\n    this.addNavigatorChangeListener();\n    this.build = () => this._renderer._rootController;\n  }\n\n  /**\n   * Add new listener to listen NavigationController transitions.\n   */\n  addNavigatorChangeListener() {\n    this._unlistener = this._renderer.onNavigatorChange(action => {\n      // if user presses backbutton or uses gesture to back\n      if (action.operation === NavigationController.OperationType.POP) {\n        // set Router to skip next history change\n        Router.skipRender();\n        // and history goes back.\n        this.goBack();\n      }\n    });\n  }\n\n  /**\n   * @override\n   *\n   */\n  dispose() {\n    super.dispose();\n    this._unlistener();\n  }\n\n  /**\n   * History change event handler\n   * @protected\n   */\n  onRouteMatch(route, match, state, action) {\n    const view = super.onRouteMatch(route, match, state);\n\n    if (!view) return false;\n\n    switch (action) {\n      case \"REPLACE\":\n      case \"PUSH\":\n        this._renderer.pushChild(view);\n        break;\n      case \"POP\":\n        if (Router.currentRouter === this) this._renderer.popChild();\n        break;\n    }\n\n    return true;\n  }\n\n  /**\n   * Current router is changed\n   * @event\n   * @param {string} action\n   */\n  onRouterExit(action) {\n    if (action === \"POP\")\n      this._renderer.setRootController(new NavigationController());\n    console.log(`onRouterExit ${this}`);\n  }\n}\n\nmodule.exports = NativeStackRouter;\n",
+    "content": "\"use strict\";\n\nconst Router = require(\"../router/Router\");\nconst NavigationController = require(\"sf-core/ui/navigationcontroller\");\nconst createRenderer = require(\"./createRenderer\");\nconst Page = require(\"sf-core/ui/page\");\n\n/**\n * @class\n * @extends {Router}\n */\nclass NativeStackRouter extends Router {\n  /**\n   * Builds OS specific NaitveRouter\n   * \n   * @static\n   * @param {RouterParams} param\n   */\n  static of({\n    path = \"\",\n    build = null,\n    routes = [],\n    exact = false,\n    renderer = null,\n    to = null,\n    isRoot = false\n  }) {\n    return new NativeStackRouter({\n      path,\n      build,\n      routes,\n      exact,\n      to,\n      isRoot,\n      renderer: createRenderer()\n    });\n  }\n\n  /**\n   * @constructor\n   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0\n   */\n  constructor({\n    path = \"\",\n    build = null,\n    routes = [],\n    exact = false,\n    renderer = null,\n    to = null,\n    isRoot = false\n  }) {\n    super({ path, build, routes, exact, to, isRoot });\n    this._renderer = renderer;\n    this._renderer.setRootController(new NavigationController());\n    this.addNavigatorChangeListener();\n    this.build = () => this._renderer._rootController;\n  }\n\n  /**\n   * Add new listener to listen NavigationController transitions.\n   */\n  addNavigatorChangeListener() {\n    this._unlistener = this._renderer.onNavigatorChange(action => {\n      // if user presses backbutton or uses gesture to back\n      if (action.operation === NavigationController.OperationType.POP) {\n        // set Router to skip next history change\n        Router.skipRender();\n        // and history goes back.\n        this.goBack();\n      }\n    });\n  }\n\n  /**\n   * @override\n   *\n   */\n  dispose() {\n    super.dispose();\n    this._unlistener();\n  }\n\n  /**\n   * History change event handler\n   * @protected\n   */\n  onRouteMatch(route, match, state, action) {\n    const view = super.onRouteMatch(route, match, state);\n\n    if (!view) return false;\n\n    switch (action) {\n      case \"REPLACE\":\n      case \"PUSH\":\n        this._renderer.pushChild(view);\n        break;\n      case \"POP\":\n        if (Router.currentRouter === this) this._renderer.popChild();\n        break;\n    }\n\n    return true;\n  }\n\n  /**\n   * Current router is changed\n   * @event\n   * @param {string} action\n   */\n  onRouterExit(action) {\n    if (action === \"POP\")\n      this._renderer.setRootController(new NavigationController());\n    console.log(`onRouterExit ${this}`);\n  }\n}\n\nmodule.exports = NativeStackRouter;\n",
     "static": true,
     "longname": "/home/ubuntu/workspace/router/src/native/NativeStackRouter.js",
     "access": "public",
@@ -2787,9 +2802,14 @@
     "export": false,
     "importPath": "@smartface/router/src/native/NativeStackRouter.js",
     "importStyle": null,
-    "description": null,
-    "lineNumber": 8,
-    "undocument": true,
+    "description": "",
+    "lineNumber": 12,
+    "unknown": [
+      {
+        "tagName": "@class",
+        "tagValue": ""
+      }
+    ],
     "interface": false,
     "extends": [
       "Router"
@@ -2807,16 +2827,16 @@
     "longname": "src/native/NativeStackRouter.js~NativeStackRouter.of",
     "access": "public",
     "description": "Builds OS specific NaitveRouter",
-    "lineNumber": 14,
+    "lineNumber": 19,
     "params": [
       {
         "nullable": null,
         "types": [
-          "{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }"
+          "RouterParams"
         ],
         "spread": false,
         "optional": false,
-        "name": "param0",
+        "name": "param",
         "description": ""
       }
     ],
@@ -2837,7 +2857,7 @@
     "longname": "src/native/NativeStackRouter.js~NativeStackRouter#constructor",
     "access": "public",
     "description": "",
-    "lineNumber": 38,
+    "lineNumber": 43,
     "unknown": [
       {
         "tagName": "@constructor",
@@ -2866,7 +2886,7 @@
     "longname": "src/native/NativeStackRouter.js~NativeStackRouter#_renderer",
     "access": "private",
     "description": null,
-    "lineNumber": 48,
+    "lineNumber": 53,
     "undocument": true,
     "type": {
       "types": [
@@ -2883,7 +2903,7 @@
     "longname": "src/native/NativeStackRouter.js~NativeStackRouter#build",
     "access": "public",
     "description": null,
-    "lineNumber": 51,
+    "lineNumber": 56,
     "undocument": true,
     "type": {
       "types": [
@@ -2902,7 +2922,7 @@
     "longname": "src/native/NativeStackRouter.js~NativeStackRouter#addNavigatorChangeListener",
     "access": "public",
     "description": "Add new listener to listen NavigationController transitions.",
-    "lineNumber": 57,
+    "lineNumber": 62,
     "params": [],
     "return": null
   },
@@ -2915,7 +2935,7 @@
     "longname": "src/native/NativeStackRouter.js~NativeStackRouter#_unlistener",
     "access": "private",
     "description": null,
-    "lineNumber": 58,
+    "lineNumber": 63,
     "undocument": true,
     "type": {
       "types": [
@@ -2934,7 +2954,7 @@
     "longname": "src/native/NativeStackRouter.js~NativeStackRouter#dispose",
     "access": "public",
     "description": "",
-    "lineNumber": 73,
+    "lineNumber": 78,
     "override": true,
     "params": [],
     "return": null
@@ -2950,7 +2970,7 @@
     "longname": "src/native/NativeStackRouter.js~NativeStackRouter#onRouteMatch",
     "access": "protected",
     "description": "History change event handler",
-    "lineNumber": 82,
+    "lineNumber": 87,
     "params": [
       {
         "name": "route",
@@ -2994,7 +3014,7 @@
     "longname": "src/native/NativeStackRouter.js~NativeStackRouter#onRouterExit",
     "access": "public",
     "description": "Current router is changed",
-    "lineNumber": 105,
+    "lineNumber": 110,
     "unknown": [
       {
         "tagName": "@event",
@@ -3019,7 +3039,7 @@
     "__docId__": 152,
     "kind": "file",
     "name": "src/native/Renderer.js",
-    "content": "const Page = require(\"sf-core/ui/page\");\nconst Application = require(\"sf-core/application\");\n\n/**\n * @external {Page} http://docs.smartface.io/#!/api/UI.Page\n */\n\n/**\n * @external {NavigationController} http://docs.smartface.io/#!/api/UI.NavigationController\n */\n\n/**\n * @external {BottomTabBarController} http://docs.smartface.io/#!/api/UI.BottomTabBarController\n */\n\n/**\n * @external {BottomTabBarItem} http://docs.smartface.io/#!/api/UI.BottomTabBarItem\n */\n \n/**\n * @typedef NavigationControllerTransformEvent\n * @property {Page} frompage\n * @property {Page} topage\n * @property {{operation: number}} operation\n */\n\n/**\n * Abstract Renderer Strategy\n * @access package\n * @abstract\n */\nclass Renderer {\n  /**\n   * Helper method sets statically rootController of the Application by DeviceOS\n   * \n   * @static\n   * @param {BottomTabBarController|Page|NavigationController} rootController\n   */\n  static setasRoot(rootController) {\n    if (Device.deviceOS === \"iOS\") {\n      var sfWindow = SF.requireClass(\"UIApplication\").sharedApplication()\n        .keyWindow;\n      sfWindow.rootViewController = rootController.nativeObject;\n      sfWindow.makeKeyAndVisible();\n\n      rootController.nativeObject.view.addFrameObserver();\n      rootController.nativeObject.view.frameObserveHandler = e => {\n        for (var child in rootController.nativeObject.childViewControllers) {\n          rootController.nativeObject.childViewControllers[child].view.frame = {\n            x: 0,\n            y: 0,\n            width: e.frame.width,\n            height: e.frame.height\n          };\n\n          if (\n            rootController.nativeObject.childViewControllers[child].view.yoga\n              .isEnabled\n          ) {\n            rootController.nativeObject.childViewControllers[\n              child\n            ].view.yoga.applyLayoutPreservingOrigin(true);\n          }\n        }\n      };\n      // currentChild = controller;\n    } else {\n      Application.setRootController(rootController);\n    }\n  }\n  \n  /**\n   * Only use if rootpage is Page instancea\n   *\n   * @protected\n   * @param {Page} fromPage\n   * @param {Page} toPage\n   * @param {number} [=1] duration\n   * @param {number} [=0] options\n   */\n  showWithTransition(fromPage, toPage, duration = 0, options = 0 << 20) {\n    throw new Error(\"onNavigatorChange method must be overridden\");\n  }\n  \n  /**\n   * Template method sets specified controller as root controller\n   * @param {BottomTabBarController|Page|NavigationController} controller\n   */\n  setRootController(controller) {\n    this._rootController = controller;\n  }\n  \n  /**\n   * NavigationController child page is changed handler\n   * Only use if rootpage is NavigationController.\n   * Must be Implemented\n   * \n   * @param {function(e:NavigationControllerTransformEvent)} fn\n   */\n  onNavigationControllerTransition(fn) {\n    throw new Error(\"onNavigatorChange method must be overridden\");\n  }\n\n  /**\n   * Set TabBarItems to BottomTabBarController\n   * \n   * @param {Array<TabBarItem>} items\n   */\n  setTabBarItems(items) {\n    this._rootController.tabBar.items = items;\n  }\n  \n  /**\n   * Set NavigationController selected index\n   * \n   * @param {nummer} index\n   */\n  setSelectedIndex(index) {\n    this._rootController.selectedIndex = index;\n    // this._rootController.hasOwnProperty('selectedIndex') ? (this._rootController.selectedIndex = index) : (this.setIndex(index));\n  }\n  \n  /**\n   * Set NavigationController child controllers.\n   * Must be implemented.\n   * \n   * @params {Array<NavigationController>} children\n   */\n  addChildViewControllers(children) {\n    throw new Error(\"addChildViewControllers method must be overridden\");\n  }\n\n  /**\n   * Remove child from root page\n   * Must be implemented.\n   * \n   * @param {Page} page\n   */\n  removeChild(page) {\n    throw new Error(\"removeChild must be overridden\");\n  }\n  \n  /**\n   * Add child from root page\n   * Must be implemented.\n   * \n   * @param {Page} page\n   */\n  addChild(page) {\n    throw new Error(\"addChild must be overridden\");\n  }\n  \n  /**\n   * Push child from root NavigationController.\n   * Must be implemented.\n   * \n   * @param {Page} page\n   * @param {boolean} [=true] animmated\n   */\n  pushChild(page, animated = true) {\n    throw new Error(\"pushChild must be overridden\");\n  }\n\n  /**\n   * Pop child from root NavigationController.\n   * Must be implemented.\n   * \n   * @param {boolean} [=true] animmated\n   */\n  popChild(animated = true) {\n    throw new Error(\"popChild must be overridden\");\n  }\n  \n  /**\n   * Displays specified page\n   * Only use if root conttroller is a Page instance\n   *\n   * @param {Page} page\n   */\n  show(page){\n    throw new Error(\"popChild must be overridden\");\n  }\n}\n\nmodule.exports = Renderer;\n",
+    "content": "const Page = require(\"sf-core/ui/page\");\nconst Application = require(\"sf-core/application\");\n\n/**\n * @external {Page} http://docs.smartface.io/#!/api/UI.Page\n */\n\n/**\n * @external {NavigationController} http://docs.smartface.io/#!/api/UI.NavigationController\n */\n\n/**\n * @external {BottomTabBarController} http://docs.smartface.io/#!/api/UI.BottomTabBarController\n */\n\n/**\n * @external {BottomTabBarItem} http://docs.smartface.io/#!/api/UI.BottomTabBarItem\n */\n \n/**\n * @typedef NavigationControllerTransformEvent\n * @property {Page} frompage\n * @property {Page} topage\n * @property {{operation: number}} operation\n */\n\n/**\n * Abstract Renderer Strategy\n * @access package\n * @abstract\n */\nclass Renderer {\n  /**\n   * Helper method sets statically rootController of the Application by DeviceOS\n   * \n   * @static\n   * @param {BottomTabBarController|Page|NavigationController} rootController\n   */\n  static setasRoot(rootController) {\n    if (Device.deviceOS === \"iOS\") {\n      var sfWindow = SF.requireClass(\"UIApplication\").sharedApplication()\n        .keyWindow;\n      sfWindow.rootViewController = rootController.nativeObject;\n      sfWindow.makeKeyAndVisible();\n\n      rootController.nativeObject.view.addFrameObserver();\n      rootController.nativeObject.view.frameObserveHandler = e => {\n        for (var child in rootController.nativeObject.childViewControllers) {\n          rootController.nativeObject.childViewControllers[child].view.frame = {\n            x: 0,\n            y: 0,\n            width: e.frame.width,\n            height: e.frame.height\n          };\n\n          if (\n            rootController.nativeObject.childViewControllers[child].view.yoga\n              .isEnabled\n          ) {\n            rootController.nativeObject.childViewControllers[\n              child\n            ].view.yoga.applyLayoutPreservingOrigin(true);\n          }\n        }\n      };\n      // currentChild = controller;\n    } else {\n      Application.setRootController(rootController);\n    }\n  }\n  \n  /**\n   * Only use if rootpage is Page instancea\n   *\n   * @protected\n   * @param {Page} fromPage\n   * @param {Page} toPage\n   * @param {number} [duration=0] duration\n   * @param {number} [options=0] options\n   */\n  showWithTransition(fromPage, toPage, duration = 0, options = 0) {\n    throw new Error(\"onNavigatorChange method must be overridden\");\n  }\n  \n  /**\n   * Template method sets specified controller as root controller\n   * @param {BottomTabBarController|Page|NavigationController} controller\n   */\n  setRootController(controller) {\n    this._rootController = controller;\n  }\n  \n  /**\n   * NavigationController child page is changed handler\n   * Only use if rootpage is NavigationController.\n   * Must be Implemented\n   * \n   * @param {function(e:NavigationControllerTransformEvent)} fn\n   */\n  onNavigationControllerTransition(fn) {\n    throw new Error(\"onNavigatorChange method must be overridden\");\n  }\n\n  /**\n   * Set TabBarItems to BottomTabBarController\n   * \n   * @param {Array<TabBarItem>} items\n   */\n  setTabBarItems(items) {\n    this._rootController.tabBar.items = items;\n  }\n  \n  /**\n   * Set NavigationController selected index\n   * \n   * @param {nummer} index\n   */\n  setSelectedIndex(index) {\n    this._rootController.selectedIndex = index;\n    // this._rootController.hasOwnProperty('selectedIndex') ? (this._rootController.selectedIndex = index) : (this.setIndex(index));\n  }\n  \n  /**\n   * Set NavigationController child controllers.\n   * Must be implemented.\n   * \n   * @params {Array<NavigationController>} children\n   */\n  addChildViewControllers(children) {\n    throw new Error(\"addChildViewControllers method must be overridden\");\n  }\n\n  /**\n   * Remove child from root page\n   * Must be implemented.\n   * \n   * @param {Page} page\n   */\n  removeChild(page) {\n    throw new Error(\"removeChild must be overridden\");\n  }\n  \n  /**\n   * Add child from root page\n   * Must be implemented.\n   * \n   * @param {Page} page\n   */\n  addChild(page) {\n    throw new Error(\"addChild must be overridden\");\n  }\n  \n  /**\n   * Push child from root NavigationController.\n   * Must be implemented.\n   * \n   * @param {Page} page\n   * @param {boolean} [animated=true] animmated\n   */\n  pushChild(page, animated = true) {\n    throw new Error(\"pushChild must be overridden\");\n  }\n\n  /**\n   * Pop child from root NavigationController.\n   * Must be implemented.\n   * \n   * @param {boolean} [animated=true] animmated\n   */\n  popChild(animated = true) {\n    throw new Error(\"popChild must be overridden\");\n  }\n  \n  /**\n   * Displays specified page\n   * Only use if root conttroller is a Page instance\n   *\n   * @param {Page} page\n   */\n  show(page){\n    throw new Error(\"popChild must be overridden\");\n  }\n}\n\nmodule.exports = Renderer;\n",
     "static": true,
     "longname": "/home/ubuntu/workspace/router/src/native/Renderer.js",
     "access": "public",
@@ -3246,9 +3266,9 @@
         ],
         "spread": false,
         "optional": true,
-        "defaultValue": "1",
-        "defaultRaw": 1,
-        "name": "",
+        "defaultValue": "0",
+        "defaultRaw": 0,
+        "name": "duration",
         "description": "duration"
       },
       {
@@ -3260,7 +3280,7 @@
         "optional": true,
         "defaultValue": "0",
         "defaultRaw": 0,
-        "name": "",
+        "name": "options",
         "description": "options"
       }
     ],
@@ -3501,7 +3521,7 @@
         "optional": true,
         "defaultValue": "true",
         "defaultRaw": true,
-        "name": "",
+        "name": "animated",
         "description": "animmated"
       }
     ],
@@ -3529,7 +3549,7 @@
         "optional": true,
         "defaultValue": "true",
         "defaultRaw": true,
-        "name": "",
+        "name": "animated",
         "description": "animmated"
       }
     ],
@@ -3946,7 +3966,7 @@
     "__docId__": 198,
     "kind": "file",
     "name": "src/router/Route.js",
-    "content": "\"use strict\";\n\n/**\n * @typedef {object} RouteMatch\n * @property {boolean} isExact\n * @property {object} params\n * @property {string} path\n * @property {string} url\n */\n\n/**\n * @typedef {object} RouteLocation\n * @property {string} pathname\n * @property {string} search\n * @property {string} hash\n * @property {RouteState} state\n * @property {string} key\n */\n\n/**\n * @typedef {object} RouteParams\n * @property {string} path\n * @property {Array<Route>} routes\n * @property {boolean} exact\n * @property {boolean} exact\n * @property {function(match: RouteMatch)} onBeforeMatch \n */\n \n/**\n * @typedef {object} RouteState\n * @property {objec} userState\n * @property {object} view\n */\n \n/**\n * @typedef {function(match: RouteMatch, state: object, router: Router, view: Page)} RouteBuildHandler\n */\n \n\nconst matchPath = require(\"../common/matchPath\").matchPath;\nconst mapComposer = require(\"../utils/map\");\n\n/**\n * Route's path ValueObject\n * For internal use\n * @access private\n * @class\n */\nclass RoutePath {\n  /**\n   * Factory method to create a new instance\n   *\n   * @param {string} path\n   */\n  static of(path) {\n    return new RoutePath(path);\n  }\n\n  /**\n   * @constructor\n   * @param {string} path\n   */\n  constructor(path) {\n    this._path = path;\n  }\n\n  /**\n   * @return {string}\n   */\n  getPath() {\n    return this._path;\n  }\n\n  /**\n   * @returns {boolean}\n   */\n  isRoot() {\n    return this._path === \"/\";\n  }\n\n  /**\n   * @returns {object}\n   */\n  toObject() {\n    return {\n      path: this._path,\n      isRoot: this.isRoot\n    };\n  }\n\n  /**\n   * @returns {RoutePath}\n   */\n  clone() {\n    return new RoutePath(this._path);\n  }\n\n  /**\n   * @return {boelean}\n   */\n  hasPath() {\n    return this._path !== null || this._path !== undefined || this._path !== \"\";\n  }\n}\n\n/**\n * Route implementation\n * @class\n */\nclass Route {\n  /**\n   * Static helper method to create a new instance of Route\n   * \n   * @static\n   * @param {RouteParams} param\n   * @return {Route}\n   */\n  static of({\n    path = null,\n    routes = [],\n    build = null,\n    exact = false,\n    onBeforeMatch = null,\n    onBeforePush = null,\n    to = null\n  }) {\n    return new Route({\n      path,\n      routes,\n      build,\n      exact,\n      onBeforeMatch,\n      onBeforePush,\n      to\n    });\n  }\n  /**\n   * @constructor\n   * @param {RouteParams} param\n   */\n  constructor({\n    path = null,\n    to = null,\n    routes = [],\n    build = null,\n    exact = false,\n    onBeforeMatch = null,\n    onBeforePush = null\n  }) {\n    this._exact = exact;\n    this._strict = false;\n    this._build = build;\n    this._path = path instanceof RoutePath ? path : new RoutePath(path);\n    this._routes = routes;\n    this.map = mapComposer.call(this, this._routes);\n    this._to = to;\n    this._onBeforeMatch = onBeforeMatch;\n    this._onBeforePush = onBeforePush;\n  }\n\n  /**\n   * @return {object}\n   */\n  toObject() {\n    return {\n      path: this._path.getPath(),\n      routes: this._routes.map(route => route.toObject())\n    };\n  }\n\n  /**\n   * String presentation of the component\n   *\n   * @return {string}\n   */\n  toString() {\n    return `[object ${this.constructor.name}, path: ${this.getUrlPath()}]`;\n  }\n\n  /**\n   * Helper method to return excat path of the component\n   *\n   * @return {string}\n   */\n  get routePath() {\n    return this.getRedirectto() || this.getUrlPath();\n  }\n\n  /**\n   * Returns redirection path\n   *\n   * @return {string}\n   */\n  getRedirectto() {\n    return this._to;\n  }\n\n  /**\n   * Builds a route's view\n   *\n   * @param {RouteMatch} match\n   * @param {RouteState} state\n   * @param {Route} route\n   * @param {Page} view\n   */\n  build(match, state, router, view) {\n    return (this._build && this._build(match, state, router, view)) || null;\n  }\n\n  /**\n   * Triggered before when an exact match happends.\n   * If the onBeforeMatch eventhandler is set\n   * and onBeforeMatch returns 'true' then match happends\n   * or onBeforeMatch returns 'false' then match is blocked\n   *\n   * @protected\n   * @param {RouteMatch} mmatch\n   */\n  onPrematch(match) {\n    return (this._onBeforeMatch && this._onBeforeMatch(match)) || true;\n  }\n\n  /**\n   * Route has a path\n   *\n   * @returns {boolean}\n   */\n  hasPath() {\n    return this._path.hasPath();\n  }\n\n  /**\n   * Queries if specified url match to the route path\n   * @param {string} url\n   * @returns {Match}\n   */\n  matchPath(url) {\n    this._match = matchPath(url, {\n      path: this._path.getPath(),\n      exact: this._exact,\n      strict: this._strict\n    });\n\n    return this._match;\n  }\n\n  /**\n   * Returns route path as string\n   *\n   * @returns {string}\n   */\n  getUrlPath() {\n    return this._path.getPath();\n  }\n\n  /**\n   * Clones route's path and returns\n   *\n   * @return {RoutePath}\n   */\n  getPath() {\n    return this._path.clone();\n  }\n\n  /**\n   * Clones new instance of the route\n   *\n   * @returns {Route}\n   */\n  clone() {\n    return Route.of({\n      path: this._path,\n      routes: this._routes.slice(),\n      props: Object.assign({}, this._props),\n      build: this._build,\n      exact: this._exact,\n      strict: this._strict\n    });\n  }\n}\n\nmodule.exports = Route;\n",
+    "content": "\"use strict\";\n\n/**\n * @typedef {Object} RouteMatch\n * @property {boolean} isExact\n * @property {Object} params\n * @property {string} path\n * @property {string} url\n */\n\n/**\n * @typedef {Object} RouteLocation\n * @property {string} pathname\n * @property {string} search\n * @property {string} hash\n * @property {RouteState} state\n * @property {string} key\n */\n\n/**\n * @typedef {Object} RouteParams\n * @property {string} path\n * @property {Array<Route>} routes\n * @property {boolean} exact\n * @property {boolean} exact\n * @property {function(match: RouteMatch)} onBeforeMatch \n */\n \n/**\n * @typedef {Object} RouteState\n * @property {objec} userState\n * @property {Object} view\n */\n \n/**\n * @typedef {function(match: RouteMatch, state: object, router: Router, view: Page)} RouteBuildHandler\n */\n \n\nconst matchPath = require(\"../common/matchPath\").matchPath;\nconst mapComposer = require(\"../utils/map\");\n\n/**\n * Route's path ValueObject\n * For internal use\n * @access private\n * @class\n */\nclass RoutePath {\n  /**\n   * Factory method to create a new instance\n   *\n   * @param {string} path\n   */\n  static of(path) {\n    return new RoutePath(path);\n  }\n\n  /**\n   * @constructor\n   * @param {string} path\n   */\n  constructor(path) {\n    this._path = path;\n  }\n\n  /**\n   * @return {string}\n   */\n  getPath() {\n    return this._path;\n  }\n\n  /**\n   * @returns {boolean}\n   */\n  isRoot() {\n    return this._path === \"/\";\n  }\n\n  /**\n   * @returns {Object}\n   */\n  toObject() {\n    return {\n      path: this._path,\n      isRoot: this.isRoot\n    };\n  }\n\n  /**\n   * @returns {RoutePath}\n   */\n  clone() {\n    return new RoutePath(this._path);\n  }\n\n  /**\n   * @return {boelean}\n   */\n  hasPath() {\n    return this._path !== null || this._path !== undefined || this._path !== \"\";\n  }\n}\n\n/**\n * Route implementation\n * @class\n */\nclass Route {\n  /**\n   * Static helper method to create a new instance of Route\n   * \n   * @static\n   * @param {RouteParams} param\n   * @return {Route}\n   */\n  static of({\n    path = null,\n    routes = [],\n    build = null,\n    exact = false,\n    onBeforeMatch = null,\n    onBeforePush = null,\n    to = null\n  }) {\n    return new Route({\n      path,\n      routes,\n      build,\n      exact,\n      onBeforeMatch,\n      onBeforePush,\n      to\n    });\n  }\n  /**\n   * @constructor\n   * @param {RouteParams} param\n   */\n  constructor({\n    path = null,\n    to = null,\n    routes = [],\n    build = null,\n    exact = false,\n    onBeforeMatch = null,\n    onBeforePush = null\n  }) {\n    this._exact = exact;\n    this._strict = false;\n    this._build = build;\n    this._path = path instanceof RoutePath ? path : new RoutePath(path);\n    this._routes = routes;\n    this.map = mapComposer.call(this, this._routes);\n    this._to = to;\n    this._onBeforeMatch = onBeforeMatch;\n    this._onBeforePush = onBeforePush;\n  }\n\n  /**\n   * @return {Object}\n   */\n  toObject() {\n    return {\n      path: this._path.getPath(),\n      routes: this._routes.map(route => route.toObject())\n    };\n  }\n\n  /**\n   * String presentation of the component\n   *\n   * @return {string}\n   */\n  toString() {\n    return `[object ${this.constructor.name}, path: ${this.getUrlPath()}]`;\n  }\n\n  /**\n   * Helper method to return excat path of the component\n   *\n   * @return {string}\n   */\n  get routePath() {\n    return this.getRedirectto() || this.getUrlPath();\n  }\n\n  /**\n   * Returns redirection path\n   *\n   * @return {string}\n   */\n  getRedirectto() {\n    return this._to;\n  }\n\n  /**\n   * Builds a route's view\n   *\n   * @param {RouteMatch} match\n   * @param {RouteState} state\n   * @param {Router} router\n   * @param {Page} view\n   */\n  build(match, state, router, view) {\n    return (this._build && this._build(match, state, router, view)) || null;\n  }\n\n  /**\n   * Triggered before when an exact match happends.\n   * If the onBeforeMatch eventhandler is set\n   * and onBeforeMatch returns 'true' then match happends\n   * or onBeforeMatch returns 'false' then match is blocked\n   *\n   * @param {RouteMatch} match\n   * @return {boolean}\n   */\n  onPrematch(match) {\n    return (this._onBeforeMatch && this._onBeforeMatch(match)) || true;\n  }\n\n  /**\n   * Route has a path\n   *\n   * @returns {boolean}\n   */\n  hasPath() {\n    return this._path.hasPath();\n  }\n\n  /**\n   * Queries if specified url match to the route path\n   * @param {string} url\n   * @returns {Match}\n   */\n  matchPath(url) {\n    this._match = matchPath(url, {\n      path: this._path.getPath(),\n      exact: this._exact,\n      strict: this._strict\n    });\n\n    return this._match;\n  }\n\n  /**\n   * Returns route path as string\n   *\n   * @returns {string}\n   */\n  getUrlPath() {\n    return this._path.getPath();\n  }\n\n  /**\n   * Clones route's path and returns\n   *\n   * @return {RoutePath}\n   */\n  getPath() {\n    return this._path.clone();\n  }\n\n  /**\n   * Clones new instance of the route\n   *\n   * @returns {Route}\n   */\n  clone() {\n    return Route.of({\n      path: this._path,\n      routes: this._routes.slice(),\n      props: Object.assign({}, this._props),\n      build: this._build,\n      exact: this._exact,\n      strict: this._strict\n    });\n  }\n}\n\nmodule.exports = Route;\n",
     "static": true,
     "longname": "/home/ubuntu/workspace/router/src/router/Route.js",
     "access": "public",
@@ -3976,7 +3996,7 @@
       {
         "nullable": null,
         "types": [
-          "object"
+          "Object"
         ],
         "spread": false,
         "optional": false,
@@ -4006,7 +4026,7 @@
     ],
     "type": {
       "types": [
-        "object"
+        "Object"
       ],
       "optional": false,
       "name": "RouteMatch"
@@ -4075,7 +4095,7 @@
     ],
     "type": {
       "types": [
-        "object"
+        "Object"
       ],
       "optional": false,
       "name": "RouteLocation"
@@ -4144,7 +4164,7 @@
     ],
     "type": {
       "types": [
-        "object"
+        "Object"
       ],
       "optional": false,
       "name": "RouteParams"
@@ -4173,7 +4193,7 @@
       {
         "nullable": null,
         "types": [
-          "object"
+          "Object"
         ],
         "spread": false,
         "optional": false,
@@ -4183,7 +4203,7 @@
     ],
     "type": {
       "types": [
-        "object"
+        "Object"
       ],
       "optional": false,
       "name": "RouteState"
@@ -4393,13 +4413,13 @@
     "unknown": [
       {
         "tagName": "@returns",
-        "tagValue": "{object}"
+        "tagValue": "{Object}"
       }
     ],
     "return": {
       "nullable": null,
       "types": [
-        "object"
+        "Object"
       ],
       "spread": false,
       "description": ""
@@ -4710,7 +4730,7 @@
     "return": {
       "nullable": null,
       "types": [
-        "object"
+        "Object"
       ],
       "spread": false,
       "description": ""
@@ -4823,11 +4843,11 @@
       {
         "nullable": null,
         "types": [
-          "Route"
+          "Router"
         ],
         "spread": false,
         "optional": false,
-        "name": "route",
+        "name": "router",
         "description": ""
       },
       {
@@ -4856,7 +4876,7 @@
     "async": false,
     "static": false,
     "longname": "src/router/Route.js~Route#onPrematch",
-    "access": "protected",
+    "access": "public",
     "description": "Triggered before when an exact match happends.\nIf the onBeforeMatch eventhandler is set\nand onBeforeMatch returns 'true' then match happends\nor onBeforeMatch returns 'false' then match is blocked",
     "lineNumber": 219,
     "params": [
@@ -4867,14 +4887,17 @@
         ],
         "spread": false,
         "optional": false,
-        "name": "mmatch",
+        "name": "match",
         "description": ""
       }
     ],
     "return": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "boolean"
+      ],
+      "spread": false,
+      "description": ""
     }
   },
   {
@@ -5107,7 +5130,7 @@
     "__docId__": 240,
     "kind": "file",
     "name": "src/router/Router.js",
-    "content": "\"use strict\";\n\n/**\n * @typedef {function(location: RouteLocation, action: string)} RouterBlockHandler\n *\n */\n\n/**\n * @typedef {function(location: RouteLocation)} HistoryListener\n *\n */\n\nconst Route = require(\"./Route\");\nconst createMemoryHistory = require(\"../common/history\");\nconst mapComposer = require(\"../utils/map\");\nconst matchPath = require(\"../common/matchPath\");\nconst matchRoutes = require(\"../common/matchRoutes\");\nlet actions = [];\n\nlet history;\nlet _skipRender = false;\n\n/**\n * Router Base\n *\n * @class\n */\nclass Router extends Route {\n  static initializeHistory({\n    initialEntries = null,\n    initialIndex = null,\n    keyLength = null,\n    getUserConfirmation = null\n  }) {\n    history = createMemoryHistory({\n      initialEntries: initialEntries || [], // The initial URLs in the history stack\n      initialIndex: initialIndex || 0, // The starting index in the history stack\n      keyLength: keyLength || 20, // The length of location.key\n      // A function to use to confirm navigation with the user. Required\n      // if you return string prompts from transition hooks (see below)\n      getUserConfirmation: getUserConfirmation\n    });\n  }\n\n  static skipRender() {\n    _skipRender = true;\n  }\n\n  static getHistory() {\n    return history;\n  }\n\n  static unloadHistory() {\n    history = null;\n  }\n  /**\n   * @constructor\n   * @param {{ path: string, target: object|null, routes: Array, exact: boolean, isRoot: boolean }} param0\n   */\n  constructor({\n    path = \"\",\n    build = null,\n    routes = [],\n    exact = false,\n    isRoot = false,\n    to = null\n  }) {\n    super({ path, build, routes, to });\n\n    if (!history) {\n      Router.initializeHistory({\n        getUserConfirmation: (blockerFn, callback) => {\n          return blockerFn(callback);\n        }\n      });\n    }\n\n    this._historyUnlisten = () => null;\n    if (isRoot) {\n      this._historyUnlisten = history.listen((location, action) => {\n        console.log(`History is changed ${_skipRender}`);\n        try {\n          if (_skipRender === false) {\n            this.onHistoryChange(location, action);\n          }\n        } catch (e) {\n          throw e;\n        } finally {\n          _skipRender = false;\n        }\n\n        // [\"pathname\",\"search\",\"hash\",\"state\",\"key\"]\n        // console.log(JSON.stringify(history.entries.map(entry => entry.pathname)));\n      });\n    }\n\n    this._isRoot = isRoot;\n    this._exact = exact;\n    // this._cache = new WeakMap();\n    this._unblock = () => null;\n  }\n\n  /**\n   * @param {HistoryListener} fn\n   */\n  listen(fn) {\n    return history.listen(fn);\n  }\n\n  getHistory() {\n    return history;\n  }\n\n  /**\n   * Adds route block handler to history. When history is changed in anywhere\n   * then the handler intercepts before history is changed.\n   *\n   * @param {function} fn\n   */\n  addRouteBlocker(fn) {\n    const unblock = history.block((location, action) => callback => {\n      unblock();\n      fn(location, action, callback);\n    });\n\n    return unblock;\n  }\n\n  /**\n   * Triggered when the current route's parent is another router.\n   *\n   * @event\n   * @param {string} action\n   */\n  onRouteExit(action) {}\n\n  /**\n   * @param {{ pathname: string, search: string, state: object }} location\n   * @param {object} action\n   */\n  onHistoryChange(location, action) {\n    this._matches = matchRoutes([this].concat(this._routes), location.pathname);\n\n    this.renderMatches(this._matches, location.state, action);\n  }\n\n  /**\n   * @protected\n   * Removes last entry from history.\n   */\n  routeRollback() {\n    this.getHistory().rollback();\n  }\n\n  /**\n   *\n   * @param {Array<{isExact: boolean,params: object,path: string,url: string}>} matches\n   * @param {*} state\n   * @param {*} action\n   */\n  renderMatches(matches, state, action) {\n    // console.log(\"matches : \" + JSON.stringify(matches.map(({ match }) => match)));\n    matches.some(({ match, route }, index) => {\n      if (route !== this && route instanceof Router) {\n        console.log(\"not exact match : \" + this);\n        // if(index > 0 && this._isRoot)\n        this.addChildRouter &&\n          actions.push([this.addChildRouter.bind(this), route]);\n        // move routes to child router\n        route.renderMatches(\n          matches.slice(index, matches.length),\n          state,\n          action\n        );\n\n        return true;\n      } else if (match.isExact === true) {\n        console.log(\"exact match : \" + this + \" : \" + route.getRedirectto());\n        // route has redirection\n        if (route.getRedirectto()) {\n          actions = [];\n          return this.redirectRoute(route, action);\n        }\n\n        if (this.onRouteMatch(route, match, state, action)) {\n          actions.forEach(item => item[0](item[1]));\n        }\n\n        this.onRouterEnter && this.onRouterEnter(action);\n        actions = [];\n\n        return true;\n      }\n    });\n  }\n\n  /**\n   * Router is activated event handler\n   * @event\n   * @protected\n   * @param {string} [=null] action\n   */\n  onRouterEnter(action = null) {\n    this.setasActiveRouter(action);\n  }\n\n  /**\n   * Sets the router statically as active router\n   * @protected\n   * @param {string} action\n   */\n  setasActiveRouter(action) {\n    Router.currentRouter &&\n      this != Router.currentRouter &&\n      Router.currentRouter.onRouterExit &&\n      Router.currentRouter.onRouterExit(action);\n    Router.currentRouter = this;\n  }\n\n  // routeRedirectMaybe(route) {\n  //   route.getRedirectto()\n  //     ? this.redirectRoute(route)\n  //     : this.push(route.getUrlPath());\n  // }\n\n  /**\n   * Redirects route and removes last route record from history\n   * @param {Route} route\n   * @param {string} action\n   */\n  redirectRoute(route, action) {\n    // redirection of a route\n    this.routeRollback(); // remove last route from history\n    this.push(route.getRedirectto()); // and add new route\n  }\n\n  /**\n   * Route is matched event handler\n   *\n   * @event\n   * @param {Route} route\n   * @param {{isExact: boolean, params: object, path: string, url: string}} match\n   * @param {object} state\n   * @param {string} action\n   */\n  onRouteMatch(route, match, state, action) {\n    const view = this.renderRoute(route, match, state);\n    if (!view) {\n      this.routeRollback();\n    }\n\n    return view;\n  }\n\n  /**\n   *\n   * @param {Route} route\n   * @param {{isExact: boolean, params: object,path: string, url: string}} match\n   * @param {object} state\n   */\n  renderRoute(route, match, state) {\n    let view = route.build(match, state.routeState || {}, this, state.view);\n    state.view = view;\n\n    return view;\n  }\n\n  /**\n   * Helper method that pushes the route's url to history\n   *\n   * @param {Route} route\n   */\n  pushRoute(route) {\n    console.log(`Push router ${route}`);\n    this.push(route.getUrlPath());\n  }\n\n  /**\n   * Change history by specified path\n   *\n   * @param {object|string} path - Path or matches of the route\n   * @param {boolean} [=true] addtoHistory\n   */\n  push(path, data = {}) {\n    // this._cache.get(path) ||\n    if (path.charAt(0) !== \"/\") {\n      path = this._path.getPath() + \"/\" + path;\n    }\n\n    this.getHistory().push(path, { routeState: { data } });\n\n    return this;\n  }\n\n  /**\n   * Replaces specified path's state\n   *\n   * @param {string} path\n   * @param {data} data\n   */\n  replace(path, data) {\n    this.getHistory().replace(path, { routeState: data });\n  }\n\n  /**\n   * Rewinds history\n   *\n   */\n  goBack() {\n    this.getHistory().go(-1);\n  }\n\n  /**\n   * Return last location of history\n   */\n  getLocation() {\n    return this.getHistory().location;\n  }\n\n  getHistoryasArray() {\n    return history.entries.map(item => item.pathname);\n  }\n\n  /**\n   * Forwards history\n   *\n   */\n  goForward() {\n    this.getHistory().goForward();\n  }\n\n  /**\n   * Changes route by history index.\n   * @param {number} index\n   */\n  go(index) {\n    if (this.getHistory().canGo(index)) {\n      this.getHistory().index();\n      return true;\n    }\n\n    return false;\n  }\n\n  /**\n   * Adds new route\n   * @param {Route} route\n   *\n   */\n  add(route) {\n    this._routes.push(route);\n  }\n\n  /**\n   * Iterates child routes\n   *\n   * @paramms {function} fn\n   */\n  map(fn) {\n    return this._routes.map(fn);\n  }\n\n  /**\n   * Unloads the router\n   */\n  dispose() {\n    this._historyUnlisten();\n    if (this._isRoot) {\n      history.clear();\n      history = null;\n    }\n    this._routes.forEach(route => route.dispose());\n    this._routes = null;\n    this._historyUnlisten = null;\n    this._unblock && this._unblock();\n    this._unblock = null;\n  }\n}\n\nmodule.exports = Router;\n",
+    "content": "\"use strict\";\n\n/**\n * @typedef {function(location: RouteLocation, action: string)} RouterBlockHandler\n *\n */\n\n/**\n * @typedef {function(location: RouteLocation)} HistoryListener\n *\n */\n\nconst Route = require(\"./Route\");\nconst createMemoryHistory = require(\"../common/history\");\nconst mapComposer = require(\"../utils/map\");\nconst matchPath = require(\"../common/matchPath\");\nconst matchRoutes = require(\"../common/matchRoutes\");\nlet actions = [];\n\nlet history;\nlet _skipRender = false;\n\n/**\n * Router Base\n *\n * @class\n * @extends {Route}\n */\nclass Router extends Route {\n  static initializeHistory({\n    initialEntries = null,\n    initialIndex = null,\n    keyLength = null,\n    getUserConfirmation = null\n  }) {\n    history = createMemoryHistory({\n      initialEntries: initialEntries || [], // The initial URLs in the history stack\n      initialIndex: initialIndex || 0, // The starting index in the history stack\n      keyLength: keyLength || 20, // The length of location.key\n      // A function to use to confirm navigation with the user. Required\n      // if you return string prompts from transition hooks (see below)\n      getUserConfirmation: getUserConfirmation\n    });\n  }\n\n  static skipRender() {\n    _skipRender = true;\n  }\n\n  static getHistory() {\n    return history;\n  }\n\n  static unloadHistory() {\n    history = null;\n  }\n  /**\n   * @constructor\n   * @param {{ path: string, target: object|null, routes: Array, exact: boolean, isRoot: boolean }} param\n   */\n  constructor({\n    path = \"\",\n    build = null,\n    routes = [],\n    exact = false,\n    isRoot = false,\n    to = null\n  }) {\n    super({ path, build, routes, to });\n\n    if (!history) {\n      Router.initializeHistory({\n        getUserConfirmation: (blockerFn, callback) => {\n          return blockerFn(callback);\n        }\n      });\n    }\n\n    this._historyUnlisten = () => null;\n    if (isRoot) {\n      this._historyUnlisten = history.listen((location, action) => {\n        console.log(`History is changed ${_skipRender}`);\n        try {\n          if (_skipRender === false) {\n            this.onHistoryChange(location, action);\n          }\n        } catch (e) {\n          throw e;\n        } finally {\n          _skipRender = false;\n        }\n\n        // [\"pathname\",\"search\",\"hash\",\"state\",\"key\"]\n        // console.log(JSON.stringify(history.entries.map(entry => entry.pathname)));\n      });\n    }\n\n    this._isRoot = isRoot;\n    this._exact = exact;\n    // this._cache = new WeakMap();\n    this._unblock = () => null;\n  }\n\n  /**\n   * @param {HistoryListener} fn\n   */\n  listen(fn) {\n    return history.listen(fn);\n  }\n  \n  /**\n   * @return {Object}\n   */\n  getHistory() {\n    return history;\n  }\n\n  /**\n   * Adds route block handler to history. When history is changed in anywhere\n   * then the handler intercepts before history is changed.\n   *\n   * @param {RouterBlockHandler} fn\n   */\n  addRouteBlocker(fn) {\n    const unblock = history.block((location, action) => callback => {\n      unblock();\n      fn(location, action, callback);\n    });\n\n    return unblock;\n  }\n\n  /**\n   * Triggered when the current route's parent is another router.\n   * \n   * @protected\n   * @param {string} action\n   */\n  onRouteExit(action) {}\n\n  /**\n   * @param {{ pathname: string, search: string, state: object }} location\n   * @param {Object} action\n   */\n  onHistoryChange(location, action) {\n    this._matches = matchRoutes([this].concat(this._routes), location.pathname);\n\n    this.renderMatches(this._matches, location.state, action);\n  }\n\n  /**\n   * @protected\n   * Removes last entry from history.\n   */\n  routeRollback() {\n    this.getHistory().rollback();\n  }\n\n  /**\n   *\n   * @param {Array<{isExact: boolean,params: object,path: string,url: string}>} matches\n   * @param {*} state\n   * @param {*} action\n   */\n  renderMatches(matches, state, action) {\n    // console.log(\"matches : \" + JSON.stringify(matches.map(({ match }) => match)));\n    matches.some(({ match, route }, index) => {\n      if (route !== this && route instanceof Router) {\n        console.log(\"not exact match : \" + this);\n        // if(index > 0 && this._isRoot)\n        this.addChildRouter &&\n          actions.push([this.addChildRouter.bind(this), route]);\n        // move routes to child router\n        route.renderMatches(\n          matches.slice(index, matches.length),\n          state,\n          action\n        );\n\n        return true;\n      } else if (match.isExact === true) {\n        console.log(\"exact match : \" + this + \" : \" + route.getRedirectto());\n        // route has redirection\n        if (route.getRedirectto()) {\n          actions = [];\n          return this.redirectRoute(route, action);\n        }\n\n        if (this.onRouteMatch(route, match, state, action)) {\n          actions.forEach(item => item[0](item[1]));\n        }\n\n        this.onRouterEnter && this.onRouterEnter(action);\n        actions = [];\n\n        return true;\n      }\n    });\n  }\n\n  /**\n   * Router is activated event handler\n   * \n   * @protected\n   * @param {?string} [action=null] action\n   */\n  onRouterEnter(action = null) {\n    this.setasActiveRouter(action);\n  }\n\n  /**\n   * Sets the router statically as active router\n   * \n   * @protected\n   * @param {string} action\n   */\n  setasActiveRouter(action) {\n    Router.currentRouter &&\n      this != Router.currentRouter &&\n      Router.currentRouter.onRouterExit &&\n      Router.currentRouter.onRouterExit(action);\n    Router.currentRouter = this;\n  }\n\n  /**\n   * Redirects route and removes last route record from history\n   * @param {Route} route\n   * @param {string} action\n   */\n  redirectRoute(route, action) {\n    // redirection of a route\n    this.routeRollback(); // remove last route from history\n    this.push(route.getRedirectto()); // and add new route\n  }\n\n  /**\n   * Route is matched event handler\n   *\n   * @protected\n   * @param {Route} route\n   * @param {{isExact: boolean, params: object, path: string, url: string}} match\n   * @param {Object} state\n   * @param {string} action\n   */\n  onRouteMatch(route, match, state, action) {\n    const view = this.renderRoute(route, match, state);\n    if (!view) {\n      this.routeRollback();\n    }\n\n    return view;\n  }\n\n  /**\n   * Render route\n   * \n   * @param {Route} route\n   * @param {RouteMatch} match\n   * @param {RouteState} state\n   */\n  renderRoute(route, match, state) {\n    let view = route.build(match, state.routeState || {}, this, state.view);\n    state.view = view;\n\n    return view;\n  }\n\n  /**\n   * Helper method that pushes the route's url to history\n   *\n   * @param {Route} route\n   */\n  pushRoute(route) {\n    console.log(`Push router ${route}`);\n    this.push(route.getUrlPath());\n  }\n\n  /**\n   * Change history by specified path\n   *\n   * @param {Object|string} path - Path or matches of the route\n   * @param {!Object} [data={}] data\n   * @return {Router}\n   */\n  push(path, data = {}) {\n    // this._cache.get(path) ||\n    if (path.charAt(0) !== \"/\") {\n      path = this._path.getPath() + \"/\" + path;\n    }\n\n    this.getHistory().push(path, { routeState: { data } });\n\n    return this;\n  }\n\n  /**\n   * Replaces specified path's state\n   *\n   * @param {string} path\n   * @param {data} data\n   */\n  replace(path, data) {\n    this.getHistory().replace(path, { routeState: data });\n  }\n\n  /**\n   * Rewinds history\n   *\n   */\n  goBack() {\n    this.getHistory().go(-1);\n  }\n\n  /**\n   * Return last location of history\n   * \n   * @return {RouteLocation}\n   */\n  getLocation() {\n    return this.getHistory().location;\n  }\n\n  /**\n   * @return {Array<string>}\n   */\n  getHistoryasArray() {\n    return history.entries.map(item => item.pathname);\n  }\n\n  /**\n   * Forwards history\n   */\n  goForward() {\n    this.getHistory().goForward();\n  }\n\n  /**\n   * Changes route by history index.\n   * \n   * @param {number} index\n   * @return {boolean}\n   */\n  go(index) {\n    if (this.getHistory().canGo(index)) {\n      this.getHistory().index();\n      return true;\n    }\n\n    return false;\n  }\n\n  /**\n   * Adds new route\n   * \n   * @param {Route} route\n   */\n  add(route) {\n    this._routes.push(route);\n  }\n\n  /**\n   * Iterates child routes\n   *\n   * @paramms {function} fn\n   * @return {Array}\n   */\n  map(fn) {\n    return this._routes.map(fn);\n  }\n\n  /**\n   * Unloads the router\n   */\n  dispose() {\n    this._historyUnlisten();\n    if (this._isRoot) {\n      history.clear();\n      history = null;\n    }\n    this._routes.forEach(route => route.dispose());\n    this._routes = null;\n    this._historyUnlisten = null;\n    this._unblock && this._unblock();\n    this._unblock = null;\n  }\n}\n\nmodule.exports = Router;\n",
     "static": true,
     "longname": "/home/ubuntu/workspace/router/src/router/Router.js",
     "access": "public",
@@ -5287,7 +5310,7 @@
     "importPath": "@smartface/router/src/router/Router.js",
     "importStyle": null,
     "description": "Router Base",
-    "lineNumber": 28,
+    "lineNumber": 29,
     "unknown": [
       {
         "tagName": "@class",
@@ -5311,7 +5334,7 @@
     "longname": "src/router/Router.js~Router.initializeHistory",
     "access": "public",
     "description": null,
-    "lineNumber": 29,
+    "lineNumber": 30,
     "undocument": true,
     "params": [
       {
@@ -5341,7 +5364,7 @@
     "longname": "src/router/Router.js~Router.skipRender",
     "access": "public",
     "description": null,
-    "lineNumber": 45,
+    "lineNumber": 46,
     "undocument": true,
     "params": [],
     "return": null
@@ -5357,7 +5380,7 @@
     "longname": "src/router/Router.js~Router.getHistory",
     "access": "public",
     "description": null,
-    "lineNumber": 49,
+    "lineNumber": 50,
     "undocument": true,
     "params": [],
     "return": {
@@ -5377,7 +5400,7 @@
     "longname": "src/router/Router.js~Router.unloadHistory",
     "access": "public",
     "description": null,
-    "lineNumber": 53,
+    "lineNumber": 54,
     "undocument": true,
     "params": [],
     "return": null
@@ -5393,7 +5416,7 @@
     "longname": "src/router/Router.js~Router#constructor",
     "access": "public",
     "description": "",
-    "lineNumber": 60,
+    "lineNumber": 61,
     "unknown": [
       {
         "tagName": "@constructor",
@@ -5408,7 +5431,7 @@
         ],
         "spread": false,
         "optional": false,
-        "name": "param0",
+        "name": "param",
         "description": ""
       }
     ]
@@ -5422,7 +5445,7 @@
     "longname": "src/router/Router.js~Router#_historyUnlisten",
     "access": "private",
     "description": null,
-    "lineNumber": 78,
+    "lineNumber": 79,
     "undocument": true,
     "type": {
       "types": [
@@ -5439,7 +5462,7 @@
     "longname": "src/router/Router.js~Router#_isRoot",
     "access": "private",
     "description": null,
-    "lineNumber": 97,
+    "lineNumber": 98,
     "undocument": true,
     "type": {
       "types": [
@@ -5456,7 +5479,7 @@
     "longname": "src/router/Router.js~Router#_exact",
     "access": "private",
     "description": null,
-    "lineNumber": 98,
+    "lineNumber": 99,
     "undocument": true,
     "type": {
       "types": [
@@ -5473,7 +5496,7 @@
     "longname": "src/router/Router.js~Router#_unblock",
     "access": "private",
     "description": null,
-    "lineNumber": 100,
+    "lineNumber": 101,
     "undocument": true,
     "type": {
       "types": [
@@ -5492,7 +5515,7 @@
     "longname": "src/router/Router.js~Router#listen",
     "access": "public",
     "description": "",
-    "lineNumber": 106,
+    "lineNumber": 107,
     "params": [
       {
         "nullable": null,
@@ -5521,15 +5544,17 @@
     "static": false,
     "longname": "src/router/Router.js~Router#getHistory",
     "access": "public",
-    "description": null,
-    "lineNumber": 110,
-    "undocument": true,
-    "params": [],
+    "description": "",
+    "lineNumber": 114,
     "return": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
-    }
+        "Object"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "params": []
   },
   {
     "__docId__": 262,
@@ -5542,12 +5567,12 @@
     "longname": "src/router/Router.js~Router#addRouteBlocker",
     "access": "public",
     "description": "Adds route block handler to history. When history is changed in anywhere\nthen the handler intercepts before history is changed.",
-    "lineNumber": 120,
+    "lineNumber": 124,
     "params": [
       {
         "nullable": null,
         "types": [
-          "function"
+          "RouterBlockHandler"
         ],
         "spread": false,
         "optional": false,
@@ -5570,15 +5595,9 @@
     "async": false,
     "static": false,
     "longname": "src/router/Router.js~Router#onRouteExit",
-    "access": "public",
+    "access": "protected",
     "description": "Triggered when the current route's parent is another router.",
-    "lineNumber": 135,
-    "unknown": [
-      {
-        "tagName": "@event",
-        "tagValue": ""
-      }
-    ],
+    "lineNumber": 139,
     "params": [
       {
         "nullable": null,
@@ -5604,7 +5623,7 @@
     "longname": "src/router/Router.js~Router#onHistoryChange",
     "access": "public",
     "description": "",
-    "lineNumber": 141,
+    "lineNumber": 145,
     "params": [
       {
         "nullable": null,
@@ -5619,7 +5638,7 @@
       {
         "nullable": null,
         "types": [
-          "object"
+          "Object"
         ],
         "spread": false,
         "optional": false,
@@ -5638,7 +5657,7 @@
     "longname": "src/router/Router.js~Router#_matches",
     "access": "private",
     "description": null,
-    "lineNumber": 142,
+    "lineNumber": 146,
     "undocument": true,
     "type": {
       "types": [
@@ -5657,7 +5676,7 @@
     "longname": "src/router/Router.js~Router#routeRollback",
     "access": "protected",
     "description": "",
-    "lineNumber": 151,
+    "lineNumber": 155,
     "params": [],
     "return": null
   },
@@ -5672,7 +5691,7 @@
     "longname": "src/router/Router.js~Router#renderMatches",
     "access": "public",
     "description": "",
-    "lineNumber": 161,
+    "lineNumber": 165,
     "params": [
       {
         "nullable": null,
@@ -5716,7 +5735,7 @@
     "longname": "src/router/Router.js~Router#addChildRouter",
     "access": "public",
     "description": null,
-    "lineNumber": 167,
+    "lineNumber": 171,
     "undocument": true,
     "type": {
       "types": [
@@ -5735,16 +5754,10 @@
     "longname": "src/router/Router.js~Router#onRouterEnter",
     "access": "protected",
     "description": "Router is activated event handler",
-    "lineNumber": 203,
-    "unknown": [
-      {
-        "tagName": "@event",
-        "tagValue": ""
-      }
-    ],
+    "lineNumber": 207,
     "params": [
       {
-        "nullable": null,
+        "nullable": true,
         "types": [
           "string"
         ],
@@ -5752,7 +5765,7 @@
         "optional": true,
         "defaultValue": "null",
         "defaultRaw": null,
-        "name": "",
+        "name": "action",
         "description": "action"
       }
     ],
@@ -5769,7 +5782,7 @@
     "longname": "src/router/Router.js~Router#setasActiveRouter",
     "access": "protected",
     "description": "Sets the router statically as active router",
-    "lineNumber": 212,
+    "lineNumber": 217,
     "params": [
       {
         "nullable": null,
@@ -5795,7 +5808,7 @@
     "longname": "src/router/Router.js~Router#redirectRoute",
     "access": "public",
     "description": "Redirects route and removes last route record from history",
-    "lineNumber": 231,
+    "lineNumber": 230,
     "params": [
       {
         "nullable": null,
@@ -5829,15 +5842,9 @@
     "async": false,
     "static": false,
     "longname": "src/router/Router.js~Router#onRouteMatch",
-    "access": "public",
+    "access": "protected",
     "description": "Route is matched event handler",
-    "lineNumber": 246,
-    "unknown": [
-      {
-        "tagName": "@event",
-        "tagValue": ""
-      }
-    ],
+    "lineNumber": 245,
     "params": [
       {
         "nullable": null,
@@ -5862,7 +5869,7 @@
       {
         "nullable": null,
         "types": [
-          "object"
+          "Object"
         ],
         "spread": false,
         "optional": false,
@@ -5896,7 +5903,7 @@
     "static": false,
     "longname": "src/router/Router.js~Router#renderRoute",
     "access": "public",
-    "description": "",
+    "description": "Render route",
     "lineNumber": 261,
     "params": [
       {
@@ -5912,7 +5919,7 @@
       {
         "nullable": null,
         "types": [
-          "{isExact: boolean, params: object,path: string, url: string}"
+          "RouteMatch"
         ],
         "spread": false,
         "optional": false,
@@ -5922,7 +5929,7 @@
       {
         "nullable": null,
         "types": [
-          "object"
+          "RouteState"
         ],
         "spread": false,
         "optional": false,
@@ -5973,12 +5980,12 @@
     "longname": "src/router/Router.js~Router#push",
     "access": "public",
     "description": "Change history by specified path",
-    "lineNumber": 284,
+    "lineNumber": 285,
     "params": [
       {
         "nullable": null,
         "types": [
-          "object",
+          "Object",
           "string"
         ],
         "spread": false,
@@ -5987,22 +5994,25 @@
         "description": "Path or matches of the route"
       },
       {
-        "nullable": null,
+        "nullable": false,
         "types": [
-          "boolean"
+          "Object"
         ],
         "spread": false,
         "optional": true,
-        "defaultValue": "true",
-        "defaultRaw": true,
-        "name": "",
-        "description": "addtoHistory"
+        "defaultValue": "{}",
+        "defaultRaw": {},
+        "name": "data",
+        "description": "data"
       }
     ],
     "return": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "Router"
+      ],
+      "spread": false,
+      "description": ""
     }
   },
   {
@@ -6016,7 +6026,7 @@
     "longname": "src/router/Router.js~Router#replace",
     "access": "public",
     "description": "Replaces specified path's state",
-    "lineNumber": 301,
+    "lineNumber": 302,
     "params": [
       {
         "nullable": null,
@@ -6052,7 +6062,7 @@
     "longname": "src/router/Router.js~Router#goBack",
     "access": "public",
     "description": "Rewinds history",
-    "lineNumber": 309,
+    "lineNumber": 310,
     "params": [],
     "return": null
   },
@@ -6067,13 +6077,16 @@
     "longname": "src/router/Router.js~Router#getLocation",
     "access": "public",
     "description": "Return last location of history",
-    "lineNumber": 316,
-    "params": [],
+    "lineNumber": 319,
     "return": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
-    }
+        "RouteLocation"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "params": []
   },
   {
     "__docId__": 280,
@@ -6085,15 +6098,17 @@
     "static": false,
     "longname": "src/router/Router.js~Router#getHistoryasArray",
     "access": "public",
-    "description": null,
-    "lineNumber": 320,
-    "undocument": true,
-    "params": [],
+    "description": "",
+    "lineNumber": 326,
     "return": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
-    }
+        "Array<string>"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "params": []
   },
   {
     "__docId__": 281,
@@ -6106,7 +6121,7 @@
     "longname": "src/router/Router.js~Router#goForward",
     "access": "public",
     "description": "Forwards history",
-    "lineNumber": 328,
+    "lineNumber": 333,
     "params": [],
     "return": null
   },
@@ -6121,7 +6136,7 @@
     "longname": "src/router/Router.js~Router#go",
     "access": "public",
     "description": "Changes route by history index.",
-    "lineNumber": 336,
+    "lineNumber": 343,
     "params": [
       {
         "nullable": null,
@@ -6135,9 +6150,12 @@
       }
     ],
     "return": {
+      "nullable": null,
       "types": [
         "boolean"
-      ]
+      ],
+      "spread": false,
+      "description": ""
     }
   },
   {
@@ -6151,7 +6169,7 @@
     "longname": "src/router/Router.js~Router#add",
     "access": "public",
     "description": "Adds new route",
-    "lineNumber": 350,
+    "lineNumber": 357,
     "params": [
       {
         "nullable": null,
@@ -6177,13 +6195,21 @@
     "longname": "src/router/Router.js~Router#map",
     "access": "public",
     "description": "Iterates child routes",
-    "lineNumber": 359,
+    "lineNumber": 367,
     "unknown": [
       {
         "tagName": "@paramms",
         "tagValue": "{function} fn"
       }
     ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Array"
+      ],
+      "spread": false,
+      "description": ""
+    },
     "params": [
       {
         "name": "fn",
@@ -6191,12 +6217,7 @@
           "*"
         ]
       }
-    ],
-    "return": {
-      "types": [
-        "*"
-      ]
-    }
+    ]
   },
   {
     "__docId__": 285,
@@ -6209,7 +6230,7 @@
     "longname": "src/router/Router.js~Router#dispose",
     "access": "public",
     "description": "Unloads the router",
-    "lineNumber": 366,
+    "lineNumber": 374,
     "params": [],
     "return": null
   },
@@ -6222,7 +6243,7 @@
     "longname": "src/router/Router.js~Router#_routes",
     "access": "private",
     "description": null,
-    "lineNumber": 373,
+    "lineNumber": 381,
     "undocument": true,
     "type": {
       "types": [
