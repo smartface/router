@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/router/Router.js | Smmartface</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Smartface NativeRouter"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Smmartface"><meta property="twitter:description" content="Smartface NativeRouter"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/smartface/router"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#native">native</a><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-NavigationControllerTransformEvent">NavigationControllerTransformEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.BottomTabBarController">BottomTabBarController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.BottomTabBarItem">BottomTabBarItem</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.NavigationController">NavigationController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.Page">Page</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#router">router</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createRouteData">createRouteData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteBuildHandler">RouteBuildHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteLocation">RouteLocation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteMatch">RouteMatch</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteParams">RouteParams</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteState">RouteState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HistoryListener">HistoryListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouterBlockHandler">RouterBlockHandler</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/router/Router.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">&quot;use strict&quot;;
+
+/**
+ * @typedef {function(location: RouteLocation, action: string)} RouterBlockHandler
+ *
+ */
+
+/**
+ * @typedef {function(location: RouteLocation)} HistoryListener
+ *
+ */
+
+const Route = require(&quot;./Route&quot;);
+const createMemoryHistory = require(&quot;../common/history&quot;);
+const mapComposer = require(&quot;../utils/map&quot;);
+const matchPath = require(&quot;../common/matchPath&quot;);
+const matchRoutes = require(&quot;../common/matchRoutes&quot;);
+let actions = [];
+
+let history;
+let _skipRender = false;
+
+/**
+ * Router Base
+ *
+ * @class
+ */
+class Router extends Route {
+  static initializeHistory({
+    initialEntries = null,
+    initialIndex = null,
+    keyLength = null,
+    getUserConfirmation = null
+  }) {
+    history = createMemoryHistory({
+      initialEntries: initialEntries || [], // The initial URLs in the history stack
+      initialIndex: initialIndex || 0, // The starting index in the history stack
+      keyLength: keyLength || 20, // The length of location.key
+      // A function to use to confirm navigation with the user. Required
+      // if you return string prompts from transition hooks (see below)
+      getUserConfirmation: getUserConfirmation
+    });
+  }
+
+  static skipRender() {
+    _skipRender = true;
+  }
+
+  static getHistory() {
+    return history;
+  }
+
+  static unloadHistory() {
+    history = null;
+  }
+  /**
+   * @constructor
+   * @param {{ path: string, target: object|null, routes: Array, exact: boolean, isRoot: boolean }} param0
+   */
+  constructor({
+    path = &quot;&quot;,
+    build = null,
+    routes = [],
+    exact = false,
+    isRoot = false,
+    to = null
+  }) {
+    super({ path, build, routes, to });
+
+    if (!history) {
+      Router.initializeHistory({
+        getUserConfirmation: (blockerFn, callback) =&gt; {
+          return blockerFn(callback);
+        }
+      });
+    }
+
+    this._historyUnlisten = () =&gt; null;
+    if (isRoot) {
+      this._historyUnlisten = history.listen((location, action) =&gt; {
+        console.log(`History is changed ${_skipRender}`);
+        try {
+          if (_skipRender === false) {
+            this.onHistoryChange(location, action);
+          }
+        } catch (e) {
+          throw e;
+        } finally {
+          _skipRender = false;
+        }
+
+        // [&quot;pathname&quot;,&quot;search&quot;,&quot;hash&quot;,&quot;state&quot;,&quot;key&quot;]
+        // console.log(JSON.stringify(history.entries.map(entry =&gt; entry.pathname)));
+      });
+    }
+
+    this._isRoot = isRoot;
+    this._exact = exact;
+    // this._cache = new WeakMap();
+    this._unblock = () =&gt; null;
+  }
+
+  /**
+   * @param {HistoryListener} fn
+   */
+  listen(fn) {
+    return history.listen(fn);
+  }
+
+  getHistory() {
+    return history;
+  }
+
+  /**
+   * Adds route block handler to history. When history is changed in anywhere
+   * then the handler intercepts before history is changed.
+   *
+   * @param {function} fn
+   */
+  addRouteBlocker(fn) {
+    const unblock = history.block((location, action) =&gt; callback =&gt; {
+      unblock();
+      fn(location, action, callback);
+    });
+
+    return unblock;
+  }
+
+  /**
+   * Triggered when the current route&apos;s parent is another router.
+   *
+   * @event
+   * @param {string} action
+   */
+  onRouteExit(action) {}
+
+  /**
+   * @param {{ pathname: string, search: string, state: object }} location
+   * @param {object} action
+   */
+  onHistoryChange(location, action) {
+    this._matches = matchRoutes([this].concat(this._routes), location.pathname);
+
+    this.renderMatches(this._matches, location.state, action);
+  }
+
+  /**
+   * @protected
+   * Removes last entry from history.
+   */
+  routeRollback() {
+    this.getHistory().rollback();
+  }
+
+  /**
+   *
+   * @param {Array&lt;{isExact: boolean,params: object,path: string,url: string}&gt;} matches
+   * @param {*} state
+   * @param {*} action
+   */
+  renderMatches(matches, state, action) {
+    // console.log(&quot;matches : &quot; + JSON.stringify(matches.map(({ match }) =&gt; match)));
+    matches.some(({ match, route }, index) =&gt; {
+      if (route !== this &amp;&amp; route instanceof Router) {
+        console.log(&quot;not exact match : &quot; + this);
+        // if(index &gt; 0 &amp;&amp; this._isRoot)
+        this.addChildRouter &amp;&amp;
+          actions.push([this.addChildRouter.bind(this), route]);
+        // move routes to child router
+        route.renderMatches(
+          matches.slice(index, matches.length),
+          state,
+          action
+        );
+
+        return true;
+      } else if (match.isExact === true) {
+        console.log(&quot;exact match : &quot; + this + &quot; : &quot; + route.getRedirectto());
+        // route has redirection
+        if (route.getRedirectto()) {
+          actions = [];
+          return this.redirectRoute(route, action);
+        }
+
+        if (this.onRouteMatch(route, match, state, action)) {
+          actions.forEach(item =&gt; item[0](item[1]));
+        }
+
+        this.onRouterEnter &amp;&amp; this.onRouterEnter(action);
+        actions = [];
+
+        return true;
+      }
+    });
+  }
+
+  /**
+   * Router is activated event handler
+   * @event
+   * @protected
+   * @param {string} [=null] action
+   */
+  onRouterEnter(action = null) {
+    this.setasActiveRouter(action);
+  }
+
+  /**
+   * Sets the router statically as active router
+   * @protected
+   * @param {string} action
+   */
+  setasActiveRouter(action) {
+    Router.currentRouter &amp;&amp;
+      this != Router.currentRouter &amp;&amp;
+      Router.currentRouter.onRouterExit &amp;&amp;
+      Router.currentRouter.onRouterExit(action);
+    Router.currentRouter = this;
+  }
+
+  // routeRedirectMaybe(route) {
+  //   route.getRedirectto()
+  //     ? this.redirectRoute(route)
+  //     : this.push(route.getUrlPath());
+  // }
+
+  /**
+   * Redirects route and removes last route record from history
+   * @param {Route} route
+   * @param {string} action
+   */
+  redirectRoute(route, action) {
+    // redirection of a route
+    this.routeRollback(); // remove last route from history
+    this.push(route.getRedirectto()); // and add new route
+  }
+
+  /**
+   * Route is matched event handler
+   *
+   * @event
+   * @param {Route} route
+   * @param {{isExact: boolean, params: object, path: string, url: string}} match
+   * @param {object} state
+   * @param {string} action
+   */
+  onRouteMatch(route, match, state, action) {
+    const view = this.renderRoute(route, match, state);
+    if (!view) {
+      this.routeRollback();
+    }
+
+    return view;
+  }
+
+  /**
+   *
+   * @param {Route} route
+   * @param {{isExact: boolean, params: object,path: string, url: string}} match
+   * @param {object} state
+   */
+  renderRoute(route, match, state) {
+    let view = route.build(match, state.routeState || {}, this, state.view);
+    state.view = view;
+
+    return view;
+  }
+
+  /**
+   * Helper method that pushes the route&apos;s url to history
+   *
+   * @param {Route} route
+   */
+  pushRoute(route) {
+    console.log(`Push router ${route}`);
+    this.push(route.getUrlPath());
+  }
+
+  /**
+   * Change history by specified path
+   *
+   * @param {object|string} path - Path or matches of the route
+   * @param {boolean} [=true] addtoHistory
+   */
+  push(path, data = {}) {
+    // this._cache.get(path) ||
+    if (path.charAt(0) !== &quot;/&quot;) {
+      path = this._path.getPath() + &quot;/&quot; + path;
+    }
+
+    this.getHistory().push(path, { routeState: { data } });
+
+    return this;
+  }
+
+  /**
+   * Replaces specified path&apos;s state
+   *
+   * @param {string} path
+   * @param {data} data
+   */
+  replace(path, data) {
+    this.getHistory().replace(path, { routeState: data });
+  }
+
+  /**
+   * Rewinds history
+   *
+   */
+  goBack() {
+    this.getHistory().go(-1);
+  }
+
+  /**
+   * Return last location of history
+   */
+  getLocation() {
+    return this.getHistory().location;
+  }
+
+  getHistoryasArray() {
+    return history.entries.map(item =&gt; item.pathname);
+  }
+
+  /**
+   * Forwards history
+   *
+   */
+  goForward() {
+    this.getHistory().goForward();
+  }
+
+  /**
+   * Changes route by history index.
+   * @param {number} index
+   */
+  go(index) {
+    if (this.getHistory().canGo(index)) {
+      this.getHistory().index();
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Adds new route
+   * @param {Route} route
+   *
+   */
+  add(route) {
+    this._routes.push(route);
+  }
+
+  /**
+   * Iterates child routes
+   *
+   * @paramms {function} fn
+   */
+  map(fn) {
+    return this._routes.map(fn);
+  }
+
+  /**
+   * Unloads the router
+   */
+  dispose() {
+    this._historyUnlisten();
+    if (this._isRoot) {
+      history.clear();
+      history = null;
+    }
+    this._routes.forEach(route =&gt; route.dispose());
+    this._routes = null;
+    this._historyUnlisten = null;
+    this._unblock &amp;&amp; this._unblock();
+    this._unblock = null;
+  }
+}
+
+module.exports = Router;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

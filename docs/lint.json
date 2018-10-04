@@ -1,0 +1,371 @@
+[
+  {
+    "name": "BottomTabBarRouter#setVisited",
+    "filePath": "src/native/BottomTabBarRouter.js",
+    "lines": [
+      {
+        "lineNumber": 135,
+        "line": "  /**"
+      },
+      {
+        "lineNumber": 136,
+        "line": "   * Sets TabBarItems visited by TabBarItem index"
+      },
+      {
+        "lineNumber": 137,
+        "line": "   *"
+      },
+      {
+        "lineNumber": 138,
+        "line": "   * @param {number} index"
+      },
+      {
+        "lineNumber": 139,
+        "line": "   */"
+      },
+      {
+        "lineNumber": 140,
+        "line": "  setVisited(index, path) {"
+      }
+    ],
+    "codeParams": [
+      "index",
+      "path"
+    ],
+    "docParams": [
+      "index"
+    ]
+  },
+  {
+    "name": "Renderer#showWithTransition",
+    "filePath": "src/native/Renderer.js",
+    "lines": [
+      {
+        "lineNumber": 71,
+        "line": "  /**"
+      },
+      {
+        "lineNumber": 72,
+        "line": "   * Only use if rootpage is Page instancea"
+      },
+      {
+        "lineNumber": 73,
+        "line": "   *"
+      },
+      {
+        "lineNumber": 74,
+        "line": "   * @protected"
+      },
+      {
+        "lineNumber": 75,
+        "line": "   * @param {Page} fromPage"
+      },
+      {
+        "lineNumber": 76,
+        "line": "   * @param {Page} toPage"
+      },
+      {
+        "lineNumber": 77,
+        "line": "   * @param {number} [=1] duration"
+      },
+      {
+        "lineNumber": 78,
+        "line": "   * @param {number} [=0] options"
+      },
+      {
+        "lineNumber": 79,
+        "line": "   */"
+      },
+      {
+        "lineNumber": 80,
+        "line": "  showWithTransition(fromPage, toPage, duration = 0, options = 0 << 20) {"
+      }
+    ],
+    "codeParams": [
+      "fromPage",
+      "toPage",
+      "duration",
+      "options"
+    ],
+    "docParams": [
+      "fromPage",
+      "toPage",
+      "",
+      ""
+    ]
+  },
+  {
+    "name": "Renderer#pushChild",
+    "filePath": "src/native/Renderer.js",
+    "lines": [
+      {
+        "lineNumber": 152,
+        "line": "  /**"
+      },
+      {
+        "lineNumber": 153,
+        "line": "   * Push child from root NavigationController."
+      },
+      {
+        "lineNumber": 154,
+        "line": "   * Must be implemented."
+      },
+      {
+        "lineNumber": 155,
+        "line": "   * "
+      },
+      {
+        "lineNumber": 156,
+        "line": "   * @param {Page} page"
+      },
+      {
+        "lineNumber": 157,
+        "line": "   * @param {boolean} [=true] animmated"
+      },
+      {
+        "lineNumber": 158,
+        "line": "   */"
+      },
+      {
+        "lineNumber": 159,
+        "line": "  pushChild(page, animated = true) {"
+      }
+    ],
+    "codeParams": [
+      "page",
+      "animated"
+    ],
+    "docParams": [
+      "page",
+      ""
+    ]
+  },
+  {
+    "name": "Renderer#popChild",
+    "filePath": "src/native/Renderer.js",
+    "lines": [
+      {
+        "lineNumber": 163,
+        "line": "  /**"
+      },
+      {
+        "lineNumber": 164,
+        "line": "   * Pop child from root NavigationController."
+      },
+      {
+        "lineNumber": 165,
+        "line": "   * Must be implemented."
+      },
+      {
+        "lineNumber": 166,
+        "line": "   * "
+      },
+      {
+        "lineNumber": 167,
+        "line": "   * @param {boolean} [=true] animmated"
+      },
+      {
+        "lineNumber": 168,
+        "line": "   */"
+      },
+      {
+        "lineNumber": 169,
+        "line": "  popChild(animated = true) {"
+      }
+    ],
+    "codeParams": [
+      "animated"
+    ],
+    "docParams": [
+      ""
+    ]
+  },
+  {
+    "name": "Route#build",
+    "filePath": "src/router/Route.js",
+    "lines": [
+      {
+        "lineNumber": 197,
+        "line": "  /**"
+      },
+      {
+        "lineNumber": 198,
+        "line": "   * Builds a route's view"
+      },
+      {
+        "lineNumber": 199,
+        "line": "   *"
+      },
+      {
+        "lineNumber": 200,
+        "line": "   * @param {RouteMatch} match"
+      },
+      {
+        "lineNumber": 201,
+        "line": "   * @param {RouteState} state"
+      },
+      {
+        "lineNumber": 202,
+        "line": "   * @param {Route} route"
+      },
+      {
+        "lineNumber": 203,
+        "line": "   * @param {Page} view"
+      },
+      {
+        "lineNumber": 204,
+        "line": "   */"
+      },
+      {
+        "lineNumber": 205,
+        "line": "  build(match, state, router, view) {"
+      }
+    ],
+    "codeParams": [
+      "match",
+      "state",
+      "router",
+      "view"
+    ],
+    "docParams": [
+      "match",
+      "state",
+      "route",
+      "view"
+    ]
+  },
+  {
+    "name": "Route#onPrematch",
+    "filePath": "src/router/Route.js",
+    "lines": [
+      {
+        "lineNumber": 209,
+        "line": "  /**"
+      },
+      {
+        "lineNumber": 210,
+        "line": "   * Triggered before when an exact match happends."
+      },
+      {
+        "lineNumber": 211,
+        "line": "   * If the onBeforeMatch eventhandler is set"
+      },
+      {
+        "lineNumber": 212,
+        "line": "   * and onBeforeMatch returns 'true' then match happends"
+      },
+      {
+        "lineNumber": 213,
+        "line": "   * or onBeforeMatch returns 'false' then match is blocked"
+      },
+      {
+        "lineNumber": 214,
+        "line": "   *"
+      },
+      {
+        "lineNumber": 215,
+        "line": "   * @protected"
+      },
+      {
+        "lineNumber": 216,
+        "line": "   * @param {RouteMatch} mmatch"
+      },
+      {
+        "lineNumber": 217,
+        "line": "   */"
+      },
+      {
+        "lineNumber": 218,
+        "line": "  onPrematch(match) {"
+      }
+    ],
+    "codeParams": [
+      "match"
+    ],
+    "docParams": [
+      "mmatch"
+    ]
+  },
+  {
+    "name": "Router#onRouterEnter",
+    "filePath": "src/router/Router.js",
+    "lines": [
+      {
+        "lineNumber": 196,
+        "line": "  /**"
+      },
+      {
+        "lineNumber": 197,
+        "line": "   * Router is activated event handler"
+      },
+      {
+        "lineNumber": 198,
+        "line": "   * @event"
+      },
+      {
+        "lineNumber": 199,
+        "line": "   * @protected"
+      },
+      {
+        "lineNumber": 200,
+        "line": "   * @param {string} [=null] action"
+      },
+      {
+        "lineNumber": 201,
+        "line": "   */"
+      },
+      {
+        "lineNumber": 202,
+        "line": "  onRouterEnter(action = null) {"
+      }
+    ],
+    "codeParams": [
+      "action"
+    ],
+    "docParams": [
+      ""
+    ]
+  },
+  {
+    "name": "Router#push",
+    "filePath": "src/router/Router.js",
+    "lines": [
+      {
+        "lineNumber": 277,
+        "line": "  /**"
+      },
+      {
+        "lineNumber": 278,
+        "line": "   * Change history by specified path"
+      },
+      {
+        "lineNumber": 279,
+        "line": "   *"
+      },
+      {
+        "lineNumber": 280,
+        "line": "   * @param {object|string} path - Path or matches of the route"
+      },
+      {
+        "lineNumber": 281,
+        "line": "   * @param {boolean} [=true] addtoHistory"
+      },
+      {
+        "lineNumber": 282,
+        "line": "   */"
+      },
+      {
+        "lineNumber": 283,
+        "line": "  push(path, data = {}) {"
+      }
+    ],
+    "codeParams": [
+      "path",
+      "data"
+    ],
+    "docParams": [
+      "path",
+      ""
+    ]
+  }
+]

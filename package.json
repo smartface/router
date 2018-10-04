@@ -28,6 +28,9 @@
     "resolve-pathname": "^2.2.0"
   },
   "devDependencies": {
+    "esdoc": "^1.1.0",
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
+    "esdoc-standard-plugin": "^1.0.0",
     "eslint": "^5.6.1",
     "eslint-config-prettier": "^3.0.1",
     "jest": "^23.5.0",

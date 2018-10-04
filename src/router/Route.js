@@ -214,7 +214,7 @@ class Route {
    * or onBeforeMatch returns 'false' then match is blocked
    *
    * @protected
-   * @param
+   * @param {RouteMatch} mmatch
    */
   onPrematch(match) {
     return (this._onBeforeMatch && this._onBeforeMatch(match)) || true;

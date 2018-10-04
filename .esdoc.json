@@ -1,13 +1,6 @@
 {
   "source": "./src",
   "destination": "./docs",
-  "test": {
-    "type": "jest",
-    "source": "./__test__",
-    "includes": ["(test)\\.(js)$"]
-  },
-  "undocumentIdentifier": false,
-  "title": "Smarface NativeRouter",
   "plugins": [
     {
       "name": "esdoc-ecmascript-proposal-plugin",
@@ -26,7 +19,7 @@
           "author": "https://github.com/cenkce"
         },
         "test": {
-          "source": "./tests/",
+          "source": "./__test__",
           "interfaces": [
             "expect",
             "test",

@@ -137,6 +137,7 @@ class BottomTabBarRouter extends Router {
    * Sets TabBarItems visited by TabBarItem index
    *
    * @param {number} index
+   * @param {string} path
    */
   setVisited(index, path) {
     console.log(`setVisited ${index} ${path}`);

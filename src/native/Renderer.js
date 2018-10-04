@@ -75,10 +75,10 @@ class Renderer {
    * @protected
    * @param {Page} fromPage
    * @param {Page} toPage
-   * @param {number} [=1] duration
+   * @param {number} [=0] duration
    * @param {number} [=0] options
    */
-  showWithTransition(fromPage, toPage, duration = 0, options = 0 << 20) {
+  showWithTransition(fromPage, toPage, duration = 0, options = 0) {
     throw new Error("onNavigatorChange method must be overridden");
   }
   

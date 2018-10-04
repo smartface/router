@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl">
+  <title data-ice="title">Home | Smmartface</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Smartface NativeRouter"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Smmartface"><meta property="twitter:description" content="Smartface NativeRouter"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/smartface/router"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#native">native</a><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-NavigationControllerTransformEvent">NavigationControllerTransformEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.BottomTabBarController">BottomTabBarController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.BottomTabBarItem">BottomTabBarItem</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.NavigationController">NavigationController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.Page">Page</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#router">router</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createRouteData">createRouteData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteBuildHandler">RouteBuildHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteLocation">RouteLocation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteMatch">RouteMatch</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteParams">RouteParams</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteState">RouteState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HistoryListener">HistoryListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouterBlockHandler">RouterBlockHandler</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><div data-ice="index" class="github-markdown"><h1 id="smartface-nativerouter">Smartface NativeRouter</h1><h2 id="usages">Usages</h2><pre><code class="lang-javascript"><code class="source-code prettyprint">const Router = require(&quot;@smartface/router/src/native/NativeRouter&quot;);
+const RouterBase = require(&quot;@smartface/router/src/router/Router&quot;);
+const StackRouter = require(&quot;@smartface/router/src/native/NativeStackRouter&quot;);
+const BottomTabBarRouter = require(&quot;@smartface/router/src/native/BottomTabBarRouter&quot;);
+const Route = require(&quot;@smartface/router/src/router/Route&quot;);
+const Color = require(&apos;sf-core/ui/color&apos;);
+const Image = require(&quot;sf-core/ui/image&quot;);
+
+var tabbar1 = Image.createFromFile(&quot;images://tabbar1.png&quot;);
+
+const router = Router.of({
+    path: &quot;/&quot;,
+    to: &quot;/pages/page1&quot;,
+    isRoot: true,
+    routes: [
+        BottomTabBarRouter.of({
+            path: &quot;/pages&quot;,
+            tabbarParams: () =&gt; ({
+                ios: {translucent: false},
+                itemColor: Color.RED,
+                unselectedItemColor: Color.YELLOW,
+                backgroundColor: Color.BLUE,
+                height: 100
+            }),
+            items: () =&gt; [{title : &quot;Page1&quot;}, {title: &quot;Page2&quot;, icon: tabbar1}],
+            routes: [
+                Route.of({
+                    path: &quot;/pages/page1&quot;,
+                    build: (match, state, router) =&gt; {
+                        let Page1 = require(&quot;pages/page1&quot;);
+                        return new Page1(router);
+                    }
+                }),
+                Route.of({
+                    path: &apos;/pages/page2&apos;,
+                    build: (match, state, router, view) =&gt; {
+                        // if (view) {
+                        //     view.routeData = state.data;
+                        //     return view;
+                        // }
+
+                        let Page2 = require(&quot;pages/page2&quot;);
+                        return new Page2({}, router);
+                    }
+                })
+            ]
+        }),
+        StackRouter.of({
+            path: &quot;/user&quot;,
+            routes: [
+                Route.of({
+                    path: &apos;/user/login&apos;,
+                    build: (match, state, router, view) =&gt; {
+                        // if checked is false
+                        if(state.data.checked){
+                            // then blocks route
+                            return null;
+                        }
+                        let Page2 = require(&quot;pages/page2&quot;);
+                        return new Page2({message: &quot;user login page&quot;}, router);
+                    }
+                })
+            ]
+        })
+
+    ]
+});
+
+router.push(&quot;/pages/page1&quot;);</code>
+</code></pre>
+<h2 id="blocking-routes">Blocking Routes</h2><pre><code class="lang-js"><code class="source-code prettyprint">router.addRouteBlocker((location, action, callback) =&gt; {
+    alert({
+     message: &quot;Would you like to answer?&quot;,
+     title: &quot;Question&quot;, //optional
+         buttons: [{
+                 text: &quot;Yes&quot;,
+                 type: AlertView.Android.ButtonType.POSITIVE,
+                 onClick: function() {
+                     callback(true)
+                 },
+             },
+             {
+                 text: &quot;No&quot;,
+                 type: AlertView.Android.ButtonType.NEGATIVE,
+                 onClick: function() {
+                     callback(false);
+                 },
+             }
+         ]
+     });
+});</code>
+</code></pre>
+<h2 id="listening-history-changes">Listening history changes</h2><pre><code class="lang-js"><code class="source-code prettyprint">const unlisten = router.getHistory().listen((location, action) =&gt; {
+    // location.state.userState
+   console.log(&quot; ---- new route action : &quot;+action+&quot; &gt; &quot;+location.pathname); 
+});
+
+unlisten();</code>
+</code></pre>
+<h2 id="types-of-routers">Types of Routers</h2><p>There are 5 types of routers</p>
+<ul>
+<li>NativeRouter</li>
+<li>NativeStackRouter</li>
+<li>NativeBottomTabBarRouter</li>
+<li>NativeModalRouter (in roadmap)</li>
+<li>NativeSplitRouter (in roadmap)</li>
+</ul>
+<h2 id="common-features-of-routers">Common features of Routers</h2><ul>
+<li>Nested routes</li>
+<li>Route redirection</li>
+<li>Route blocking</li>
+<li>History listening</li>
+</ul>
+</div>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

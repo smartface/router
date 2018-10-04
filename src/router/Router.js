@@ -6,7 +6,7 @@
  */
 
 /**
- * @typedef {function(location: RouteLocation)} RouterBlockHandler
+ * @typedef {function(location: RouteLocation)} HistoryListener
  *
  */
 
@@ -101,7 +101,7 @@ class Router extends Route {
   }
 
   /**
-   * @param {function}
+   * @param {HistoryListener} fn
    */
   listen(fn) {
     return history.listen(fn);
@@ -268,7 +268,7 @@ class Router extends Route {
   /**
    * Helper method that pushes the route's url to history
    *
-   * @param {Route}
+   * @param {Route} route
    */
   pushRoute(route) {
     console.log(`Push router ${route}`);

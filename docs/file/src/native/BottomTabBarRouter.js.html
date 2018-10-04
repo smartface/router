@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/native/BottomTabBarRouter.js | Smmartface</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Smartface NativeRouter"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Smmartface"><meta property="twitter:description" content="Smartface NativeRouter"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/smartface/router"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#native">native</a><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-NavigationControllerTransformEvent">NavigationControllerTransformEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.BottomTabBarController">BottomTabBarController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.BottomTabBarItem">BottomTabBarItem</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.NavigationController">NavigationController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.Page">Page</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#router">router</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createRouteData">createRouteData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteBuildHandler">RouteBuildHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteLocation">RouteLocation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteMatch">RouteMatch</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteParams">RouteParams</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteState">RouteState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HistoryListener">HistoryListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouterBlockHandler">RouterBlockHandler</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/native/BottomTabBarRouter.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">&quot;use strict&quot;;
+
+const Router = require(&quot;../router/Router&quot;);
+const BottomTabBarController = require(&quot;sf-core/ui/bottomtabbarcontroller&quot;);
+const createRenderer = require(&quot;./createRenderer&quot;);
+const TabBarItem = require(&quot;sf-core/ui/tabbaritem&quot;);
+
+function functionMaybe(val) {
+  return typeof val === &quot;function&quot; ? val() : val;
+}
+
+function createTabBarItem(item) {
+  return item instanceof TabBarItem ? item : new TabBarItem(item);
+}
+
+class BottomTabBarRouter extends Router {
+  /**
+   * Builds OS specific NaitveRouter
+   * @static
+   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0
+   */
+  static of({
+    path = &quot;&quot;,
+    routes = [],
+    exact = false,
+    to = null,
+    items = [],
+    tabbarParams = {},
+    isRoot = false
+  }) {
+    return new BottomTabBarRouter({
+      path,
+      routes,
+      exact,
+      to,
+      items,
+      tabbarParams,
+      isRoot,
+      renderer: createRenderer()
+    });
+  }
+
+  /**
+   * @constructor
+   * @param {{ path: string, target:object|null, routes: Array, exact: boolean }} param0
+   */
+  constructor({
+    path = &quot;&quot;,
+    routes = [],
+    exact = false,
+    renderer = null,
+    to = null,
+    tabbarParams = {},
+    items = [],
+    isRoot = false
+  }) {
+    super({
+      path,
+      routes,
+      exact,
+      to,
+      isRoot
+    });
+
+    this._renderer = renderer;
+    this._renderer.setRootController(new BottomTabBarController());
+    this._visitedIndexes = { length: 0 };
+    this._fromRouter = false;
+
+    this._renderer._rootController.shouldSelectByIndex = ({ index }) =&gt; {
+      // TabbarItem should be changed
+      this._currentIndex = index;
+      return true;
+    };
+
+    this._renderer._rootController.didSelectByIndex = ({ index }) =&gt; {
+      // TabbarItem did change
+      console.log(&quot;didSelectByIndex  : &quot; + index + &quot; : &quot; + this._fromRouter);
+      if (this._fromRouter === false) {
+        const route = this.resolveRoute(index);
+        if (this.isVisited(index)) {
+          // Will Not trigger next history change
+          Router.skipRender();
+          this.push(this._visitedIndexes[index].path);
+        }
+        if (route instanceof Router) {
+          route.onRouterEnter(&quot;PUSH&quot;);
+        }
+      }
+
+      !this.isVisited(index) &amp;&amp; this.routetoIndex(index);
+    };
+
+    // Assigns BottomTabBar props
+    Object.assign(this._renderer._rootController, tabbarParams);
+    //Clears child routers onRouteExit because of NatveStackRouter creates new NavigationController to clear all children.
+    this._routes.map(route =&gt; {
+      route.onRouterExit &amp;&amp; (route.onRouteExit = () =&gt; null);
+    });
+    // Initilaze BottomTabBarController&apos;s child controllers
+    this._renderer.setChildControllers(
+      this._routes.map(route =&gt; route.build(null, null, this))
+    );
+    // Initilaze BottomTabBarController&apos;s TabBarItems
+    this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem));
+    this._renderer._rootController.show();
+    // Overrides build method
+    this.build = () =&gt; this._renderer._rootController;
+  }
+
+  /**
+   * @override
+   */
+  renderMatches(matches, state, action) {
+    this._fromRouter = true;
+
+    if (matches.length &gt; 0) {
+      console.log(`Render matches`);
+      const { match: next } = matches[matches.length - 1];
+      const { match } = matches[1];
+      const lastIndex = this.resolveIndex(next.path);
+      const index = this.resolveIndex(match.path);
+      // sets target tabbar item as visited.
+      // selects target tabbaritem by index
+      this._renderer.setSelectedIndex(index);
+      this._renderer._rootController.show();
+      console.log(`current : ${match.path} - next : ${next.path}`);
+      this.setVisited(index, next.path);
+    }
+
+    super.renderMatches(matches, state, action);
+
+    this._fromRouter = false;
+  }
+
+  /**
+   * Sets TabBarItems visited by TabBarItem index
+   *
+   * @param {number} index
+   */
+  setVisited(index, path) {
+    console.log(`setVisited ${index} ${path}`);
+    if (index &lt; 0) return;
+    this._visitedIndexes[index] = {
+      path
+    };
+    this._visitedIndexes.length++;
+  }
+
+  /**
+   * CHecks if TabBarItem is visited before
+   * @param {number} index
+   * @returns {boolean}
+   */
+  isVisited(index) {
+    return !!this._visitedIndexes[index];
+  }
+
+  /**
+   * Finds child route&apos;s index by path
+   * @param {string} path
+   */
+  resolveIndex(path) {
+    return this._routes.findIndex(route =&gt; route.getUrlPath() === path);
+  }
+
+  /**
+   * Finds child route by index
+   * @param {number} index
+   */
+  resolveRoute(index) {
+    return this._routes.find((route, ind) =&gt; ind === index);
+  }
+
+  /**
+   * @override
+   */
+  dispose() {
+    super.dispose();
+    this._unlistener();
+    this._renderer._rootController.didSelectByIndex = () =&gt; null;
+  }
+
+  /**
+   * @override
+   * @event
+   * @protected
+   */
+  onRouteMatch(route, match, state, action) {
+    const view = super.onRouteMatch(route, match, state);
+
+    if (!view) return false;
+
+    //if the path has already opened then skip routing
+    if (!this.isInitialPath(match.path)) {
+      this.routetoIndex(this.resolveIndex(match.path));
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Checks specified path is currently opened path
+   * @param {stirng} path - Route path
+   * @returns {boolean}
+   */
+  isInitialPath(path) {
+    console.log(
+      `isInitialPath : ${path} : redirection : ${this.getRedirectto()} : url : ${this.getUrlPath()}`
+    );
+    return path === this.getRedirectto() || path === this.getUrlPath();
+  }
+
+  /**
+   * Pushes a new route by index
+   *
+   * @param {number} index
+   */
+  routetoIndex(index) {
+    index = index &lt; 0 ? 0 : index;
+    console.log(&quot;routetoIndex : &quot; + index);
+    // this.setVisited(index);
+    this._renderer.setSelectedIndex(index);
+    this._renderer._rootController.show();
+    const route = this.resolveRoute(index);
+    route instanceof Router &amp;&amp; this.pushRoute(route);
+    console.log(&quot;end of routetoIndex : &quot; + route);
+  }
+}
+
+module.exports = BottomTabBarRouter;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

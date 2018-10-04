@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/native/NativeRouter.js | Smmartface</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Smartface NativeRouter"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Smmartface"><meta property="twitter:description" content="Smartface NativeRouter"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  <a href="test.html" data-ice="testLink">Test</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/smartface/router"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#native">native</a><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-NavigationControllerTransformEvent">NavigationControllerTransformEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.BottomTabBarController">BottomTabBarController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.BottomTabBarItem">BottomTabBarItem</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.NavigationController">NavigationController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="http://docs.smartface.io/#!/api/UI.Page">Page</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#router">router</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createRouteData">createRouteData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteBuildHandler">RouteBuildHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteLocation">RouteLocation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteMatch">RouteMatch</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteParams">RouteParams</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouteState">RouteState</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-HistoryListener">HistoryListener</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RouterBlockHandler">RouterBlockHandler</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/native/NativeRouter.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const Router = require(&quot;../router/Router&quot;);
+const createRenderer = require(&quot;./createRenderer&quot;);
+const Page = require(&quot;sf-core/ui/page&quot;);
+
+class NativeRouter extends Router {
+  /**
+   * Create OS specific NativeRouter instance
+   * @static
+   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean, isRoot: boolean }} param0
+   */
+  static of({
+    path = &quot;&quot;,
+    build = null,
+    routes = [],
+    exact = false,
+    renderer = null,
+    to = null,
+    isRoot = false
+  }) {
+    return new NativeRouter({
+      path,
+      build,
+      routes,
+      exact,
+      to,
+      isRoot,
+      renderer: createRenderer()
+    });
+  }
+
+  /**
+   * @constructor
+   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean, isRoot: boolean }} param0
+   */
+  constructor({
+    path = &quot;&quot;,
+    build = null,
+    routes = [],
+    exact = false,
+    renderer = null,
+    isRoot = false,
+    to = null
+  }) {
+    super({ path, build, routes, exact, isRoot, to });
+
+    this._renderer = renderer;
+    this._renderer.setRootController(
+      new Page({ orientation: Page.Orientation.AUTO })
+    );
+    if (isRoot) {
+      const Renderer = require(&quot;./Renderer&quot;);
+      Renderer.setasRoot(this._renderer._rootController);
+    }
+  }
+
+  addChildRouter(router) {
+    this._renderer.show(router._renderer._rootController);
+  }
+
+  onRouteExit(action) {
+    // if (action === &quot;POP&quot;) this._renderer.clear();
+  }
+
+  onRouteMatch(route, match, state, action) {
+    const view = super.onRouteMatch(route, match, state);
+
+    if (!view) return false;
+
+    try {
+      view &amp;&amp; this._renderer.show(view);
+    } catch (e) {
+      console.log(e.message + &quot;&quot; + e.stack);
+    }
+
+    return true;
+  }
+}
+
+module.exports = NativeRouter;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
