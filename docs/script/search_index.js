@@ -1,9 +1,63 @@
 window.esdocSearchIndex = [
   [
+    "@smartface/router/src/native/bottomtabbarrouter.js~bottomtabbarrouter",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html",
+    "<span>BottomTabBarRouter</span> <span class=\"search-result-import-path\">@smartface/router/src/native/BottomTabBarRouter.js</span>",
+    "class"
+  ],
+  [
+    "@smartface/router/src/native/nativestackrouter.js~nativestackrouter",
+    "class/src/native/NativeStackRouter.js~NativeStackRouter.html",
+    "<span>NativeStackRouter</span> <span class=\"search-result-import-path\">@smartface/router/src/native/NativeStackRouter.js</span>",
+    "class"
+  ],
+  [
+    "@smartface/router/src/router/route.js~route",
+    "class/src/router/Route.js~Route.html",
+    "<span>Route</span> <span class=\"search-result-import-path\">@smartface/router/src/router/Route.js</span>",
+    "class"
+  ],
+  [
+    "@smartface/router/src/router/route.js~routepath",
+    "class/src/router/Route.js~RoutePath.html",
+    "<span>RoutePath</span> <span class=\"search-result-import-path\">@smartface/router/src/router/Route.js</span>",
+    "class"
+  ],
+  [
+    "@smartface/router/src/router/router.js~router",
+    "class/src/router/Router.js~Router.html",
+    "<span>Router</span> <span class=\"search-result-import-path\">@smartface/router/src/router/Router.js</span>",
+    "class"
+  ],
+  [
+    "@smartface/router/src/common/history.js~creatememoryhistory",
+    "function/index.html#static-function-createMemoryHistory",
+    "<span>createMemoryHistory</span> <span class=\"search-result-import-path\">@smartface/router/src/common/history.js</span>",
+    "function"
+  ],
+  [
     "@smartface/router/src/router/routedata.js~createroutedata",
     "function/index.html#static-function-createRouteData",
     "<span>createRouteData</span> <span class=\"search-result-import-path\">@smartface/router/src/router/RouteData.js</span>",
     "function"
+  ],
+  [
+    "@smartface/router/src/common/matchpath.js~matchpath",
+    "function/index.html#static-function-matchPath",
+    "<span>matchPath</span> <span class=\"search-result-import-path\">@smartface/router/src/common/matchPath.js</span>",
+    "function"
+  ],
+  [
+    "@smartface/router/src/common/matchroutes.js~matchroutes",
+    "function/index.html#static-function-matchRoutes",
+    "<span>matchRoutes</span> <span class=\"search-result-import-path\">@smartface/router/src/common/matchRoutes.js</span>",
+    "function"
+  ],
+  [
+    "@smartface/router/src/common/matchpath.js~pathtoregexp",
+    "variable/index.html#static-variable-pathToRegexp",
+    "<span>pathToRegexp</span> <span class=\"search-result-import-path\">@smartface/router/src/common/matchPath.js</span>",
+    "variable"
   ],
   [
     "",
@@ -85,13 +139,13 @@ window.esdocSearchIndex = [
   ],
   [
     "",
-    "test-file/__test__/Router.test.js.html#lineNumber240",
+    "test-file/__test__/Router.test.js.html#lineNumber293",
     "Router can call a relative path",
     "test"
   ],
   [
     "",
-    "test-file/__test__/Router.test.js.html#lineNumber293",
+    "test-file/__test__/Router.test.js.html#lineNumber240",
     "Router can call a relative path",
     "test"
   ],
@@ -480,6 +534,72 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/native/bottomtabbarrouter.js~bottomtabbarrouter#constructor",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-constructor-constructor",
+    "src/native/BottomTabBarRouter.js~BottomTabBarRouter#constructor",
+    "method"
+  ],
+  [
+    "src/native/bottomtabbarrouter.js~bottomtabbarrouter#dispose",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-method-dispose",
+    "src/native/BottomTabBarRouter.js~BottomTabBarRouter#dispose",
+    "method"
+  ],
+  [
+    "src/native/bottomtabbarrouter.js~bottomtabbarrouter#isinitialpath",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-method-isInitialPath",
+    "src/native/BottomTabBarRouter.js~BottomTabBarRouter#isInitialPath",
+    "method"
+  ],
+  [
+    "src/native/bottomtabbarrouter.js~bottomtabbarrouter#isvisited",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-method-isVisited",
+    "src/native/BottomTabBarRouter.js~BottomTabBarRouter#isVisited",
+    "method"
+  ],
+  [
+    "src/native/bottomtabbarrouter.js~bottomtabbarrouter#onroutematch",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-method-onRouteMatch",
+    "src/native/BottomTabBarRouter.js~BottomTabBarRouter#onRouteMatch",
+    "method"
+  ],
+  [
+    "src/native/bottomtabbarrouter.js~bottomtabbarrouter#rendermatches",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-method-renderMatches",
+    "src/native/BottomTabBarRouter.js~BottomTabBarRouter#renderMatches",
+    "method"
+  ],
+  [
+    "src/native/bottomtabbarrouter.js~bottomtabbarrouter#resolveindex",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-method-resolveIndex",
+    "src/native/BottomTabBarRouter.js~BottomTabBarRouter#resolveIndex",
+    "method"
+  ],
+  [
+    "src/native/bottomtabbarrouter.js~bottomtabbarrouter#resolveroute",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-method-resolveRoute",
+    "src/native/BottomTabBarRouter.js~BottomTabBarRouter#resolveRoute",
+    "method"
+  ],
+  [
+    "src/native/bottomtabbarrouter.js~bottomtabbarrouter#routetoindex",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-method-routetoIndex",
+    "src/native/BottomTabBarRouter.js~BottomTabBarRouter#routetoIndex",
+    "method"
+  ],
+  [
+    "src/native/bottomtabbarrouter.js~bottomtabbarrouter#setvisited",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-method-setVisited",
+    "src/native/BottomTabBarRouter.js~BottomTabBarRouter#setVisited",
+    "method"
+  ],
+  [
+    "src/native/bottomtabbarrouter.js~bottomtabbarrouter.of",
+    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#static-method-of",
+    "src/native/BottomTabBarRouter.js~BottomTabBarRouter.of",
+    "method"
+  ],
+  [
     "src/native/iosrenderer.js",
     "file/src/native/IOSRenderer.js.html",
     "src/native/IOSRenderer.js",
@@ -502,6 +622,42 @@ window.esdocSearchIndex = [
     "file/src/native/NativeStackRouter.js.html",
     "src/native/NativeStackRouter.js",
     "file"
+  ],
+  [
+    "src/native/nativestackrouter.js~nativestackrouter#addnavigatorchangelistener",
+    "class/src/native/NativeStackRouter.js~NativeStackRouter.html#instance-method-addNavigatorChangeListener",
+    "src/native/NativeStackRouter.js~NativeStackRouter#addNavigatorChangeListener",
+    "method"
+  ],
+  [
+    "src/native/nativestackrouter.js~nativestackrouter#constructor",
+    "class/src/native/NativeStackRouter.js~NativeStackRouter.html#instance-constructor-constructor",
+    "src/native/NativeStackRouter.js~NativeStackRouter#constructor",
+    "method"
+  ],
+  [
+    "src/native/nativestackrouter.js~nativestackrouter#dispose",
+    "class/src/native/NativeStackRouter.js~NativeStackRouter.html#instance-method-dispose",
+    "src/native/NativeStackRouter.js~NativeStackRouter#dispose",
+    "method"
+  ],
+  [
+    "src/native/nativestackrouter.js~nativestackrouter#onroutematch",
+    "class/src/native/NativeStackRouter.js~NativeStackRouter.html#instance-method-onRouteMatch",
+    "src/native/NativeStackRouter.js~NativeStackRouter#onRouteMatch",
+    "method"
+  ],
+  [
+    "src/native/nativestackrouter.js~nativestackrouter#onrouterexit",
+    "class/src/native/NativeStackRouter.js~NativeStackRouter.html#instance-method-onRouterExit",
+    "src/native/NativeStackRouter.js~NativeStackRouter#onRouterExit",
+    "method"
+  ],
+  [
+    "src/native/nativestackrouter.js~nativestackrouter.of",
+    "class/src/native/NativeStackRouter.js~NativeStackRouter.html#static-method-of",
+    "src/native/NativeStackRouter.js~NativeStackRouter.of",
+    "method"
   ],
   [
     "src/native/renderer.js",
@@ -558,6 +714,84 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/router/route.js~route#build",
+    "class/src/router/Route.js~Route.html#instance-method-build",
+    "src/router/Route.js~Route#build",
+    "method"
+  ],
+  [
+    "src/router/route.js~route#clone",
+    "class/src/router/Route.js~Route.html#instance-method-clone",
+    "src/router/Route.js~Route#clone",
+    "method"
+  ],
+  [
+    "src/router/route.js~route#constructor",
+    "class/src/router/Route.js~Route.html#instance-constructor-constructor",
+    "src/router/Route.js~Route#constructor",
+    "method"
+  ],
+  [
+    "src/router/route.js~route#getpath",
+    "class/src/router/Route.js~Route.html#instance-method-getPath",
+    "src/router/Route.js~Route#getPath",
+    "method"
+  ],
+  [
+    "src/router/route.js~route#getredirectto",
+    "class/src/router/Route.js~Route.html#instance-method-getRedirectto",
+    "src/router/Route.js~Route#getRedirectto",
+    "method"
+  ],
+  [
+    "src/router/route.js~route#geturlpath",
+    "class/src/router/Route.js~Route.html#instance-method-getUrlPath",
+    "src/router/Route.js~Route#getUrlPath",
+    "method"
+  ],
+  [
+    "src/router/route.js~route#haspath",
+    "class/src/router/Route.js~Route.html#instance-method-hasPath",
+    "src/router/Route.js~Route#hasPath",
+    "method"
+  ],
+  [
+    "src/router/route.js~route#matchpath",
+    "class/src/router/Route.js~Route.html#instance-method-matchPath",
+    "src/router/Route.js~Route#matchPath",
+    "method"
+  ],
+  [
+    "src/router/route.js~route#onprematch",
+    "class/src/router/Route.js~Route.html#instance-method-onPrematch",
+    "src/router/Route.js~Route#onPrematch",
+    "method"
+  ],
+  [
+    "src/router/route.js~route#routepath",
+    "class/src/router/Route.js~Route.html#instance-get-routePath",
+    "src/router/Route.js~Route#routePath",
+    "member"
+  ],
+  [
+    "src/router/route.js~route#toobject",
+    "class/src/router/Route.js~Route.html#instance-method-toObject",
+    "src/router/Route.js~Route#toObject",
+    "method"
+  ],
+  [
+    "src/router/route.js~route#tostring",
+    "class/src/router/Route.js~Route.html#instance-method-toString",
+    "src/router/Route.js~Route#toString",
+    "method"
+  ],
+  [
+    "src/router/route.js~route.of",
+    "class/src/router/Route.js~Route.html#static-method-of",
+    "src/router/Route.js~Route.of",
+    "method"
+  ],
+  [
     "src/router/route.js~routebuildhandler",
     "typedef/index.html#static-typedef-RouteBuildHandler",
     "src/router/Route.js~RouteBuildHandler",
@@ -582,6 +816,48 @@ window.esdocSearchIndex = [
     "typedef"
   ],
   [
+    "src/router/route.js~routepath#clone",
+    "class/src/router/Route.js~RoutePath.html#instance-method-clone",
+    "src/router/Route.js~RoutePath#clone",
+    "method"
+  ],
+  [
+    "src/router/route.js~routepath#constructor",
+    "class/src/router/Route.js~RoutePath.html#instance-constructor-constructor",
+    "src/router/Route.js~RoutePath#constructor",
+    "method"
+  ],
+  [
+    "src/router/route.js~routepath#getpath",
+    "class/src/router/Route.js~RoutePath.html#instance-method-getPath",
+    "src/router/Route.js~RoutePath#getPath",
+    "method"
+  ],
+  [
+    "src/router/route.js~routepath#haspath",
+    "class/src/router/Route.js~RoutePath.html#instance-method-hasPath",
+    "src/router/Route.js~RoutePath#hasPath",
+    "method"
+  ],
+  [
+    "src/router/route.js~routepath#isroot",
+    "class/src/router/Route.js~RoutePath.html#instance-method-isRoot",
+    "src/router/Route.js~RoutePath#isRoot",
+    "method"
+  ],
+  [
+    "src/router/route.js~routepath#toobject",
+    "class/src/router/Route.js~RoutePath.html#instance-method-toObject",
+    "src/router/Route.js~RoutePath#toObject",
+    "method"
+  ],
+  [
+    "src/router/route.js~routepath.of",
+    "class/src/router/Route.js~RoutePath.html#static-method-of",
+    "src/router/Route.js~RoutePath.of",
+    "method"
+  ],
+  [
     "src/router/route.js~routestate",
     "typedef/index.html#static-typedef-RouteState",
     "src/router/Route.js~RouteState",
@@ -604,6 +880,150 @@ window.esdocSearchIndex = [
     "typedef/index.html#static-typedef-HistoryListener",
     "src/router/Router.js~HistoryListener",
     "typedef"
+  ],
+  [
+    "src/router/router.js~router#add",
+    "class/src/router/Router.js~Router.html#instance-method-add",
+    "src/router/Router.js~Router#add",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#addrouteblocker",
+    "class/src/router/Router.js~Router.html#instance-method-addRouteBlocker",
+    "src/router/Router.js~Router#addRouteBlocker",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#constructor",
+    "class/src/router/Router.js~Router.html#instance-constructor-constructor",
+    "src/router/Router.js~Router#constructor",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#dispose",
+    "class/src/router/Router.js~Router.html#instance-method-dispose",
+    "src/router/Router.js~Router#dispose",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#gethistory",
+    "class/src/router/Router.js~Router.html#instance-method-getHistory",
+    "src/router/Router.js~Router#getHistory",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#gethistoryasarray",
+    "class/src/router/Router.js~Router.html#instance-method-getHistoryasArray",
+    "src/router/Router.js~Router#getHistoryasArray",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#getlocation",
+    "class/src/router/Router.js~Router.html#instance-method-getLocation",
+    "src/router/Router.js~Router#getLocation",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#go",
+    "class/src/router/Router.js~Router.html#instance-method-go",
+    "src/router/Router.js~Router#go",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#goback",
+    "class/src/router/Router.js~Router.html#instance-method-goBack",
+    "src/router/Router.js~Router#goBack",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#goforward",
+    "class/src/router/Router.js~Router.html#instance-method-goForward",
+    "src/router/Router.js~Router#goForward",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#listen",
+    "class/src/router/Router.js~Router.html#instance-method-listen",
+    "src/router/Router.js~Router#listen",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#map",
+    "class/src/router/Router.js~Router.html#instance-method-map",
+    "src/router/Router.js~Router#map",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#onhistorychange",
+    "class/src/router/Router.js~Router.html#instance-method-onHistoryChange",
+    "src/router/Router.js~Router#onHistoryChange",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#onrouteexit",
+    "class/src/router/Router.js~Router.html#instance-method-onRouteExit",
+    "src/router/Router.js~Router#onRouteExit",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#onroutematch",
+    "class/src/router/Router.js~Router.html#instance-method-onRouteMatch",
+    "src/router/Router.js~Router#onRouteMatch",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#onrouterenter",
+    "class/src/router/Router.js~Router.html#instance-method-onRouterEnter",
+    "src/router/Router.js~Router#onRouterEnter",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#push",
+    "class/src/router/Router.js~Router.html#instance-method-push",
+    "src/router/Router.js~Router#push",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#pushroute",
+    "class/src/router/Router.js~Router.html#instance-method-pushRoute",
+    "src/router/Router.js~Router#pushRoute",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#redirectroute",
+    "class/src/router/Router.js~Router.html#instance-method-redirectRoute",
+    "src/router/Router.js~Router#redirectRoute",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#rendermatches",
+    "class/src/router/Router.js~Router.html#instance-method-renderMatches",
+    "src/router/Router.js~Router#renderMatches",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#renderroute",
+    "class/src/router/Router.js~Router.html#instance-method-renderRoute",
+    "src/router/Router.js~Router#renderRoute",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#replace",
+    "class/src/router/Router.js~Router.html#instance-method-replace",
+    "src/router/Router.js~Router#replace",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#routerollback",
+    "class/src/router/Router.js~Router.html#instance-method-routeRollback",
+    "src/router/Router.js~Router#routeRollback",
+    "method"
+  ],
+  [
+    "src/router/router.js~router#setasactiverouter",
+    "class/src/router/Router.js~Router.html#instance-method-setasActiveRouter",
+    "src/router/Router.js~Router#setasActiveRouter",
+    "method"
   ],
   [
     "src/router/router.js~routerblockhandler",

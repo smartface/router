@@ -884,8 +884,7 @@
       "types": [
         "*"
       ]
-    },
-    "ignore": true
+    }
   },
   {
     "__docId__": 61,
@@ -915,8 +914,7 @@
       "types": [
         "*"
       ]
-    },
-    "ignore": true
+    }
   },
   {
     "__docId__": 63,
@@ -1060,8 +1058,7 @@
       "types": [
         "{\"path\": *, \"url\": *, \"isExact\": *, \"params\": *}"
       ]
-    },
-    "ignore": true
+    }
   },
   {
     "__docId__": 68,
@@ -1125,8 +1122,7 @@
       "types": [
         "*"
       ]
-    },
-    "ignore": true
+    }
   },
   {
     "__docId__": 70,
@@ -1590,8 +1586,7 @@
     "interface": false,
     "extends": [
       "Router"
-    ],
-    "ignore": true
+    ]
   },
   {
     "__docId__": 91,
@@ -1669,7 +1664,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 94,
@@ -1686,7 +1682,8 @@
       "types": [
         "{\"length\": *}"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 95,
@@ -1703,7 +1700,8 @@
       "types": [
         "boolean"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 96,
@@ -1720,7 +1718,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 97,
@@ -1737,7 +1736,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 98,
@@ -2420,7 +2420,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 125,
@@ -2603,7 +2604,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 134,
@@ -2626,7 +2628,8 @@
         ]
       }
     ],
-    "return": null
+    "return": null,
+    "ignore": true
   },
   {
     "__docId__": 135,
@@ -2649,7 +2652,8 @@
         ]
       }
     ],
-    "return": null
+    "return": null,
+    "ignore": true
   },
   {
     "__docId__": 136,
@@ -2694,7 +2698,8 @@
       "types": [
         "boolean"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 137,
@@ -2813,8 +2818,7 @@
     "interface": false,
     "extends": [
       "Router"
-    ],
-    "ignore": true
+    ]
   },
   {
     "__docId__": 143,
@@ -2892,7 +2896,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 146,
@@ -2909,7 +2914,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 147,
@@ -2941,7 +2947,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 149,
@@ -3329,7 +3336,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 165,
@@ -3714,7 +3722,8 @@
     "access": "public",
     "description": null,
     "lineNumber": 4,
-    "undocument": true
+    "undocument": true,
+    "ignore": true
   },
   {
     "__docId__": 181,
@@ -3731,7 +3740,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 182,
@@ -3748,7 +3758,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 183,
@@ -3775,7 +3786,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 184,
@@ -3792,7 +3804,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 185,
@@ -3819,7 +3832,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 186,
@@ -3836,7 +3850,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 187,
@@ -3883,7 +3898,8 @@
         "defaultValue": "{}"
       }
     ],
-    "return": null
+    "return": null,
+    "ignore": true
   },
   {
     "__docId__": 190,
@@ -3900,7 +3916,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 191,
@@ -3916,7 +3933,8 @@
     "lineNumber": 54,
     "undocument": true,
     "params": [],
-    "return": null
+    "return": null,
+    "ignore": true
   },
   {
     "__docId__": 195,
@@ -3933,7 +3951,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 196,
@@ -3960,7 +3979,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 198,
@@ -4267,8 +4287,7 @@
         "tagValue": ""
       }
     ],
-    "interface": false,
-    "ignore": true
+    "interface": false
   },
   {
     "__docId__": 206,
@@ -4346,7 +4365,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 209,
@@ -4495,8 +4515,7 @@
         "tagValue": ""
       }
     ],
-    "interface": false,
-    "ignore": true
+    "interface": false
   },
   {
     "__docId__": 215,
@@ -4577,7 +4596,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 218,
@@ -4594,7 +4614,8 @@
       "types": [
         "boolean"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 219,
@@ -4611,7 +4632,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 220,
@@ -4628,7 +4650,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 221,
@@ -4645,7 +4668,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 222,
@@ -4662,7 +4686,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 223,
@@ -4679,7 +4704,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 224,
@@ -4696,7 +4722,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 225,
@@ -4713,7 +4740,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 226,
@@ -4982,7 +5010,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 235,
@@ -5320,8 +5349,7 @@
     "interface": false,
     "extends": [
       "Route"
-    ],
-    "ignore": true
+    ]
   },
   {
     "__docId__": 250,
@@ -5351,7 +5379,8 @@
         "defaultValue": "{\"initialEntries\":null,\"initialIndex\":null,\"keyLength\":null,\"getUserConfirmation\":null}"
       }
     ],
-    "return": null
+    "return": null,
+    "ignore": true
   },
   {
     "__docId__": 251,
@@ -5367,7 +5396,8 @@
     "lineNumber": 46,
     "undocument": true,
     "params": [],
-    "return": null
+    "return": null,
+    "ignore": true
   },
   {
     "__docId__": 252,
@@ -5387,7 +5417,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 253,
@@ -5403,7 +5434,8 @@
     "lineNumber": 54,
     "undocument": true,
     "params": [],
-    "return": null
+    "return": null,
+    "ignore": true
   },
   {
     "__docId__": 254,
@@ -5451,7 +5483,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 257,
@@ -5468,7 +5501,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 258,
@@ -5485,7 +5519,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 259,
@@ -5502,7 +5537,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 260,
@@ -5663,7 +5699,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 266,
@@ -5741,7 +5778,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 270,
@@ -6249,7 +6287,8 @@
       "types": [
         "*"
       ]
-    }
+    },
+    "ignore": true
   },
   {
     "__docId__": 290,
