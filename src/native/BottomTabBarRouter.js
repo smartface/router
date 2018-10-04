@@ -113,7 +113,7 @@ class BottomTabBarRouter extends Router {
    */
   renderMatches(matches, state, action) {
     this._fromRouter = true;
-    // alert(JSON.stringify(matches.map(({match}) => match)));
+
     if (matches.length > 0) {
       console.log(`Render matches`);
       const { match: next } = matches[matches.length - 1];
@@ -126,12 +126,8 @@ class BottomTabBarRouter extends Router {
       this._renderer._rootController.show();
       console.log(`current : ${match.path} - next : ${next.path}`);
       this.setVisited(index, next.path);
-      // console.log(`renderMatches ${next.path}`);
-      // if(this.isInitialPath(next.path))
-      //   return;
     }
 
-    // !this._isRendered && (this._isRendered = true);
     super.renderMatches(matches, state, action);
 
     this._fromRouter = false;
@@ -186,19 +182,11 @@ class BottomTabBarRouter extends Router {
   }
 
   /**
-   * History change event handler
+   * @override
+   * @event
    * @protected
    */
   onRouteMatch(route, match, state, action) {
-    // if(!match.isExact){
-    //   //TODO: make more performance
-    //   // const index = this.resolveIndex(match.path);
-    //   // console.log("onRouteMatch "+match.path+" : "+match.url+" : "+index);
-    //   // this.setVisited(index);
-
-    //   return false;
-    // }
-
     const view = super.onRouteMatch(route, match, state);
 
     if (!view) return false;

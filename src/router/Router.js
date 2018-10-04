@@ -1,5 +1,15 @@
 "use strict";
 
+/**
+ * @typedef {function(location: RouteLocation, action: string)} RouterBlockHandler
+ *
+ */
+
+/**
+ * @typedef {function(location: RouteLocation)} RouterBlockHandler
+ *
+ */
+
 const Route = require("./Route");
 const createMemoryHistory = require("../common/history");
 const mapComposer = require("../utils/map");
@@ -11,7 +21,7 @@ let history;
 let _skipRender = false;
 
 /**
- * Base Router
+ * Router Base
  *
  * @class
  */
@@ -69,16 +79,16 @@ class Router extends Route {
     if (isRoot) {
       this._historyUnlisten = history.listen((location, action) => {
         console.log(`History is changed ${_skipRender}`);
-          try {
-            if (_skipRender === false) {
-                this.onHistoryChange(location, action);
-            }
-          } catch(e) {
-            throw e;
-          } finally {
-            _skipRender = false;
+        try {
+          if (_skipRender === false) {
+            this.onHistoryChange(location, action);
           }
-        
+        } catch (e) {
+          throw e;
+        } finally {
+          _skipRender = false;
+        }
+
         // ["pathname","search","hash","state","key"]
         // console.log(JSON.stringify(history.entries.map(entry => entry.pathname)));
       });
@@ -89,11 +99,9 @@ class Router extends Route {
     // this._cache = new WeakMap();
     this._unblock = () => null;
   }
-  
+
   /**
    * @param {function}
-   * location = {"pathname","search","hash","state","key"}
-   * action = string
    */
   listen(fn) {
     return history.listen(fn);
@@ -116,14 +124,6 @@ class Router extends Route {
     });
 
     return unblock;
-  }
-
-  /**
-   * Blocks path handler for user inteact for example user confirmation
-   * @event
-   */
-  onBlockPath(fn) {
-    this._blockPath = fn;
   }
 
   /**
@@ -154,7 +154,7 @@ class Router extends Route {
 
   /**
    *
-   * @param {Array.<{isExact: boolean,params: object,path: string,url: string}>} matches
+   * @param {Array<{isExact: boolean,params: object,path: string,url: string}>} matches
    * @param {*} state
    * @param {*} action
    */
@@ -194,12 +194,20 @@ class Router extends Route {
     });
   }
 
+  /**
+   * Router is activated event handler
+   * @event
+   * @protected
+   * @param {string} [=null] action
+   */
   onRouterEnter(action = null) {
     this.setasActiveRouter(action);
   }
 
   /**
-   *
+   * Sets the router statically as active router
+   * @protected
+   * @param {string} action
    */
   setasActiveRouter(action) {
     Router.currentRouter &&
@@ -209,20 +217,26 @@ class Router extends Route {
     Router.currentRouter = this;
   }
 
-  routeRedirectMaybe(route) {
-    route.getRedirectto()
-      ? this.redirectRoute(route)
-      : this.push(route.getUrlPath());
-  }
+  // routeRedirectMaybe(route) {
+  //   route.getRedirectto()
+  //     ? this.redirectRoute(route)
+  //     : this.push(route.getUrlPath());
+  // }
 
+  /**
+   * Redirects route and removes last route record from history
+   * @param {Route} route
+   * @param {string} action
+   */
   redirectRoute(route, action) {
     // redirection of a route
     this.routeRollback(); // remove last route from history
-    console.log("redirectRoute");
     this.push(route.getRedirectto()); // and add new route
   }
 
   /**
+   * Route is matched event handler
+   *
    * @event
    * @param {Route} route
    * @param {{isExact: boolean, params: object, path: string, url: string}} match
@@ -250,14 +264,6 @@ class Router extends Route {
 
     return view;
   }
-
-  // /**
-  // * User block event handler for protected use
-  // *
-  // * @protected
-  // * @param {function} handler
-  // */
-  // onBeforeRouteChange(handler) {}
 
   /**
    * Helper method that pushes the route's url to history

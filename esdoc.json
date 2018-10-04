@@ -1,0 +1,43 @@
+{
+  "source": "./src",
+  "destination": "./docs",
+  "test": {
+    "type": "jest",
+    "source": "./__test__",
+    "includes": ["(test)\\.(js)$"]
+  },
+  "undocumentIdentifier": false,
+  "title": "Smarface NativeRouter",
+  "plugins": [
+    {
+      "name": "esdoc-ecmascript-proposal-plugin",
+      "option": {
+        "all": true
+      }
+    },
+    {
+      "name": "esdoc-standard-plugin",
+      "option": {
+        "brand": {
+          "title": "Smmartface",
+          "description": "Smartface NativeRouter",
+          "repository": "https://github.com/smartface/router",
+          "site": "http://smartface.io",
+          "author": "https://github.com/cenkce"
+        },
+        "test": {
+          "source": "./tests/",
+          "interfaces": [
+            "expect",
+            "test",
+            "describe",
+            "it"
+          ],
+          "includes": [
+            "(spec|test)\\.js$"
+          ]
+        }
+      }
+    }
+  ]
+}

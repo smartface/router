@@ -4,35 +4,30 @@ const Renderer = require("./Renderer");
 const Animator = require("./iOSAnimator");
 
 /**
- * Renderer for iOS
+ * Rendering strategy for iOS
  * It encapsulates all logic to display pages on iOS
+ * 
+ * @class
+ * @access package
+ * @extends {Renderer}
  */
 class IOSRenderer extends Renderer {
   /**
    * @constructor
-   * @param {Page|NavigationController} root
    */
   constructor() {
     super();
-    // get application native window
   }
 
   /**
-   * Only use if rootpage is NavigationController
-   * @param {Array.<object>} controllers
+   * @override
    */
   addChildViewControllers(controllers) {
     this._rootController.childViewControllers = controllers;
   }
 
   /**
-   * Only use if rootpage is Page instancea
-   *
-   * @protected
-   * @param {Page} fromPage
-   * @param {Page} toPage
-   * @param {number} [=1] duration
-   * @param {number} [=0] options
+   * @override
    */
   showWithTransition(fromPage, toPage, duration = 0, options = 0 << 20) {
     new Animator(this._rootController)
@@ -48,59 +43,39 @@ class IOSRenderer extends Renderer {
   }
 
   /**
-   * Pushes a new page to rootpage which is instance of NavigationController
-   * Only use if rootpage is NavigationController
-   * @param {Array.<object>} controllers
+   * @override
    */
   pushChild(page, animated = true) {
     super.pushChild();
     this._rootController.push &&
       this._rootController.push({ controller: page, animated });
-    // this._rootController.nativeObject.view.addFrameObserver();
-    // this._rootController.nativeObject.view.frameObserveHandler = (e) => {
-    //   for (var child in this._rootController.nativeObject.childViewControllers) {
-    //     this._rootController.nativeObject.childViewControllers[child].view.frame = { x: 0, y: 0, width: e.frame.width, height: e.frame.height };
-    //     if (this._rootController.nativeObject.childViewControllers[child].view.yoga.isEnabled) {
-    //       this._rootController.nativeObject.childViewControllers[child].view.yoga.applyLayoutPreservingOrigin(true);
-    //     }
-    //   }
-    // };
   }
 
   /**
-   * NavigationController child page is changed handler
-   * Only use if rootpage is NavigationController
-   *
-   * @param {function} fn
+   * @override
    */
-  onNavigatorChange(fn) {
+  onNavigationControllerTransition(fn) {
     this._rootController.onTransition = fn;
     return () => (this._rootController.onTransition = () => null);
   }
 
   /**
-   * Only use if rootpage is NavigationController
-   *
-   * @param {boolean} [=true] animated
+   * @override
    */
   popChild(animated = true) {
     if (this._rootController.childControllers.length > 1)
       this._rootController.pop({ animated });
   }
 
+  /**
+   */
   popTo(index) {
     this.setasRoot();
     this._rootController.popTo(index);
   }
 
-  popAll() {
-    this._rootController.popAll();
-  }
-
   /**
-   * Only use if rootpage is Page instancea
-   *
-   * @param {Page} page
+   * @override
    */
   removeChild(page) {
     page.nativeObject.removeFromParentViewController();
@@ -108,9 +83,7 @@ class IOSRenderer extends Renderer {
   }
 
   /**
-   * Only use if rootpage is Page instancea
-   *
-   * @param {Page} page
+   * @override
    */
   addChild(page) {
     page.nativeObject.view &&
@@ -118,21 +91,14 @@ class IOSRenderer extends Renderer {
   }
 
   /**
-   * Adds ViewController for internal use
-   * Only use if rootpage is Page instance
-   *
-   * @protected
-   * @param {Page} page
+   * @override
    */
   addPageViewController(page) {
     this._rootController.nativeObject.addChildViewController(page.nativeObject);
   }
 
   /**
-   * Displays specified page
-   * Only use if rootpage is PageController
-   *
-   * @param {Page} page
+   * @override
    */
   show(page) {
     console.log("enter show");
@@ -153,8 +119,6 @@ class IOSRenderer extends Renderer {
     // }
 
     this._currentPage = page;
-
-    // TODO: this part must be moved to native-layer
   }
 }
 

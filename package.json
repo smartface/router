@@ -1,6 +1,6 @@
 {
   "name": "@smartface/router",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-beta.1",
   "description": "Smmartface Router",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,6 @@
     "dev:remove": "rm -R -f ../scripts/node_modules/@smartface/router",
     "dev:sync": "mkdir -p ../scripts/node_modules/@smartface/router && cp -r -t ../scripts/node_modules/@smartface/router src package.json ",
     "pretty": "prettier --write src/**/**"
-    
   },
   "repository": {
     "type": "git",
@@ -29,8 +28,10 @@
     "resolve-pathname": "^2.2.0"
   },
   "devDependencies": {
+    "eslint": "^5.6.1",
     "eslint-config-prettier": "^3.0.1",
     "jest": "^23.5.0",
+    "jsdoc-to-markdown": "^4.0.1",
     "prettier": "^1.14.2"
   }
 }

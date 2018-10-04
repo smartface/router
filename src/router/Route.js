@@ -1,25 +1,86 @@
 "use strict";
 
+/**
+ * @typedef {object} RouteMatch
+ * @property {boolean} isExact
+ * @property {object} params
+ * @property {string} path
+ * @property {string} url
+ */
+
+/**
+ * @typedef {object} RouteLocation
+ * @property {string} pathname
+ * @property {string} search
+ * @property {string} hash
+ * @property {RouteState} state
+ * @property {string} key
+ */
+
+/**
+ * @typedef {object} RouteParams
+ * @property {string} path
+ * @property {Array<Route>} routes
+ * @property {boolean} exact
+ * @property {boolean} exact
+ * @property {function(match: RouteMatch)} onBeforeMatch 
+ */
+ 
+/**
+ * @typedef {object} RouteState
+ * @property {objec} userState
+ * @property {object} view
+ */
+ 
+/**
+ * @typedef {function(match: RouteMatch, state: object, router: Router, view: Page)} RouteBuildHandler
+ */
+ 
+
 const matchPath = require("../common/matchPath").matchPath;
 const mapComposer = require("../utils/map");
 
+/**
+ * Route's path ValueObject
+ * For internal use
+ * @access private
+ * @class
+ */
 class RoutePath {
+  /**
+   * Factory method to create a new instance
+   *
+   * @param {string} path
+   */
   static of(path) {
     return new RoutePath(path);
   }
 
+  /**
+   * @constructor
+   * @param {string} path
+   */
   constructor(path) {
     this._path = path;
   }
 
+  /**
+   * @return {string}
+   */
   getPath() {
     return this._path;
   }
 
+  /**
+   * @returns {boolean}
+   */
   isRoot() {
     return this._path === "/";
   }
 
+  /**
+   * @returns {object}
+   */
   toObject() {
     return {
       path: this._path,
@@ -27,22 +88,38 @@ class RoutePath {
     };
   }
 
+  /**
+   * @returns {RoutePath}
+   */
   clone() {
     return new RoutePath(this._path);
   }
 
+  /**
+   * @return {boelean}
+   */
   hasPath() {
     return this._path !== null || this._path !== undefined || this._path !== "";
   }
 }
 
+/**
+ * Route implementation
+ * @class
+ */
 class Route {
+  /**
+   * Static helper method to create a new instance of Route
+   * 
+   * @static
+   * @param {RouteParams} param
+   * @return {Route}
+   */
   static of({
     path = null,
     routes = [],
     build = null,
     exact = false,
-    strict = false,
     onBeforeMatch = null,
     onBeforePush = null,
     to = null
@@ -52,25 +129,26 @@ class Route {
       routes,
       build,
       exact,
-      strict,
       onBeforeMatch,
       onBeforePush,
       to
     });
   }
-
+  /**
+   * @constructor
+   * @param {RouteParams} param
+   */
   constructor({
     path = null,
     to = null,
     routes = [],
     build = null,
     exact = false,
-    strict = false,
     onBeforeMatch = null,
     onBeforePush = null
   }) {
     this._exact = exact;
-    this._strict = strict;
+    this._strict = false;
     this._build = build;
     this._path = path instanceof RoutePath ? path : new RoutePath(path);
     this._routes = routes;
@@ -80,6 +158,9 @@ class Route {
     this._onBeforePush = onBeforePush;
   }
 
+  /**
+   * @return {object}
+   */
   toObject() {
     return {
       path: this._path.getPath(),
@@ -87,33 +168,71 @@ class Route {
     };
   }
 
+  /**
+   * String presentation of the component
+   *
+   * @return {string}
+   */
   toString() {
     return `[object ${this.constructor.name}, path: ${this.getUrlPath()}]`;
   }
 
+  /**
+   * Helper method to return excat path of the component
+   *
+   * @return {string}
+   */
   get routePath() {
     return this.getRedirectto() || this.getUrlPath();
   }
 
+  /**
+   * Returns redirection path
+   *
+   * @return {string}
+   */
   getRedirectto() {
     return this._to;
   }
 
-  build(params, state, router, view) {
-    return (this._build && this._build(params, state, router, view)) || null;
+  /**
+   * Builds a route's view
+   *
+   * @param {RouteMatch} match
+   * @param {RouteState} state
+   * @param {Route} route
+   * @param {Page} view
+   */
+  build(match, state, router, view) {
+    return (this._build && this._build(match, state, router, view)) || null;
   }
 
+  /**
+   * Triggered before when an exact match happends.
+   * If the onBeforeMatch eventhandler is set
+   * and onBeforeMatch returns 'true' then match happends
+   * or onBeforeMatch returns 'false' then match is blocked
+   *
+   * @protected
+   * @param
+   */
   onPrematch(match) {
     return (this._onBeforeMatch && this._onBeforeMatch(match)) || true;
   }
 
+  /**
+   * Route has a path
+   *
+   * @returns {boolean}
+   */
   hasPath() {
     return this._path.hasPath();
   }
 
   /**
-   *
+   * Queries if specified url match to the route path
    * @param {string} url
+   * @returns {Match}
    */
   matchPath(url) {
     this._match = matchPath(url, {
@@ -125,17 +244,29 @@ class Route {
     return this._match;
   }
 
+  /**
+   * Returns route path as string
+   *
+   * @returns {string}
+   */
   getUrlPath() {
     return this._path.getPath();
   }
 
   /**
-   * @return {string}
+   * Clones route's path and returns
+   *
+   * @return {RoutePath}
    */
   getPath() {
     return this._path.clone();
   }
 
+  /**
+   * Clones new instance of the route
+   *
+   * @returns {Route}
+   */
   clone() {
     return Route.of({
       path: this._path,

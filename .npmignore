@@ -1,0 +1,15 @@
+test
+node_modules
+.babelrc
+.git
+src
+npm-debug.log
+.scripts
+docs
+examples
+.eslintrc
+.cz-config.js
+Makefile
+.travis.yml
+.jsdoc.json
+.npmrc

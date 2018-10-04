@@ -2,30 +2,30 @@ const Renderer = require("./Renderer");
 const Application = require("sf-core/application");
 
 /**
- * Renderer for Android
+ * Rendering strategy for Android
  * It encapsulates all logic to display pages on Android
+ * 
+ * @class
+ * @access package
+ * @extends {Renderer}
  */
 class AndroidRenderer extends Renderer {
   /**
    * @constructor
-   * @param {Page|NavigationController} root
    */
   constructor() {
     super();
   }
 
   /**
-   * Only use if rootpage is NavigationController
-   * @param {Array.<object>} controllers
+   * @override
    */
   addChildViewControllers(controllers) {
     this._rootController.childControllers = controllers;
   }
 
   /**
-   * Pushes a new page to rootpage which is instance of NavigationController
-   * Only use if rootpage is NavigationController
-   * @param {Array.<object>} controllers
+   * @override
    */
   pushChild(page, animated = true) {
     this._rootController.push &&
@@ -33,12 +33,9 @@ class AndroidRenderer extends Renderer {
   }
 
   /**
-   * NavigationController child page is changed handler
-   * Only use if rootpage is NavigationController
-   *
-   * @param {function} fn
+   * @override
    */
-  onNavigatorChange(fn) {
+  onNavigationControllerTransition(fn) {
     if (this._rootController.onTransition) {
       this._rootController.onTransition = fn;
       return () => (this._rootController.onTransition = () => null);
@@ -48,9 +45,7 @@ class AndroidRenderer extends Renderer {
   }
 
   /**
-   * Only use if rootpage is NavigationController
-   *
-   * @param {boolean} [=true] animated
+   * @override
    */
   popChild(animated = true) {
     this._rootController.pop &&
@@ -58,9 +53,7 @@ class AndroidRenderer extends Renderer {
   }
 
   /**
-   *
-   * Only use if rootpage is Page
-   * @param {NavigationController} controller
+   * @override
    */
   show(page) {
     Application.setRootController(page);

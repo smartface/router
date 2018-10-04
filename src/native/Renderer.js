@@ -1,33 +1,42 @@
 const Page = require("sf-core/ui/page");
 const Application = require("sf-core/application");
 
-// var currentChild;
-
-// function addChildController(child){
-//   if(Device.deviceOS === 'iOS'){
-//     rootController.nativeObject.view.addSubview(child.nativeObject.view);
-//     child.nativeObject.didMoveToParentViewController(
-//       rootController.nativeObject
-//     );
-//   }
-// }
-
-// function removeChildController(child){
-//   if(Device.deviceOS === 'iOS'){
-//     child.nativeObject.removeFromParentViewController();
-//     child.nativeObject.view.removeFromSuperview();
-//   }
-// }
+/**
+ * @external {Page} http://docs.smartface.io/#!/api/UI.Page
+ */
 
 /**
- * Abstract Renderer
+ * @external {NavigationController} http://docs.smartface.io/#!/api/UI.NavigationController
+ */
+
+/**
+ * @external {BottomTabBarController} http://docs.smartface.io/#!/api/UI.BottomTabBarController
+ */
+
+/**
+ * @external {BottomTabBarItem} http://docs.smartface.io/#!/api/UI.BottomTabBarItem
+ */
+ 
+/**
+ * @typedef NavigationControllerTransformEvent
+ * @property {Page} frompage
+ * @property {Page} topage
+ * @property {{operation: number}} operation
+ */
+
+/**
+ * Abstract Renderer Strategy
+ * @access package
  * @abstract
  */
 class Renderer {
+  /**
+   * Helper method sets statically rootController of the Application by DeviceOS
+   * 
+   * @static
+   * @param {BottomTabBarController|Page|NavigationController} rootController
+   */
   static setasRoot(rootController) {
-    // alert("controller"+ rootController.constructor.name);
-    // currentChild && removeChildController(currentChild);
-    // addChildController(controller);
     if (Device.deviceOS === "iOS") {
       var sfWindow = SF.requireClass("UIApplication").sharedApplication()
         .keyWindow;
@@ -59,47 +68,118 @@ class Renderer {
       Application.setRootController(rootController);
     }
   }
-
-  constructor() {}
-
+  
+  /**
+   * Only use if rootpage is Page instancea
+   *
+   * @protected
+   * @param {Page} fromPage
+   * @param {Page} toPage
+   * @param {number} [=1] duration
+   * @param {number} [=0] options
+   */
+  showWithTransition(fromPage, toPage, duration = 0, options = 0 << 20) {
+    throw new Error("onNavigatorChange method must be overridden");
+  }
+  
+  /**
+   * Template method sets specified controller as root controller
+   * @param {BottomTabBarController|Page|NavigationController} controller
+   */
   setRootController(controller) {
     this._rootController = controller;
   }
-
-  onNavigatorChange(fn) {
+  
+  /**
+   * NavigationController child page is changed handler
+   * Only use if rootpage is NavigationController.
+   * Must be Implemented
+   * 
+   * @param {function(e:NavigationControllerTransformEvent)} fn
+   */
+  onNavigationControllerTransition(fn) {
     throw new Error("onNavigatorChange method must be overridden");
   }
 
+  /**
+   * Set TabBarItems to BottomTabBarController
+   * 
+   * @param {Array<TabBarItem>} items
+   */
   setTabBarItems(items) {
     this._rootController.tabBar.items = items;
   }
-
+  
+  /**
+   * Set NavigationController selected index
+   * 
+   * @param {nummer} index
+   */
   setSelectedIndex(index) {
     this._rootController.selectedIndex = index;
     // this._rootController.hasOwnProperty('selectedIndex') ? (this._rootController.selectedIndex = index) : (this.setIndex(index));
   }
-
-  setChildControllers(children) {
-    this._rootController.childControllers = children;
-  }
-
-  addChildViewControllers(controllers) {
+  
+  /**
+   * Set NavigationController child controllers.
+   * Must be implemented.
+   * 
+   * @params {Array<NavigationController>} children
+   */
+  addChildViewControllers(children) {
     throw new Error("addChildViewControllers method must be overridden");
   }
 
-  show(page, animated = true) {
-    // Renderer.setasRoot(page);
-  }
-
+  /**
+   * Remove child from root page
+   * Must be implemented.
+   * 
+   * @param {Page} page
+   */
   removeChild(page) {
-    throw new Error("removeChild method must be overridden");
+    throw new Error("removeChild must be overridden");
+  }
+  
+  /**
+   * Add child from root page
+   * Must be implemented.
+   * 
+   * @param {Page} page
+   */
+  addChild(page) {
+    throw new Error("addChild must be overridden");
+  }
+  
+  /**
+   * Push child from root NavigationController.
+   * Must be implemented.
+   * 
+   * @param {Page} page
+   * @param {boolean} [=true] animmated
+   */
+  pushChild(page, animated = true) {
+    throw new Error("pushChild must be overridden");
   }
 
-  addChild(page) {}
-
-  pushChild(page, animated = true) {}
-
-  popChild(animated = true) {}
+  /**
+   * Pop child from root NavigationController.
+   * Must be implemented.
+   * 
+   * @param {boolean} [=true] animmated
+   */
+  popChild(animated = true) {
+    throw new Error("popChild must be overridden");
+  }
+  
+  /**
+   * Displays specified page
+   * Only use if root conttroller is a Page instance
+   *
+   * @param {Page} page
+   */
+  show(page){
+    throw new Error("popChild must be overridden");
+  }
 }
 
 module.exports = Renderer;
