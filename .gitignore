@@ -4,6 +4,7 @@ npm-debug.log
 dist
 .tmp
 build/package.smartface.ui-editor.js
+.npmrc
 
 **/target
 **/.project
