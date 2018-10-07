@@ -1,6 +1,6 @@
 # Smartface NativeRouter
 
-[Documentation](https://github.com/smartface/router)
+[Documentation](https://smartface.github.io/router/)
 
 ## Usages
 
