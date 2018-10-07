@@ -1,5 +1,7 @@
 # Smartface NativeRouter
 
+[Documentation](https://github.com/smartface/router)
+
 ## Usages
 
 ```javascript
