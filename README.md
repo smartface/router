@@ -76,6 +76,8 @@ const router = Router.of({
 router.push("/pages/page1");
 ```
 ## Blocking Routes
+### Limitation
+It doesn't work with iOS default headerbar's back-button and back gesture. If you want to use in these cases, you must use custom back button and disable back gesture.
 
 ```js
 router.addRouteBlocker((location, action, callback) => {
