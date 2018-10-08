@@ -126,7 +126,7 @@ class Renderer {
    * 
    * @params {Array<NavigationController>} children
    */
-  addChildViewControllers(children) {
+  setChildControllers(children) {
     throw new Error("addChildViewControllers method must be overridden");
   }
 

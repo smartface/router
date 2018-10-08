@@ -22,8 +22,8 @@ class IOSRenderer extends Renderer {
   /**
    * @override
    */
-  addChildViewControllers(controllers) {
-    this._rootController.childViewControllers = controllers;
+  setChildControllers(controllers) {
+    this._rootController.childControllers = controllers;
   }
 
   /**
@@ -46,7 +46,6 @@ class IOSRenderer extends Renderer {
    * @override
    */
   pushChild(page, animated = true) {
-    super.pushChild();
     this._rootController.push &&
       this._rootController.push({ controller: page, animated });
   }

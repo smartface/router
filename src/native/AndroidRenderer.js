@@ -20,7 +20,7 @@ class AndroidRenderer extends Renderer {
   /**
    * @override
    */
-  addChildViewControllers(controllers) {
+  setChildControllers(controllers) {
     this._rootController.childControllers = controllers;
   }
 

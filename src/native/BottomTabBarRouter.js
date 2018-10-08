@@ -1,5 +1,3 @@
-"use strict";
-
 const Router = require("../router/Router");
 const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
 const createRenderer = require("./createRenderer");

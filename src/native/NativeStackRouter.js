@@ -60,7 +60,7 @@ class NativeStackRouter extends Router {
    * Add new listener to listen NavigationController transitions.
    */
   addNavigatorChangeListener() {
-    this._unlistener = this._renderer.onNavigatorChange(action => {
+    this._unlistener = this._renderer.onNavigationControllerTransition(action => {
       // if user presses backbutton or uses gesture to back
       if (action.operation === NavigationController.OperationType.POP) {
         // set Router to skip next history change
