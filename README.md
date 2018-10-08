@@ -1,4 +1,4 @@
-# Smartface NativeRouter
+# Smartface Router
 
 [Documentation](https://smartface.github.io/router/)
 
