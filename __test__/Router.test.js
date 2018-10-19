@@ -378,4 +378,36 @@ describe("Router", () => {
 
     expect(router.getHistory().entries[0].pathname).toBe("/path/to/cenk");
   });
+
+  it("can redirect to specified route when route has 'to' attribute", () => {
+    let callCount = 0;
+    var component1 = {};
+    const router = new Router({
+      path: "/",
+      isRoot: true,
+      routes: [
+        new Route({
+          path: "/path",
+          to: "/path/to/1",
+          build: (match, state, router) => {
+            component1.router = router;
+            component1.params = match.params;
+            return component1;
+          }
+        }),
+        new Route({
+          path: "/path/to/:id",
+          build: (match, state, router, view) => {
+            return component1;
+          }
+        })
+      ]
+    });
+
+    router.push("/path", { name: "name" });
+    expect(router.getHistory().entries[0].pathname).toBe("/path/to/1");
+    expect(router.getHistory().entries[0].state).toEqual({
+      routeState: { data: { name: "name" } }
+    });
+  });
 });

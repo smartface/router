@@ -79,7 +79,7 @@ class Router extends Route {
     this._historyUnlisten = () => null;
     if (isRoot) {
       this._historyUnlisten = history.listen((location, action) => {
-        console.log(`History is changed ${_skipRender}`);
+        // console.log(`History is changed ${_skipRender}`);
         try {
           if (_skipRender === false) {
             this.onHistoryChange(location, action);
@@ -107,7 +107,7 @@ class Router extends Route {
   listen(fn) {
     return history.listen(fn);
   }
-  
+
   /**
    * @return {Object}
    */
@@ -132,7 +132,7 @@ class Router extends Route {
 
   /**
    * Triggered when the current route's parent is another router.
-   * 
+   *
    * @protected
    * @param {string} action
    */
@@ -166,7 +166,7 @@ class Router extends Route {
     // console.log("matches : " + JSON.stringify(matches.map(({ match }) => match)));
     matches.some(({ match, route }, index) => {
       if (route !== this && route instanceof Router) {
-        console.log("not exact match : " + this);
+        // console.log("not exact match : " + this);
         // if(index > 0 && this._isRoot)
         this.addChildRouter &&
           actions.push([this.addChildRouter.bind(this), route]);
@@ -179,11 +179,11 @@ class Router extends Route {
 
         return true;
       } else if (match.isExact === true) {
-        console.log("exact match : " + this + " : " + route.getRedirectto());
+        // console.log("exact match : " + this + " : " + route.getRedirectto());
         // route has redirection
         if (route.getRedirectto()) {
           actions = [];
-          return this.redirectRoute(route, action);
+          return this.redirectRoute(route, state, action);
         }
 
         if (this.onRouteMatch(route, match, state, action)) {
@@ -200,7 +200,7 @@ class Router extends Route {
 
   /**
    * Router is activated event handler
-   * 
+   *
    * @protected
    * @param {?string} [action=null] action
    */
@@ -210,7 +210,7 @@ class Router extends Route {
 
   /**
    * Sets the router statically as active router
-   * 
+   *
    * @protected
    * @param {string} action
    */
@@ -227,10 +227,10 @@ class Router extends Route {
    * @param {Route} route
    * @param {string} action
    */
-  redirectRoute(route, action) {
+  redirectRoute(route, state, action) {
     // redirection of a route
     this.routeRollback(); // remove last route from history
-    this.push(route.getRedirectto()); // and add new route
+    this.push(route.getRedirectto(), state.routeState.data); // and add new route
   }
 
   /**
@@ -253,7 +253,7 @@ class Router extends Route {
 
   /**
    * Render route
-   * 
+   *
    * @param {Route} route
    * @param {RouteMatch} match
    * @param {RouteState} state
@@ -271,7 +271,7 @@ class Router extends Route {
    * @param {Route} route
    */
   pushRoute(route) {
-    console.log(`Push router ${route}`);
+    // console.log(`Push router ${route}`);
     this.push(route.getUrlPath());
   }
 
@@ -313,7 +313,7 @@ class Router extends Route {
 
   /**
    * Return last location of history
-   * 
+   *
    * @return {RouteLocation}
    */
   getLocation() {
@@ -336,7 +336,7 @@ class Router extends Route {
 
   /**
    * Changes route by history index.
-   * 
+   *
    * @param {number} index
    * @return {boolean}
    */
@@ -351,7 +351,7 @@ class Router extends Route {
 
   /**
    * Adds new route
-   * 
+   *
    * @param {Route} route
    */
   add(route) {
