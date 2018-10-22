@@ -1,14 +1,5 @@
 "use strict";
-
-/**
- * @typedef {function(location: RouteLocation, action: string)} RouterBlockHandler
- *
- */
-
-/**
- * @typedef {function(location: RouteLocation)} HistoryListener
- *
- */
+require('../types');
 
 const Route = require("./Route");
 const createMemoryHistory = require("../common/history");
@@ -22,6 +13,7 @@ let _skipRender = false;
 
 /**
  * Router Base
+ * Base Router implementation
  *
  * @class
  * @extends {Route}
@@ -56,7 +48,7 @@ class Router extends Route {
   }
   /**
    * @constructor
-   * @param {{ path: string, target: object|null, routes: Array, exact: boolean, isRoot: boolean }} param
+   * @param {{ path: string, routes: Array, exact: boolean, isRoot: boolean, to: (string|null) }} param
    */
   constructor({
     path = "",
@@ -166,7 +158,7 @@ class Router extends Route {
     // console.log("matches : " + JSON.stringify(matches.map(({ match }) => match)));
     matches.some(({ match, route }, index) => {
       if (route !== this && route instanceof Router) {
-        // console.log("not exact match : " + this);
+        console.log("not exact match : " + this);
         // if(index > 0 && this._isRoot)
         this.addChildRouter &&
           actions.push([this.addChildRouter.bind(this), route]);
@@ -179,7 +171,7 @@ class Router extends Route {
 
         return true;
       } else if (match.isExact === true) {
-        // console.log("exact match : " + this + " : " + route.getRedirectto());
+        console.log("exact match : " + this + " : " + route.getRedirectto());
         // route has redirection
         if (route.getRedirectto()) {
           actions = [];
@@ -232,6 +224,10 @@ class Router extends Route {
     this.routeRollback(); // remove last route from history
     this.push(route.getRedirectto(), state.routeState.data); // and add new route
   }
+  
+  shouldRouteMatch(view){
+    return view !== null || view !== undefined;
+  }
 
   /**
    * Route is matched event handler
@@ -241,11 +237,15 @@ class Router extends Route {
    * @param {{isExact: boolean, params: object, path: string, url: string}} match
    * @param {Object} state
    * @param {string} action
+   * @returns {(object | null)}
    */
   onRouteMatch(route, match, state, action) {
     const view = this.renderRoute(route, match, state);
-    if (!view) {
+    
+    if (!this.shouldRouteMatch(view)) {
       this.routeRollback();
+      
+      return null;
     }
 
     return view;

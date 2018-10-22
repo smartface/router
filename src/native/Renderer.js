@@ -1,31 +1,11 @@
 const Page = require("sf-core/ui/page");
 const Application = require("sf-core/application");
 
-/**
- * @external {Page} http://docs.smartface.io/#!/api/UI.Page
- */
-
-/**
- * @external {NavigationController} http://docs.smartface.io/#!/api/UI.NavigationController
- */
-
-/**
- * @external {BottomTabBarController} http://docs.smartface.io/#!/api/UI.BottomTabBarController
- */
-
-/**
- * @external {BottomTabBarItem} http://docs.smartface.io/#!/api/UI.BottomTabBarItem
- */
- 
-/**
- * @typedef NavigationControllerTransformEvent
- * @property {Page} frompage
- * @property {Page} topage
- * @property {{operation: number}} operation
- */
 
 /**
  * Abstract Renderer Strategy
+ * It encapsulates displaying strategies for child views.
+ * 
  * @access package
  * @abstract
  */

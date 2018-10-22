@@ -44,16 +44,14 @@ class NativeRouter extends Router {
     super({ path, build, routes, exact, isRoot, to });
 
     this._renderer = renderer;
-    this._renderer.setRootController(
-      new Page({ orientation: Page.Orientation.AUTO })
-    );
-    if (isRoot) {
+    this._renderer.setRootController(new Page({ orientation: Page.Orientation.AUTO }));
+    if(isRoot){
       const Renderer = require("./Renderer");
       Renderer.setasRoot(this._renderer._rootController);
     }
   }
-
-  addChildRouter(router) {
+  
+  addChildRouter(router){
     this._renderer.show(router._renderer._rootController);
   }
 
@@ -71,7 +69,7 @@ class NativeRouter extends Router {
     } catch (e) {
       console.log(e.message + "" + e.stack);
     }
-
+    
     return true;
   }
 }

@@ -2,6 +2,7 @@ const Router = require("../router/Router");
 const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
 const createRenderer = require("./createRenderer");
 const TabBarItem = require("sf-core/ui/tabbaritem");
+// const console = {log: _ => _};
 
 function functionMaybe(val) {
   return typeof val === "function" ? val() : val;
@@ -72,13 +73,12 @@ class BottomTabBarRouter extends Router {
 
     this._renderer._rootController.shouldSelectByIndex = ({ index }) => {
       // TabbarItem should be changed
-      this._currentIndex = index;
-      return true;
+      return index !== this._currentIndex;
     };
 
     this._renderer._rootController.didSelectByIndex = ({ index }) => {
       // TabbarItem did change
-      console.log("didSelectByIndex  : " + index + " : " + this._fromRouter);
+      // console.log("didSelectByIndex  : " + index + " : " + this._fromRouter);
       if (this._fromRouter === false) {
         const route = this.resolveRoute(index);
         if (this.isVisited(index)) {
@@ -90,7 +90,8 @@ class BottomTabBarRouter extends Router {
           route.onRouterEnter("PUSH");
         }
       }
-
+      
+      this._currentIndex = index;
       !this.isVisited(index) && this.routetoIndex(index);
     };
 
@@ -118,16 +119,16 @@ class BottomTabBarRouter extends Router {
     this._fromRouter = true;
 
     if (matches.length > 0) {
-      console.log(`Render matches`);
+      // console.log(`Render matches ${matches.map(match => match.path)}`);
       const { match: next } = matches[matches.length - 1];
-      const { match } = matches[1];
+      const { match } = matches[1] || matches[0];
       const lastIndex = this.resolveIndex(next.path);
       const index = this.resolveIndex(match.path);
       // sets target tabbar item as visited.
       // selects target tabbaritem by index
       this._renderer.setSelectedIndex(index);
       this._renderer._rootController.show();
-      console.log(`current : ${match.path} - next : ${next.path}`);
+      // console.log(`current : ${match.path} - next : ${next.path}`);
       this.setVisited(index, next.path);
     }
 
@@ -143,7 +144,7 @@ class BottomTabBarRouter extends Router {
    * @param {string} path
    */
   setVisited(index, path) {
-    console.log(`setVisited ${index} ${path}`);
+    // console.log(`setVisited ${index} ${path}`);
     if (index < 0) return;
     this._visitedIndexes[index] = {
       path
@@ -153,6 +154,7 @@ class BottomTabBarRouter extends Router {
 
   /**
    * CHecks if TabBarItem is visited before
+   * 
    * @param {number} index
    * @returns {boolean}
    */
@@ -162,6 +164,7 @@ class BottomTabBarRouter extends Router {
 
   /**
    * Finds child route's index by path
+   * 
    * @param {string} path
    */
   resolveIndex(path) {
@@ -170,6 +173,7 @@ class BottomTabBarRouter extends Router {
 
   /**
    * Finds child route by index
+   * 
    * @param {number} index
    */
   resolveRoute(index) {
@@ -186,32 +190,36 @@ class BottomTabBarRouter extends Router {
   }
 
   /**
+   * Handler of requested path is matched to route 
+   * 
    * @override
    * @event
    * @protected
    */
   onRouteMatch(route, match, state, action) {
-    const view = super.onRouteMatch(route, match, state);
+    // const view = super.onRouteMatch(route, match, state);
 
-    if (!view) return false;
+    // if (!view) return false;
 
     //if the path has already opened then skip routing
-    if (!this.isInitialPath(match.path)) {
+    // if (!this.isInitialPath(match.path)) {
       this.routetoIndex(this.resolveIndex(match.path));
-      return true;
-    }
-    return false;
+      // return true;
+    // }
+    
+    return super.onRouteMatch(route, match, state);
   }
 
   /**
    * Checks specified path is currently opened path
+   * 
    * @param {stirng} path - Route path
    * @returns {boolean}
    */
   isInitialPath(path) {
-    console.log(
-      `isInitialPath : ${path} : redirection : ${this.getRedirectto()} : url : ${this.getUrlPath()}`
-    );
+    // console.log(
+    //   `isInitialPath : ${path} : redirection : ${this.getRedirectto()} : url : ${this.getUrlPath()}`
+    // );
     return path === this.getRedirectto() || path === this.getUrlPath();
   }
 
@@ -222,13 +230,13 @@ class BottomTabBarRouter extends Router {
    */
   routetoIndex(index) {
     index = index < 0 ? 0 : index;
-    console.log("routetoIndex : " + index);
-    // this.setVisited(index);
+    // console.log("routetoIndex : " + index);
     this._renderer.setSelectedIndex(index);
     this._renderer._rootController.show();
     const route = this.resolveRoute(index);
+    this.setVisited(index, route.getUrlPath());
     route instanceof Router && this.pushRoute(route);
-    console.log("end of routetoIndex : " + route);
+    // console.log("end of routetoIndex : " + route);
   }
 }
 
