@@ -54,10 +54,6 @@ function createHistory(
       return new Set(_nodes);
     }
 
-    get skipRender() {
-      return _skipRender;
-    }
-
     get history() {
       return _history;
     }
@@ -70,9 +66,10 @@ function createHistory(
       _history = null;
     }
 
-    push(path, state) {
-      console.log(`history push ${path}`);
+    push(path, state={}) {
+      console.log(`history push`);
       _history.push(path, state);
+      _preventDefault = false;
     }
 
     canGoBack() {

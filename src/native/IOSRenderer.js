@@ -26,6 +26,13 @@ class IOSRenderer extends Renderer {
     this._rootController.childControllers = controllers;
   }
 
+  setSelectedIndex(index) {
+    // if (this._rootController.shouldSelectByIndex({index})) {
+      super.setSelectedIndex(index);
+      // this._rootController.didSelectByIndex({index});
+    // }
+  }
+
   /**
    * @override
    */

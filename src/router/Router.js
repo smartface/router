@@ -280,7 +280,7 @@ class Router extends Route {
     if (path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;
     }
-
+    
     this._historyController.push(path, { routeState: { data } });
 
     return this;
@@ -322,6 +322,7 @@ class Router extends Route {
 
   /**
    * Forwards history
+   * 
    */
   goForward() {
     this.getHistory().goForward();
@@ -329,18 +330,18 @@ class Router extends Route {
 
   /**
    * Changes route by history index.
-   *
+   * @ignore
    * @param {number} index
    * @return {boolean}
    */
-  go(index) {
-    if (this.getHistory().canGo(index)) {
-      this.getHistory().index();
-      return true;
-    }
+  // go(index) {
+  //   if (this.getHistory().canGo(index)) {
+  //     this.getHistory().index();
+  //     return true;
+  //   }
 
-    return false;
-  }
+  //   return false;
+  // }
 
   /**
    * Adds new route
