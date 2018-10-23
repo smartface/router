@@ -1,4 +1,7 @@
+'use strict';
+
 const Router = require("../router/Router");
+const NativeRouterBase = require("./NativeRouterBase");
 const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
 const createRenderer = require("./createRenderer");
 const TabBarItem = require("sf-core/ui/tabbaritem");
@@ -13,10 +16,12 @@ function createTabBarItem(item) {
 }
 
 /**
+ * It creates BottomTabbarController and pushes Routes' views.
+ * 
  * @class
  * @extends {Router}
  */
-class BottomTabBarRouter extends Router {
+class BottomTabBarRouter extends NativeRouterBase {
   /**
    * Builds OS specific NaitveRouter
    * 
@@ -67,7 +72,7 @@ class BottomTabBarRouter extends Router {
     });
 
     this._renderer = renderer;
-    this._renderer.setRootController(new BottomTabBarController());
+    this._renderer.setRootController(new BottomTabBarController(tabbarParams));
     this._visitedIndexes = { length: 0 };
     this._fromRouter = false;
 
@@ -94,9 +99,7 @@ class BottomTabBarRouter extends Router {
       this._currentIndex = index;
       !this.isVisited(index) && this.routetoIndex(index);
     };
-
     // Assigns BottomTabBar props
-    Object.assign(this._renderer._rootController, tabbarParams);
     //Clears child routers onRouteExit because of NatveStackRouter creates new NavigationController to clear all children.
     this._routes.map(route => {
       route.onRouterExit && (route.onRouteExit = () => null);
@@ -106,8 +109,12 @@ class BottomTabBarRouter extends Router {
       this._routes.map(route => route.build(null, null, this))
     );
     // Initilaze BottomTabBarController's TabBarItems
-    this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem));
+    this._renderer._rootController.onLoad = () => {
+     this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem)); 
+    };
+    // this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem));
     this._renderer._rootController.show();
+    
     // Overrides build method
     this.build = () => this._renderer._rootController;
   }
@@ -136,7 +143,7 @@ class BottomTabBarRouter extends Router {
 
     this._fromRouter = false;
   }
-
+  
   /**
    * Sets TabBarItems visited by TabBarItem index
    *
@@ -144,7 +151,7 @@ class BottomTabBarRouter extends Router {
    * @param {string} path
    */
   setVisited(index, path) {
-    // console.log(`setVisited ${index} ${path}`);
+    console.log(`setVisited ${index} ${path}`);
     if (index < 0) return;
     this._visitedIndexes[index] = {
       path
@@ -203,7 +210,7 @@ class BottomTabBarRouter extends Router {
 
     //if the path has already opened then skip routing
     // if (!this.isInitialPath(match.path)) {
-      this.routetoIndex(this.resolveIndex(match.path));
+    this.routetoIndex(this.resolveIndex(match.path));
       // return true;
     // }
     
@@ -230,13 +237,13 @@ class BottomTabBarRouter extends Router {
    */
   routetoIndex(index) {
     index = index < 0 ? 0 : index;
-    // console.log("routetoIndex : " + index);
+    console.log("routetoIndex : " + index);
     this._renderer.setSelectedIndex(index);
     this._renderer._rootController.show();
     const route = this.resolveRoute(index);
     this.setVisited(index, route.getUrlPath());
     route instanceof Router && this.pushRoute(route);
-    // console.log("end of routetoIndex : " + route);
+    console.log("end of routetoIndex : " + route);
   }
 }
 

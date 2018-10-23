@@ -1,6 +1,6 @@
 /**
  * IOS Transtion Options
- *
+ * @ignore
  */
 module.exports = {
   UIViewAnimationOptionLayoutSubviews: 1 << 0,

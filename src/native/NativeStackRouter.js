@@ -1,15 +1,15 @@
 "use strict";
 
+const NativeRouterBase = require("./NativeRouterBase");
 const Router = require("../router/Router");
 const NavigationController = require("sf-core/ui/navigationcontroller");
 const createRenderer = require("./createRenderer");
-const Page = require("sf-core/ui/page");
 
 /**
  * @class
  * @extends {Router}
  */
-class NativeStackRouter extends Router {
+class NativeStackRouter extends NativeRouterBase {
   /**
    * Builds OS specific NaitveRouter
    * 
@@ -38,7 +38,7 @@ class NativeStackRouter extends Router {
 
   /**
    * @constructor
-   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean }} param0
+   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean, headerBarParams: function }} param0
    */
   constructor({
     path = "",
@@ -47,13 +47,18 @@ class NativeStackRouter extends Router {
     exact = false,
     renderer = null,
     to = null,
-    isRoot = false
+    isRoot = false,
+    headerBarParams=() => {}
   }) {
     super({ path, build, routes, exact, to, isRoot });
+    console.log('new StackRouter created');
     this._renderer = renderer;
     this._renderer.setRootController(new NavigationController());
     this.addNavigatorChangeListener();
     this.build = () => this._renderer._rootController;
+    this._renderer._rootController.onLoad = () => {
+      this._renderer._rootController.headerBar = headerBarParams();
+    };
   }
 
   /**
@@ -86,12 +91,13 @@ class NativeStackRouter extends Router {
    */
   onRouteMatch(route, match, state, action) {
     const view = super.onRouteMatch(route, match, state);
-
+    console.log(`onRouteMatch ${typeof view} ${action}`);
     if (!view) return false;
-
+    
     switch (action) {
       case "REPLACE":
       case "PUSH":
+        console.log(`PUSH ${typeof view} ${action} name : ${this._renderer.name}`);
         this._renderer.pushChild(view);
         break;
       case "POP":

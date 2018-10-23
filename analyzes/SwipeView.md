@@ -1,3 +1,0 @@
-- SwipeView no longer take `Page` classes for its pages
-- It will take `FlexLayout` classes instad.
-- Those flexLayouts are shown full size of the parent swipeView

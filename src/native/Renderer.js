@@ -1,3 +1,5 @@
+'use strict';
+
 const Page = require("sf-core/ui/page");
 const Application = require("sf-core/application");
 

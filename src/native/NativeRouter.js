@@ -1,8 +1,16 @@
-const Router = require("../router/Router");
+'use strict';
+
+const NativeRouterBase = require("./NativeRouterBase");
 const createRenderer = require("./createRenderer");
 const Page = require("sf-core/ui/page");
 
-class NativeRouter extends Router {
+/**
+ * Router for native PageController.
+ * It manages PageController and adds and removes child controllers.
+ * 
+ * @class
+ */
+class NativeRouter extends NativeRouterBase {
   /**
    * Create OS specific NativeRouter instance
    * @static
@@ -30,7 +38,7 @@ class NativeRouter extends Router {
 
   /**
    * @constructor
-   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean, isRoot: boolean }} param0
+   * @param {{renderer: Renderer, path: string, build: function|null, routes: Array, exact: boolean, isRoot: boolean }} param0
    */
   constructor({
     path = "",
@@ -44,8 +52,8 @@ class NativeRouter extends Router {
     super({ path, build, routes, exact, isRoot, to });
 
     this._renderer = renderer;
-    this._renderer.setRootController(new Page({ orientation: Page.Orientation.AUTO }));
     if(isRoot){
+      this._renderer.setRootController(new Page({ orientation: Page.Orientation.AUTO }));
       const Renderer = require("./Renderer");
       Renderer.setasRoot(this._renderer._rootController);
     }
