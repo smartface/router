@@ -1,113 +1,14 @@
 "use strict";
-require('../types');
+require("../types");
 
 const Route = require("./Route");
-const createMemoryHistory = require("../common/history");
-const mapComposer = require("../utils/map");
-const matchPath = require("../common/matchPath");
 const matchRoutes = require("../common/matchRoutes");
+const createHistory = require("../common/createHistory");
 let actions = [];
 
 let _historyController;
 
-function createHistory({
-  initialEntries = null,
-  initialIndex = null,
-  keyLength = null,
-  getUserConfirmation = null
-}, parent=null) {
-
-  let _history = createMemoryHistory({
-    initialEntries: initialEntries || [], // The initial URLs in the history stack
-    initialIndex: initialIndex || 0, // The starting index in the history stack
-    keyLength: keyLength || 20, // The length of location.key
-    // A function to use to confirm navigation with the user. Required
-    // if you return string prompts from transition hooks (see below)
-    getUserConfirmation: getUserConfirmation
-  });
-
-  let _skipRender = false;
-  const _listeners = new Set();
-  const _unlistenAll = new Set();
-
-
-  return new class HistoryController {
-    constructor() {
-    }
-
-    set skipRender(val) {
-      _skipRender = val;
-    }
-
-    createNode(props={}) {
-      const node = createHistory(props, _history);
-      _listeners.forEach(listener => _unlistenAll.add(node.listen(listener)));
-      
-      return node;
-    }
-
-    get skipRender() {
-      return _skipRender;
-    }
-
-    get history() {
-      return _history;
-    }
-    
-    rollback(){
-      _history.rollback();
-    }
-
-    unloadHistory() {
-      _history = null;
-    }
-
-    push(path, state) {
-      console.log(`history push ${path}`);
-      _history.push(path, state);
-    }
-    
-    canGoBack(){
-      return _history.canGo(-1);
-    }
-
-    goBack(){
-      if(this.canGoBack())
-        _history.goBack();
-      else if(parent)
-        parent.goBack();
-    }
-
-    listen(fn) {
-      const unlisten = new Set();
-      if(parent){
-        unlisten.add(parent.listen(fn));
-      }
-      
-      _listeners.add(fn);
-      unlisten.add(_history.listen(fn));
-      console.log(_unlistenAll.constructor.name);
-      unlisten.forEach(item => _unlistenAll.add(item));
-      return () => {
-        unlisten.forEach(item => { item(); _unlistenAll.delete(item); });
-        _listeners.delete(fn);
-      };
-    }
-
-    toString() {
-      return '[Object HistoryController]';
-    }
-    
-    dispose(){
-      _unlistenAll.forEach(item => item());
-      _unlistenAll.clear();
-      _listeners.clear();
-      _history = null;
-      parent = null;
-    }
-  };
-}
-// let _skipRender = false;
+let _skipRender = false;
 
 /**
  * Router Base
@@ -127,46 +28,43 @@ class Router extends Route {
     routes = [],
     exact = false,
     isRoot = false,
-    to = null
+    to = null,
+    _historyController = null
   }) {
     super({ path, build, routes, to });
-    console.log('Router created')
+    // console.log("Router created");
     if (!_historyController) {
-      console.log('Router history is creating');
+      // console.log("Router history is creating");
       _historyController = createHistory({
         getUserConfirmation: (blockerFn, callback) => {
           return blockerFn(callback);
         }
       });
       this._historyController = _historyController;
-    } else {
-      this._historyController = _historyController.createNode({
-        getUserConfirmation: (blockerFn, callback) => {
-          return blockerFn(callback);
-        }
-      });
     }
-    
+
+    routes.forEach(route => {
+      if (route instanceof Router) {
+        route.initialize(this._historyController);
+      }
+    });
 
     this._historyUnlisten = () => null;
     if (isRoot) {
-      this._historyUnlisten = this._historyController.listen((location, action) => {
-        console.log(`History is changed ${location.pathname}`);
-        try {
-          if (!this._historyController.skipRender) {
-            this.onHistoryChange(location, action);
+      this._historyUnlisten = this._historyController.listen(
+        (location, action) => {
+          console.log(`History is changed ${location.pathname}`);
+          try {
+            if (!_skipRender) {
+              this.onHistoryChange(location, action);
+            }
+          } catch (e) {
+            throw e;
+          } finally {
+            _skipRender = false;
           }
         }
-        catch (e) {
-          throw e;
-        }
-        finally {
-          this._historyController.skipRender = false;
-        }
-
-        // ["pathname","search","hash","state","key"]
-        // console.log(JSON.stringify(history.entries.map(entry => entry.pathname)));
-      });
+      );
     }
 
     this._isRoot = isRoot;
@@ -174,7 +72,15 @@ class Router extends Route {
     // this._cache = new WeakMap();
     this._unblock = () => null;
   }
-  
+
+  initialize(parentHistory) {
+    this._historyController = parentHistory.createNode({
+      getUserConfirmation: (blockerFn, callback) => {
+        return blockerFn(callback);
+      }
+    });
+  }
+
   /**
    * @param {HistoryListener} fn
    */
@@ -196,10 +102,12 @@ class Router extends Route {
    * @param {RouterBlockHandler} fn
    */
   addRouteBlocker(fn) {
-    const unblock = this._historyController.history.block((location, action) => callback => {
-      unblock();
-      fn(location, action, callback);
-    });
+    const unblock = this._historyController.history.block(
+      (location, action) => callback => {
+        unblock();
+        fn(location, action, callback);
+      }
+    );
 
     return unblock;
   }
@@ -237,7 +145,9 @@ class Router extends Route {
    * @param {*} action
    */
   renderMatches(matches, state, action) {
-    console.log("matches : " + JSON.stringify(matches.map(({ match }) => match)));
+    // console.log(
+    //   "matches : " + JSON.stringify(matches.map(({ match }) => match))
+    // );
     matches.some(({ match, route }, index) => {
       if (route !== this && route instanceof Router) {
         console.log("not exact match : " + this);
@@ -252,9 +162,8 @@ class Router extends Route {
         );
 
         return true;
-      }
-      else if (match.isExact === true) {
-        console.log("exact match : " + this + " : " + route.getRedirectto());
+      } else if (match.isExact === true) {
+        console.log("exact match : " + route + " : " + route.getRedirectto());
         // route has redirection
         if (route.getRedirectto()) {
           console.log("redirection  : " + route.getRedirectto());
@@ -305,7 +214,7 @@ class Router extends Route {
    */
   redirectRoute(route, state, action) {
     // redirection of a route
-    // this.routeRollback(); // remove last route from history
+    this.routeRollback(); // remove last route from history
     this.push(route.getRedirectto(), state.routeState.data); // and add new route
   }
 
@@ -392,7 +301,7 @@ class Router extends Route {
    *
    */
   goBack() {
-    this.getHistory().go(-1);
+    this._historyController.goBack();
   }
 
   /**
@@ -457,10 +366,10 @@ class Router extends Route {
    */
   dispose() {
     this._historyUnlisten();
-    if (this._isRoot) {
-      this._historyController.dispose();
-      this._historyController = null;
-    }
+    // if (this._isRoot) {
+    this._historyController.dispose();
+    this._historyController = null;
+    // }
     this._routes.forEach(route => route.dispose());
     this._routes = null;
     this._historyUnlisten = null;
