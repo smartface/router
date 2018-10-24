@@ -23,7 +23,6 @@ class Renderer {
       var sfWindow = SF.requireClass("UIApplication").sharedApplication()
         .keyWindow;
       sfWindow.rootViewController = rootController.nativeObject;
-      sfWindow.makeKeyAndVisible();
 
       rootController.nativeObject.view.addFrameObserver();
       rootController.nativeObject.view.frameObserveHandler = e => {
@@ -49,6 +48,12 @@ class Renderer {
     } else {
       Application.setRootController(rootController);
     }
+  }
+  
+  makeRootVisible(){
+    var sfWindow = SF.requireClass("UIApplication").sharedApplication()
+        .keyWindow;
+    sfWindow.makeKeyAndVisible();
   }
   
   /**

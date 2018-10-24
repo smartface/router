@@ -54,6 +54,7 @@ class IOSRenderer extends Renderer {
    */
   pushChild(page, animated = true) {
     console.log(`pushChild ${this._rootController}`);
+    this.makeRootVisible();
     this._rootController.push &&
       this._rootController.push({ controller: page, animated });
   }
@@ -70,6 +71,7 @@ class IOSRenderer extends Renderer {
    * @override
    */
   popChild(animated = true) {
+    this.makeRootVisible();
     if (this._rootController.childControllers.length > 1)
       this._rootController.pop({ animated });
   }
@@ -93,6 +95,7 @@ class IOSRenderer extends Renderer {
    * @override
    */
   addChild(page) {
+    this.makeRootVisible();
     page.nativeObject.view &&
       this._rootController.nativeObject.view.addSubview(page.nativeObject.view);
   }
@@ -126,6 +129,8 @@ class IOSRenderer extends Renderer {
     // }
 
     this._currentPage = page;
+    
+    this.makeRootVisible();
   }
 }
 
