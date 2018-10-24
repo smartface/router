@@ -104,7 +104,6 @@ class Router extends Route {
   addRouteBlocker(fn) {
     const unblock = this._historyController.history.block(
       (location, action) => callback => {
-        unblock();
         fn(location, action, callback);
       }
     );
