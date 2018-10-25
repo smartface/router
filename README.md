@@ -5,7 +5,7 @@
 ## Installation
 
 ```
-cd ~/workspace/scripts && npm i @smartface/router
+(cd ~/workspace/scripts && npm i @smartface/router)
 ```
 
 ## Usage
@@ -124,10 +124,10 @@ unlisten();
 
 ## Contribute to Repository
 
-- Clone repo
+- Clone repo to workspace root folder. (Feel free to clone into the /workspace/scripts/node_modules/@smartface folder)
 
 ```
-cd ~/workspace && git clone @smartface/router
+cd ~/workspace && git clone git@github.com:smartface/router.git
 ```
 
 - TDD
@@ -136,7 +136,7 @@ cd ~/workspace && git clone @smartface/router
 npm test -- --watch
 ```
 
-- Syncronize router to scripts/node_modules/@smmartface/router
+- Syncronize router to scripts/node_modules/@smmartface/router (If you clone repo to /scripts/node_modules and you must not use that.)
 
 ```
 npm run dev:link

@@ -1,7 +1,7 @@
 {
-  "coverage": "55.6%",
-  "expectCount": 205,
-  "actualCount": 114,
+  "coverage": "56.79%",
+  "expectCount": 206,
+  "actualCount": 117,
   "files": {
     "src/common/createHistory.js": {
       "expectCount": 2,
@@ -62,7 +62,7 @@
     },
     "src/native/BottomTabBarRouter.js": {
       "expectCount": 23,
-      "actualCount": 12,
+      "actualCount": 13,
       "undocumentLines": [
         3,
         4,
@@ -70,11 +70,10 @@
         6,
         7,
         10,
-        14,
-        112,
-        114,
-        115,
-        159
+        116,
+        118,
+        119,
+        163
       ]
     },
     "src/native/IOSRenderer.js": {
@@ -94,9 +93,9 @@
         3,
         4,
         5,
-        53,
-        71,
-        75
+        78,
+        96,
+        100
       ]
     },
     "src/native/NativeRouterBase.js": {
@@ -108,8 +107,8 @@
       ]
     },
     "src/native/NativeStackRouter.js": {
-      "expectCount": 15,
-      "actualCount": 8,
+      "expectCount": 16,
+      "actualCount": 9,
       "undocumentLines": [
         3,
         4,
@@ -117,7 +116,7 @@
         6,
         119,
         122,
-        142
+        151
       ]
     },
     "src/native/Renderer.js": {
@@ -178,21 +177,20 @@
     },
     "src/router/Router.js": {
       "expectCount": 40,
-      "actualCount": 27,
+      "actualCount": 28,
       "undocumentLines": [
         3,
         4,
         5,
         6,
         10,
-        42,
-        51,
-        69,
-        70,
-        72,
-        139,
-        166,
-        396
+        62,
+        80,
+        81,
+        83,
+        150,
+        177,
+        407
       ]
     },
     "src/utils/map.js": {

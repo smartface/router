@@ -115,6 +115,7 @@ const clamp = (n, lowerBound, upperBound) =>
 /**
  * Creates a history object that stores locations in memory.
  * @ignore
+ * @return {History}
  */
 const createMemoryHistory = (props = {}) => {
   const {
@@ -284,6 +285,9 @@ const createMemoryHistory = (props = {}) => {
 
   const listen = listener => transitionManager.appendListener(listener);
 
+  /**
+   * @type History
+   */
   const history = {
     length: entries.length,
     action: "POP",

@@ -11,6 +11,10 @@ function functionMaybe(val) {
   return typeof val === "function" ? val() : val;
 }
 
+/**
+ * @private
+ * @param {TabBarItem} item
+ */
 function createTabBarItem(item) {
   return item instanceof TabBarItem ? item : new TabBarItem(item);
 }
@@ -36,7 +40,7 @@ function createTabBarItem(item) {
  *      }),
  *      tabbarItems: [
  *        { title: "Page1", icon: Image.createFromFile("images://icon1.png") },
- *        { title: "Page2", icon: Image.createFromFile("images://icon2.png"),
+ *        { title: "Page2", icon: Image.createFromFile("images://icon2.png") },
  *      ],
  *      routes: [
  *        Route.of({

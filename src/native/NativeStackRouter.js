@@ -24,7 +24,7 @@ const createRenderer = require("./createRenderer");
  *      headerBarParams: () => ({
  *        ios: {
  *          translucent: true,
- *          alpha: 1,
+ *          alpha: 1
  *        },
  *        backgroundColor: Color.BLUE,
  *        visible: true
@@ -82,27 +82,27 @@ class NativeStackRouter extends NativeRouterBase {
    */
   static of({
     path = "",
-    build = null,
     routes = [],
     exact = false,
     renderer = null,
     to = null,
-    isRoot = false
+    isRoot = false,
+    headerBarParams = () => {}
   }) {
     return new NativeStackRouter({
       path,
-      build,
       routes,
       exact,
       to,
       isRoot,
+      headerBarParams,
       renderer: createRenderer()
     });
   }
 
   /**
    * @constructor
-   * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean, headerBarParams: function }} param0
+   * @param {{ path: string, routes: Array, exact: boolean, headerBarParams: function }} param0
    */
   constructor({
     path = "",
@@ -128,10 +128,19 @@ class NativeStackRouter extends NativeRouterBase {
   /**
    * Applies new params to the headerBar
    *
-   * @param {object} params
+   * @param {HeaderBarParams} params
    */
   setHeaderBarParams(params) {
     this._renderer._rootController.headerBar = params;
+  }
+
+  /**
+   * Returns headerBar instance
+   *
+   * @return {object}
+   */
+  get headerBar() {
+    return this._renderer._rootController.headerBar;
   }
 
   /**
@@ -186,15 +195,17 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   /**
-   * Current router is changed
+   * Event handler when a router exits from active state
+   *
    * @override
+   * @protected
    * @event
    * @param {string} action
    */
   onRouterExit(action) {
     if (action === "POP")
       this._renderer.setRootController(new NavigationController());
-    console.log(`onRouterExit ${this}`);
+    // console.log(`onRouterExit ${this}`);
   }
 }
 

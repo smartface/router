@@ -42,6 +42,18 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
+    "@smartface/router/src/common/createhistory.js~createhistory",
+    "function/index.html#static-function-createHistory",
+    "<span>createHistory</span> <span class=\"search-result-import-path\">@smartface/router/src/common/createHistory.js</span>",
+    "function"
+  ],
+  [
+    "@smartface/router/src/native/bottomtabbarrouter.js~createtabbaritem",
+    "function/index.html#static-function-createTabBarItem",
+    "<span>createTabBarItem</span> <span class=\"search-result-import-path\">@smartface/router/src/native/BottomTabBarRouter.js</span>",
+    "function"
+  ],
+  [
     "",
     "test-file/__test__/HistoryController.test.js.html#lineNumber6",
     "HistoryController",
@@ -708,6 +720,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/native/nativestackrouter.js~nativestackrouter#headerbar",
+    "class/src/native/NativeStackRouter.js~NativeStackRouter.html#instance-get-headerBar",
+    "src/native/NativeStackRouter.js~NativeStackRouter#headerBar",
+    "member"
+  ],
+  [
     "src/native/nativestackrouter.js~nativestackrouter#onroutematch",
     "class/src/native/NativeStackRouter.js~NativeStackRouter.html#instance-method-onRouteMatch",
     "src/native/NativeStackRouter.js~NativeStackRouter#onRouteMatch",
@@ -882,6 +900,12 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/router/router.js~router#_historycontroller",
+    "class/src/router/Router.js~Router.html#instance-member-_historyController",
+    "src/router/Router.js~Router#_historyController",
+    "member"
+  ],
+  [
     "src/router/router.js~router#add",
     "class/src/router/Router.js~Router.html#instance-method-add",
     "src/router/Router.js~Router#add",
@@ -1026,6 +1050,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/router/router.js~routerparams",
+    "typedef/index.html#static-typedef-RouterParams",
+    "src/router/Router.js~RouterParams",
+    "typedef"
+  ],
+  [
     "src/types.js",
     "file/src/types.js.html",
     "src/types.js",
@@ -1033,9 +1063,15 @@ window.esdocSearchIndex = [
   ],
   [
     "src/types.js~bottomtabbaritem",
-    "http://docs.smartface.io/#!/api/UI.BottomTabBarItem",
+    "typedef/index.html#static-typedef-BottomTabBarItem",
     "src/types.js~BottomTabBarItem",
-    "external"
+    "typedef"
+  ],
+  [
+    "src/types.js~bottomtabbarrouterparams",
+    "typedef/index.html#static-typedef-BottomTabBarRouterParams",
+    "src/types.js~BottomTabBarRouterParams",
+    "typedef"
   ],
   [
     "src/types.js~bottomtabbarcontroller",
@@ -1044,9 +1080,39 @@ window.esdocSearchIndex = [
     "external"
   ],
   [
+    "src/types.js~color",
+    "http://docs.smartface.io/#!/api/UI.Color",
+    "src/types.js~Color",
+    "external"
+  ],
+  [
+    "src/types.js~headerbarparams",
+    "typedef/index.html#static-typedef-HeaderBarParams",
+    "src/types.js~HeaderBarParams",
+    "typedef"
+  ],
+  [
+    "src/types.js~history",
+    "typedef/index.html#static-typedef-History",
+    "src/types.js~History",
+    "typedef"
+  ],
+  [
     "src/types.js~historylistener",
     "typedef/index.html#static-typedef-HistoryListener",
     "src/types.js~HistoryListener",
+    "typedef"
+  ],
+  [
+    "src/types.js~image",
+    "http://docs.smartface.io/#!/api/UI.Image",
+    "src/types.js~Image",
+    "external"
+  ],
+  [
+    "src/types.js~nativestackrouterparams",
+    "typedef/index.html#static-typedef-NativeStackRouterParams",
+    "src/types.js~NativeStackRouterParams",
     "typedef"
   ],
   [
@@ -1102,6 +1168,12 @@ window.esdocSearchIndex = [
     "typedef/index.html#static-typedef-RouterBlockHandler",
     "src/types.js~RouterBlockHandler",
     "typedef"
+  ],
+  [
+    "src/types.js~tabbaritem",
+    "http://docs.smartface.io/#!/api/UI.TabBarItem",
+    "src/types.js~TabBarItem",
+    "external"
   ],
   [
     "src/utils/map.js",

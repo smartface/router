@@ -6,8 +6,33 @@ const Page = require("sf-core/ui/page");
 
 /**
  * It creates root {@link Page} and adds and removes child pages.
- *
  * @class
+ * @example
+ * const {NativeRouter: Router, Route} = require('@smartface/router')
+ * const Image = require('sf-core/ui/image');
+ * const Color = require('sf-core/ui/color');
+ *
+ * var router = Router.of({
+ *  path: "/",
+ *  routes: [
+ *    Route.of({
+ *      path: "/tabs/page1",
+ *      build((match, state, router, view) => {
+ *        const Page1 = require('/pages/Page1');
+ *          return new Page1(state.data, router);
+ *         })
+ *      }),
+ *      Route.of({
+ *        path: "/tabs/page2",
+ *        build((match, state, router, view) => {
+ *          const Page2 = require('/pages/Page2');
+ *          return new Page2(state.data, router);
+ *        });
+ *      });
+ *    ]
+ * })
+ *
+ * @since 1.0.0
  */
 class NativeRouter extends NativeRouterBase {
   /**

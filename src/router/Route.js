@@ -73,7 +73,7 @@ class RoutePath {
 class Route {
   /**
    * Static helper method to create a new instance of Route
-   * 
+   *
    * @static
    * @param {RouteParams} param
    * @return {Route}
@@ -122,7 +122,7 @@ class Route {
   }
 
   /**
-   * @return {Object}
+   * @return {{path: string, routes: Array<object>}}
    */
   toObject() {
     return {

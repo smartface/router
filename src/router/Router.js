@@ -10,6 +10,15 @@ let _historyController;
 let _skipRender = false;
 
 /**
+ * @typedef {object} RouterParams
+ * @property {string} path Routing path
+ * @property {Array<Route>} routes Child routes
+ * @property {boolean} exact If it's only exact match or not
+ * @property {boolean} isRoot If it's root or not
+ * @property {(string|null)} to Redirection path
+ */
+
+/**
  * Router Base
  * Base Router implementation
  *
@@ -19,7 +28,7 @@ let _skipRender = false;
 class Router extends Route {
   /**
    * @constructor
-   * @param {{ path: string, routes: Array, exact: boolean, isRoot: boolean, to: (string|null) }} param
+   * @param {RouterParams} param
    */
   constructor({
     path = "",
@@ -34,11 +43,13 @@ class Router extends Route {
     // console.log("Router created");
     if (!_historyController) {
       // console.log("Router history is creating");
+      /** @type {HistoryListener} */
       _historyController = createHistory({
         getUserConfirmation: (blockerFn, callback) => {
           return blockerFn(callback);
         }
       });
+      /** @type {HistoryListener} */
       this._historyController = _historyController;
     }
 
