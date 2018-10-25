@@ -7,13 +7,13 @@
  */
 
 /**
- * @external {BottomTabBarController} http://docs.smartface.io/#!/api/UI.BottomTabBarController
+ * @external {BottomTabbarController} http://docs.smartface.io/#!/api/UI.BottomTabBarController
  */
 
 /**
  * @external {BottomTabBarItem} http://docs.smartface.io/#!/api/UI.BottomTabBarItem
  */
- 
+
 /**
  * @typedef NavigationControllerTransformEvent
  * @property {Page} frompage
@@ -24,7 +24,7 @@
 /**
  * @typedef {Object} RouteMatch
  * @property {boolean} isExact if Requested path is an exact match or not.
- * @property {Object} params 
+ * @property {Object} params
  * @property {string} path
  * @property {string} url
  */
@@ -43,20 +43,18 @@
  * @property {string} path
  * @property {Array<Route>} routes
  * @property {boolean} exact
- * @property {boolean} exact
- * @property {function(match: RouteMatch)} onBeforeMatch 
+ * @property {function(match: RouteMatch)} onBeforeMatch
  */
- 
+
 /**
  * @typedef {Object} RouteState
  * @property {objec} userState
  * @property {Object} view
  */
- 
+
 /**
  * @typedef {function(match: RouteMatch, state: object, router: Router, view: Page)} RouteBuildHandler
  */
- 
 
 /**
  * @typedef {function(location: RouteLocation, action: string)} RouterBlockHandler

@@ -6,13 +6,77 @@ const NavigationController = require("sf-core/ui/navigationcontroller");
 const createRenderer = require("./createRenderer");
 
 /**
+ * Creates {@link NavigationController} and manages its behavours and routes.
+ *
  * @class
  * @extends {Router}
+ * @example
+ * const {NativeStackRouter, Route} = require('@smartface/router');
+ * const Image = require('sf-core/ui/image');
+ * const Color = require('sf-core/ui/color');
+ *
+ * var router = Router.of({
+ *  path: "/",
+ *
+ *  routes: [
+ *    NativeStackRouter.of(
+ *      path: '/pages',
+ *      headerBarParams: () => ({
+ *        ios: {
+ *          translucent: true,
+ *          alpha: 1,
+ *        },
+ *        backgroundColor: Color.BLUE,
+ *        visible: true
+ *      }),
+ *      routes: [
+ *        Route.of({
+ *          path: "/pages/page1",
+ *          build((match, state, router, view) => {
+ *            const Page1 = require('/pages/Page1');
+ *            return new Page1(state.data, router);
+ *          })
+ *        }),
+ *        Route.of({
+ *          path: "/pages/page2",
+ *          build((match, state, router, view) => {
+ *            const Page2 = require('/pages/Page2');
+ *            return new Page2(state.data, router);
+ *          });
+ *        });
+ *      ]
+ *    )]
+ * });
+ *
+ * @example
+ * const extend = require("js-base/core/extend");
+ *  const System = require("sf-core/device/system");
+ *  const Application = require("sf-core/application");
+ *  const AlertView = require("sf-core/ui/alertview");
+ *  const {NativeStackRouter} = require('@smartface/router');
+ *
+ *  // Get generated UI code
+ *  const Page1Design = require("ui/ui_page1");
+ *
+ *  const Page1 = extend(Page1Design)(
+ *   // Constructor
+ *   function(_super, data, router) {
+ *       // Initalizes super class for this page scope
+ *       _super(this);
+ *       this._router = router;
+ *       if(router instanceof NativeStackRouter)
+ *         router.setHeaderBarParams({visible: false});
+ *
+ *       ...
+ *   });
+ *
+ *
+ * @since 1.0.0
  */
 class NativeStackRouter extends NativeRouterBase {
   /**
    * Builds OS specific NaitveRouter
-   * 
+   *
    * @static
    * @param {RouterParams} param
    */
@@ -48,32 +112,44 @@ class NativeStackRouter extends NativeRouterBase {
     renderer = null,
     to = null,
     isRoot = false,
-    headerBarParams=() => {}
+    headerBarParams = () => {}
   }) {
     super({ path, build, routes, exact, to, isRoot });
-    console.log('new StackRouter created');
+    console.log("new StackRouter created");
     this._renderer = renderer;
     this._renderer.setRootController(new NavigationController());
     this.addNavigatorChangeListener();
     this.build = () => this._renderer._rootController;
-    this._renderer._rootController.onLoad = () => {
-      this._renderer._rootController.headerBar = headerBarParams();
-    };
+    // this._renderer._rootController.onLoad = () => {
+    this._renderer._rootController.headerBar = headerBarParams();
+    // };
   }
 
   /**
+   * Applies new params to the headerBar
+   *
+   * @param {object} params
+   */
+  setHeaderBarParams(params) {
+    this._renderer._rootController.headerBar = params;
+  }
+
+  /**
+   * @private
    * Add new listener to listen NavigationController transitions.
    */
   addNavigatorChangeListener() {
-    this._unlistener = this._renderer.onNavigationControllerTransition(action => {
-      // if user presses backbutton or uses gesture to back
-      if (action.operation === NavigationController.OperationType.POP) {
-        // set Router to skip next history change
-        Router.skipRender();
-        // and history goes back.
-        this.goBack();
+    this._unlistener = this._renderer.onNavigationControllerTransition(
+      action => {
+        // if user presses backbutton or uses gesture to back
+        if (action.operation === NavigationController.OperationType.POP) {
+          // set Router to skip next history change
+          Router.skipRender();
+          // and history goes back.
+          this.goBack();
+        }
       }
-    });
+    );
   }
 
   /**
@@ -86,18 +162,19 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   /**
-   * History change event handler
-   * @protected
+   * @override
    */
   onRouteMatch(route, match, state, action) {
     const view = super.onRouteMatch(route, match, state);
     console.log(`onRouteMatch ${typeof view} ${action}`);
     if (!view) return false;
-    
+
     switch (action) {
       case "REPLACE":
       case "PUSH":
-        console.log(`PUSH ${typeof view} ${action} name : ${this._renderer.name}`);
+        console.log(
+          `PUSH ${typeof view} ${action} name : ${this._renderer.name}`
+        );
         this._renderer.pushChild(view);
         break;
       case "POP":
@@ -110,6 +187,7 @@ class NativeStackRouter extends NativeRouterBase {
 
   /**
    * Current router is changed
+   * @override
    * @event
    * @param {string} action
    */

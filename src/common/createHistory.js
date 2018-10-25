@@ -1,5 +1,10 @@
 const createMemoryHistory = require("./history");
 
+/**
+ * @ignore
+ * @param {*} param0
+ * @param {*} parent
+ */
 function createHistory(
   {
     initialEntries = null,
@@ -66,7 +71,7 @@ function createHistory(
       _history = null;
     }
 
-    push(path, state={}) {
+    push(path, state = {}) {
       console.log(`history push`);
       _history.push(path, state);
       _preventDefault = false;

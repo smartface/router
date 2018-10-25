@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const Router = require("../router/Router");
 const NativeRouterBase = require("./NativeRouterBase");
@@ -16,19 +16,57 @@ function createTabBarItem(item) {
 }
 
 /**
- * It creates BottomTabbarController and pushes Routes' views.
- * 
+ * It creates {@link BottomTabbarController} and manages its behavours and routes.
+ *
  * @class
  * @extends {Router}
+ * @example
+ * const {BottommTabBarRouter, Route} = require('@smartface/router')
+ * const Image = require('sf-core/ui/image');
+ * const Color = require('sf-core/ui/color');
+ *
+ * var router = Router.of({
+ *  path: "/",
+ *  routes: [
+ *    BottomTabBarRouter.of(
+ *      path: '/tabs',
+ *      tabbarParams: () => ({
+ *        itemColor: {normal: Color.BLACK, selected: Color.BLUE},
+ *        backgroundColor: Color.BLUE,
+ *      }),
+ *      tabbarItems: [
+ *        { title: "Page1", icon: Image.createFromFile("images://icon1.png") },
+ *        { title: "Page2", icon: Image.createFromFile("images://icon2.png"),
+ *      ],
+ *      routes: [
+ *        Route.of({
+ *          path: "/tabs/page1",
+ *          build((match, state, router, view) => {
+ *            const Page1 = require('/pages/Page1');
+ *            return new Page1(state.data, router);
+ *          })
+ *        }),
+ *        Route.of({
+ *          path: "/tabs/page2",
+ *          build((match, state, router, view) => {
+ *            const Page2 = require('/pages/Page2');
+ *            return new Page2(state.data, router);
+ *          });
+ *        });
+ *      ]
+ *    )]
+ * })
+ *
+ * @since 1.0.0
  */
 class BottomTabBarRouter extends NativeRouterBase {
   /**
    * Builds OS specific NaitveRouter
-   * 
+   *
    * @static
    * @param {RouteParams} param
    */
-  static of ({
+  static of({
     path = "",
     routes = [],
     exact = false,
@@ -121,6 +159,11 @@ class BottomTabBarRouter extends NativeRouterBase {
     this.build = () => this._renderer._rootController;
   }
 
+  /**
+   * @ignore
+   * @protected
+   * @param {*} index
+   */
   shouldSelectByIndex(index) {
     // var res = index !== this._currentIndex;
     // // console.log(`shouldSelectByIndex ${index} ${this._currentIndex}`);
@@ -156,11 +199,11 @@ class BottomTabBarRouter extends NativeRouterBase {
   /**
    * Sets TabBarItems visited by TabBarItem index
    *
+   * @protected
    * @param {number} index
    * @param {string} path
    */
   setVisited(index, path) {
-    console.log(`setVisited ${index} ${path}`);
     if (index < 0) return;
     this._visitedIndexes[index] = {
       path
@@ -170,9 +213,10 @@ class BottomTabBarRouter extends NativeRouterBase {
 
   /**
    * CHecks if TabBarItem is visited before
-   * 
+   *
+   * @protected
    * @param {number} index
-   * @returns {boolean}
+   * @return {boolean}
    */
   isVisited(index) {
     return !!this._visitedIndexes[index];
@@ -180,7 +224,8 @@ class BottomTabBarRouter extends NativeRouterBase {
 
   /**
    * Finds child route's index by path
-   * 
+   *
+   * @protected
    * @param {string} path
    */
   resolveIndex(path) {
@@ -189,7 +234,8 @@ class BottomTabBarRouter extends NativeRouterBase {
 
   /**
    * Finds child route by index
-   * 
+   *
+   * @protected
    * @param {number} index
    */
   resolveRoute(index) {
@@ -206,8 +252,8 @@ class BottomTabBarRouter extends NativeRouterBase {
   }
 
   /**
-   * Handler of requested path is matched to route 
-   * 
+   * Handler of requested path is matched to route
+   *
    * @override
    * @event
    * @protected
@@ -229,6 +275,7 @@ class BottomTabBarRouter extends NativeRouterBase {
   /**
    * Pushes a new route by index
    *
+   * @protected
    * @param {number} index
    */
   routetoIndex(index) {

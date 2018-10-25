@@ -114,6 +114,7 @@ const clamp = (n, lowerBound, upperBound) =>
 
 /**
  * Creates a history object that stores locations in memory.
+ * @ignore
  */
 const createMemoryHistory = (props = {}) => {
   const {

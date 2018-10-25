@@ -1,10 +1,15 @@
-/** from react-router */
-const pathToRegexp = require("path-to-regexp");
+/* from react-router */
 
+const pathToRegexp = require("path-to-regexp");
 const patternCache = {};
 const cacheLimit = 10000;
 let cacheCount = 0;
 
+/**
+ * @ignore
+ * @param {*} pattern
+ * @param {*} options
+ */
 const compilePath = (pattern, options) => {
   const cacheKey = `${options.end}${options.strict}${options.sensitive}`;
   const cache = patternCache[cacheKey] || (patternCache[cacheKey] = {});
@@ -28,6 +33,7 @@ const compilePath = (pattern, options) => {
 
 /**
  * Public API for matching a URL pathname to a path pattern.
+ * @ignore
  */
 const matchPath = (pathname, options = {}, parent) => {
   if (typeof options === "string")

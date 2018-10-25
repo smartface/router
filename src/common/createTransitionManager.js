@@ -2,6 +2,9 @@
 
 const warning = require("./warning");
 
+/**
+ * @ignore
+ */
 const createTransitionManager = () => {
   let prompt = null;
 

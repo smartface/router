@@ -4,7 +4,7 @@ const Application = require("sf-core/application");
 /**
  * Rendering strategy for Android
  * It encapsulates all logic to display pages on Android
- * 
+ *
  * @class
  * @access package
  * @extends {Renderer}

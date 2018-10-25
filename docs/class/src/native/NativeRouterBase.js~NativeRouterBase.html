@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <base data-ice="baseUrl" href="../../../">
-  <title data-ice="title">src/common/matchRoutes.js | Smartface NativeRouter</title>
+  <title data-ice="title">NativeRouterBase | Smartface NativeRouter</title>
   <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
   <script src="script/prettify/prettify.js"></script>
@@ -52,51 +52,58 @@
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1 data-ice="title">src/common/matchRoutes.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// code from react-router
+<div class="content" data-ice="content"><div class="header-notice">
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode"></code></pre></div>
+  <span data-ice="access">public</span>
+  <span data-ice="kind">class</span>
+  
+  
+  
+  <span data-ice="source">| <span><a href="file/src/native/NativeRouterBase.js.html#lineNumber9">source</a></span></span>
+</div>
 
-/**
- *
- * @ignore
- *
- * @param {Array.&lt;Route&gt;} routes
- * @param {string} pathname
- * @param {Array} branch
- */
-const matchRoutes = (routes, pathname, /*not public API*/ branch = []) =&gt; {
-  routes.some(route =&gt; {
-    const match = route.hasPath() // changed
-      ? route.matchPath(pathname) // changed
-      : branch.length
-        ? branch[branch.length - 1].match
-        : {
-            // ensure we&apos;re using the exact code for default root match
-            path: &quot;/&quot;,
-            url: &quot;/&quot;,
-            params: {},
-            isExact: pathname === &quot;/&quot;
-          };
+<div class="self-detail detail">
+  <h1 data-ice="name">NativeRouterBase</h1>
 
-    if (match &amp;&amp; route.onPrematch(match)) {
-      branch.push({
-        route: route,
-        match
-      });
-      const children = route.map(child =&gt; {
-        return child;
-      });
+  
 
-      matchRoutes(children, pathname, branch);
-    }
+  
+  
+  <div class="flat-list" data-ice="extendsChain"><h4>Extends:</h4><div><span>src/native/BottomTabBarRouter.js~Router</span> &#x2192; NativeRouterBase</div></div>
+  
+  
+  
+  
+  
+  
 
-    return match;
-  });
+  
+  
+  <div class="description" data-ice="description"><p>Native router base</p>
+</div>
+  
 
-  return branch;
-};
+  
 
-module.exports = matchRoutes;
-</code></pre>
+  
+
+  
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </div>
 

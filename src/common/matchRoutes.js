@@ -2,6 +2,8 @@
 
 /**
  *
+ * @ignore
+ *
  * @param {Array.<Route>} routes
  * @param {string} pathname
  * @param {Array} branch

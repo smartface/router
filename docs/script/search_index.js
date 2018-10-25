@@ -6,6 +6,18 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
+    "@smartface/router/src/native/nativerouter.js~nativerouter",
+    "class/src/native/NativeRouter.js~NativeRouter.html",
+    "<span>NativeRouter</span> <span class=\"search-result-import-path\">@smartface/router/src/native/NativeRouter.js</span>",
+    "class"
+  ],
+  [
+    "@smartface/router/src/native/nativerouterbase.js~nativerouterbase",
+    "class/src/native/NativeRouterBase.js~NativeRouterBase.html",
+    "<span>NativeRouterBase</span> <span class=\"search-result-import-path\">@smartface/router/src/native/NativeRouterBase.js</span>",
+    "class"
+  ],
+  [
     "@smartface/router/src/native/nativestackrouter.js~nativestackrouter",
     "class/src/native/NativeStackRouter.js~NativeStackRouter.html",
     "<span>NativeStackRouter</span> <span class=\"search-result-import-path\">@smartface/router/src/native/NativeStackRouter.js</span>",
@@ -30,34 +42,64 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
-    "@smartface/router/src/common/history.js~creatememoryhistory",
-    "function/index.html#static-function-createMemoryHistory",
-    "<span>createMemoryHistory</span> <span class=\"search-result-import-path\">@smartface/router/src/common/history.js</span>",
-    "function"
+    "",
+    "test-file/__test__/HistoryController.test.js.html#lineNumber6",
+    "HistoryController",
+    "test"
   ],
   [
-    "@smartface/router/src/router/routedata.js~createroutedata",
-    "function/index.html#static-function-createRouteData",
-    "<span>createRouteData</span> <span class=\"search-result-import-path\">@smartface/router/src/router/RouteData.js</span>",
-    "function"
+    "",
+    "test-file/__test__/HistoryController.test.js.html#lineNumber145",
+    "HistoryController can call parent go back if node history is empty",
+    "test"
   ],
   [
-    "@smartface/router/src/common/matchpath.js~matchpath",
-    "function/index.html#static-function-matchPath",
-    "<span>matchPath</span> <span class=\"search-result-import-path\">@smartface/router/src/common/matchPath.js</span>",
-    "function"
+    "",
+    "test-file/__test__/HistoryController.test.js.html#lineNumber11",
+    "HistoryController can create nested nodes",
+    "test"
   ],
   [
-    "@smartface/router/src/common/matchroutes.js~matchroutes",
-    "function/index.html#static-function-matchRoutes",
-    "<span>matchRoutes</span> <span class=\"search-result-import-path\">@smartface/router/src/common/matchRoutes.js</span>",
-    "function"
+    "",
+    "test-file/__test__/HistoryController.test.js.html#lineNumber168",
+    "HistoryController can dispose",
+    "test"
   ],
   [
-    "@smartface/router/src/common/matchpath.js~pathtoregexp",
-    "variable/index.html#static-variable-pathToRegexp",
-    "<span>pathToRegexp</span> <span class=\"search-result-import-path\">@smartface/router/src/common/matchPath.js</span>",
-    "variable"
+    "",
+    "test-file/__test__/HistoryController.test.js.html#lineNumber101",
+    "HistoryController can go back",
+    "test"
+  ],
+  [
+    "",
+    "test-file/__test__/HistoryController.test.js.html#lineNumber54",
+    "HistoryController can listen grandchild nodes",
+    "test"
+  ],
+  [
+    "",
+    "test-file/__test__/HistoryController.test.js.html#lineNumber34",
+    "HistoryController can unlisten child nodes",
+    "test"
+  ],
+  [
+    "",
+    "test-file/__test__/HistoryController.test.js.html#lineNumber77",
+    "HistoryController can unlisten grandchild nodes",
+    "test"
+  ],
+  [
+    "",
+    "test-file/__test__/HistoryController.test.js.html#lineNumber123",
+    "HistoryController can't go back if history is empty",
+    "test"
+  ],
+  [
+    "",
+    "test-file/__test__/HistoryController.test.js.html#lineNumber16",
+    "HistoryController should listen child nodes",
+    "test"
   ],
   [
     "",
@@ -133,20 +175,20 @@ window.esdocSearchIndex = [
   ],
   [
     "",
-    "test-file/__test__/Router.test.js.html#lineNumber343",
+    "test-file/__test__/Router.test.js.html#lineNumber302",
     "Router can be blocked",
     "test"
   ],
   [
     "",
-    "test-file/__test__/Router.test.js.html#lineNumber293",
+    "test-file/__test__/Router.test.js.html#lineNumber241",
     "Router can call a relative path",
     "test"
   ],
   [
     "",
-    "test-file/__test__/Router.test.js.html#lineNumber240",
-    "Router can call a relative path",
+    "test-file/__test__/Router.test.js.html#lineNumber341",
+    "Router can redirect to specified route when route has 'to' attribute",
     "test"
   ],
   [
@@ -178,6 +220,12 @@ window.esdocSearchIndex = [
     "test-file/__test__/Router.test.js.html#lineNumber113",
     "Router sends data and params to specified route",
     "test"
+  ],
+  [
+    "__test__/historycontroller.test.js",
+    "test-file/__test__/HistoryController.test.js.html",
+    "__test__/HistoryController.test.js",
+    "testFile"
   ],
   [
     "__test__/route.test.js",
@@ -486,6 +534,12 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/common/createhistory.js",
+    "file/src/common/createHistory.js.html",
+    "src/common/createHistory.js",
+    "file"
+  ],
+  [
     "src/common/createtransitionmanager.js",
     "file/src/common/createTransitionManager.js.html",
     "src/common/createTransitionManager.js",
@@ -522,12 +576,6 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
-    "src/native/backhandler.js",
-    "file/src/native/BackHandler.js.html",
-    "src/native/BackHandler.js",
-    "file"
-  ],
-  [
     "src/native/bottomtabbarrouter.js",
     "file/src/native/BottomTabBarRouter.js.html",
     "src/native/BottomTabBarRouter.js",
@@ -543,12 +591,6 @@ window.esdocSearchIndex = [
     "src/native/bottomtabbarrouter.js~bottomtabbarrouter#dispose",
     "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-method-dispose",
     "src/native/BottomTabBarRouter.js~BottomTabBarRouter#dispose",
-    "method"
-  ],
-  [
-    "src/native/bottomtabbarrouter.js~bottomtabbarrouter#isinitialpath",
-    "class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html#instance-method-isInitialPath",
-    "src/native/BottomTabBarRouter.js~BottomTabBarRouter#isInitialPath",
     "method"
   ],
   [
@@ -618,6 +660,30 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/native/nativerouter.js~nativerouter#addchildrouter",
+    "class/src/native/NativeRouter.js~NativeRouter.html#instance-method-addChildRouter",
+    "src/native/NativeRouter.js~NativeRouter#addChildRouter",
+    "method"
+  ],
+  [
+    "src/native/nativerouter.js~nativerouter#constructor",
+    "class/src/native/NativeRouter.js~NativeRouter.html#instance-constructor-constructor",
+    "src/native/NativeRouter.js~NativeRouter#constructor",
+    "method"
+  ],
+  [
+    "src/native/nativerouter.js~nativerouter.of",
+    "class/src/native/NativeRouter.js~NativeRouter.html#static-method-of",
+    "src/native/NativeRouter.js~NativeRouter.of",
+    "method"
+  ],
+  [
+    "src/native/nativerouterbase.js",
+    "file/src/native/NativeRouterBase.js.html",
+    "src/native/NativeRouterBase.js",
+    "file"
+  ],
+  [
     "src/native/nativestackrouter.js",
     "file/src/native/NativeStackRouter.js.html",
     "src/native/NativeStackRouter.js",
@@ -654,6 +720,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/native/nativestackrouter.js~nativestackrouter#setheaderbarparams",
+    "class/src/native/NativeStackRouter.js~NativeStackRouter.html#instance-method-setHeaderBarParams",
+    "src/native/NativeStackRouter.js~NativeStackRouter#setHeaderBarParams",
+    "method"
+  ],
+  [
     "src/native/nativestackrouter.js~nativestackrouter.of",
     "class/src/native/NativeStackRouter.js~NativeStackRouter.html#static-method-of",
     "src/native/NativeStackRouter.js~NativeStackRouter.of",
@@ -664,36 +736,6 @@ window.esdocSearchIndex = [
     "file/src/native/Renderer.js.html",
     "src/native/Renderer.js",
     "file"
-  ],
-  [
-    "src/native/renderer.js~bottomtabbarcontroller",
-    "http://docs.smartface.io/#!/api/UI.BottomTabBarController",
-    "src/native/Renderer.js~BottomTabBarController",
-    "external"
-  ],
-  [
-    "src/native/renderer.js~bottomtabbaritem",
-    "http://docs.smartface.io/#!/api/UI.BottomTabBarItem",
-    "src/native/Renderer.js~BottomTabBarItem",
-    "external"
-  ],
-  [
-    "src/native/renderer.js~navigationcontroller",
-    "http://docs.smartface.io/#!/api/UI.NavigationController",
-    "src/native/Renderer.js~NavigationController",
-    "external"
-  ],
-  [
-    "src/native/renderer.js~navigationcontrollertransformevent",
-    "typedef/index.html#static-typedef-NavigationControllerTransformEvent",
-    "src/native/Renderer.js~NavigationControllerTransformEvent",
-    "typedef"
-  ],
-  [
-    "src/native/renderer.js~page",
-    "http://docs.smartface.io/#!/api/UI.Page",
-    "src/native/Renderer.js~Page",
-    "external"
   ],
   [
     "src/native/createrenderer.js",
@@ -792,30 +834,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/router/route.js~routebuildhandler",
-    "typedef/index.html#static-typedef-RouteBuildHandler",
-    "src/router/Route.js~RouteBuildHandler",
-    "typedef"
-  ],
-  [
-    "src/router/route.js~routelocation",
-    "typedef/index.html#static-typedef-RouteLocation",
-    "src/router/Route.js~RouteLocation",
-    "typedef"
-  ],
-  [
-    "src/router/route.js~routematch",
-    "typedef/index.html#static-typedef-RouteMatch",
-    "src/router/Route.js~RouteMatch",
-    "typedef"
-  ],
-  [
-    "src/router/route.js~routeparams",
-    "typedef/index.html#static-typedef-RouteParams",
-    "src/router/Route.js~RouteParams",
-    "typedef"
-  ],
-  [
     "src/router/route.js~routepath#clone",
     "class/src/router/Route.js~RoutePath.html#instance-method-clone",
     "src/router/Route.js~RoutePath#clone",
@@ -858,28 +876,10 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/router/route.js~routestate",
-    "typedef/index.html#static-typedef-RouteState",
-    "src/router/Route.js~RouteState",
-    "typedef"
-  ],
-  [
-    "src/router/routedata.js",
-    "file/src/router/RouteData.js.html",
-    "src/router/RouteData.js",
-    "file"
-  ],
-  [
     "src/router/router.js",
     "file/src/router/Router.js.html",
     "src/router/Router.js",
     "file"
-  ],
-  [
-    "src/router/router.js~historylistener",
-    "typedef/index.html#static-typedef-HistoryListener",
-    "src/router/Router.js~HistoryListener",
-    "typedef"
   ],
   [
     "src/router/router.js~router#add",
@@ -1026,9 +1026,81 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/router/router.js~routerblockhandler",
+    "src/types.js",
+    "file/src/types.js.html",
+    "src/types.js",
+    "file"
+  ],
+  [
+    "src/types.js~bottomtabbaritem",
+    "http://docs.smartface.io/#!/api/UI.BottomTabBarItem",
+    "src/types.js~BottomTabBarItem",
+    "external"
+  ],
+  [
+    "src/types.js~bottomtabbarcontroller",
+    "http://docs.smartface.io/#!/api/UI.BottomTabBarController",
+    "src/types.js~BottomTabbarController",
+    "external"
+  ],
+  [
+    "src/types.js~historylistener",
+    "typedef/index.html#static-typedef-HistoryListener",
+    "src/types.js~HistoryListener",
+    "typedef"
+  ],
+  [
+    "src/types.js~navigationcontroller",
+    "http://docs.smartface.io/#!/api/UI.NavigationController",
+    "src/types.js~NavigationController",
+    "external"
+  ],
+  [
+    "src/types.js~navigationcontrollertransformevent",
+    "typedef/index.html#static-typedef-NavigationControllerTransformEvent",
+    "src/types.js~NavigationControllerTransformEvent",
+    "typedef"
+  ],
+  [
+    "src/types.js~page",
+    "http://docs.smartface.io/#!/api/UI.Page",
+    "src/types.js~Page",
+    "external"
+  ],
+  [
+    "src/types.js~routebuildhandler",
+    "typedef/index.html#static-typedef-RouteBuildHandler",
+    "src/types.js~RouteBuildHandler",
+    "typedef"
+  ],
+  [
+    "src/types.js~routelocation",
+    "typedef/index.html#static-typedef-RouteLocation",
+    "src/types.js~RouteLocation",
+    "typedef"
+  ],
+  [
+    "src/types.js~routematch",
+    "typedef/index.html#static-typedef-RouteMatch",
+    "src/types.js~RouteMatch",
+    "typedef"
+  ],
+  [
+    "src/types.js~routeparams",
+    "typedef/index.html#static-typedef-RouteParams",
+    "src/types.js~RouteParams",
+    "typedef"
+  ],
+  [
+    "src/types.js~routestate",
+    "typedef/index.html#static-typedef-RouteState",
+    "src/types.js~RouteState",
+    "typedef"
+  ],
+  [
+    "src/types.js~routerblockhandler",
     "typedef/index.html#static-typedef-RouterBlockHandler",
-    "src/router/Router.js~RouterBlockHandler",
+    "src/types.js~RouterBlockHandler",
     "typedef"
   ],
   [

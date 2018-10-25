@@ -1,4 +1,4 @@
-'use strict'
+"use strict";
 
 const Router = require("../router/Router");
 
@@ -7,10 +7,10 @@ const Router = require("../router/Router");
  * @class
  */
 class NativeRouterBase extends Router {
-  setHeaderbarProps(props){
+  setHeaderbarProps(props) {
     this._renderer._rootController &&
-    this._renderer._rootController.headerBar && 
-        Object.assign(this._renderer._rootController.headerBar, props);
+      this._renderer._rootController.headerBar &&
+      Object.assign(this._renderer._rootController.headerBar, props);
   }
 }
 
