@@ -27,6 +27,14 @@ let _skipRender = false;
  */
 class Router extends Route {
   /**
+   * Factory method to create a new Router instance
+   *
+   * @param {RouterParams} props
+   */
+  static of(props) {
+    return new Router(props);
+  }
+  /**
    * @constructor
    * @param {RouterParams} param
    */
@@ -171,6 +179,13 @@ class Router extends Route {
    */
   renderMatches(matches, state, action) {
     matches.some(({ match, route }, index) => {
+      console.log(
+        "pathname",
+        match.path,
+        "" + route,
+        route instanceof Router,
+        route.name
+      );
       if (route !== this && route instanceof Router) {
         console.log("not exact match : " + this);
         // if(index > 0 && this._isRoot)
@@ -302,7 +317,7 @@ class Router extends Route {
    * Change history by specified path
    *
    * @param {object|string} path - Path or matches of the route
-   * @param {!object} [data={}] data
+   * @param {!object} [data={}] data - Routing data
    * @return {Router}
    */
   push(path, data = {}) {

@@ -323,18 +323,19 @@ describe("Router", () => {
       ]
     });
 
-    router.addRouteBlocker((location, action, callback) => {
+    const unlisten = router.addRouteBlocker((location, action, callback) => {
       callback(false);
     });
 
     router.push("/path/to/cenk", { name: "name" });
     expect(router.getHistory().entries).toEqual([]);
-
+    unlisten();
     router.push("/path/to/cenk", { name: "name" });
     router.addRouteBlocker((location, action, callback) => {
       callback(true);
     });
 
+    console.log(router.getHistory().entries);
     expect(router.getHistory().entries[0].pathname).toBe("/path/to/cenk");
   });
 
@@ -364,10 +365,69 @@ describe("Router", () => {
     });
 
     router.push("/path", { name: "name" });
-    console.log(`entries`, router.getHistory().entries[1]);
     expect(router.getHistory().entries[0].pathname).toBe("/path/to/1");
     expect(router.getHistory().entries[0].state).toEqual({
       routeState: { data: { name: "name" } }
     });
+  });
+  it("can call nested Routers", () => {
+    let callCount = 0;
+    var component1 = {};
+    var component2 = {};
+
+    var router1 = Router.of({
+      path: "/stack1",
+      routes: [
+        new Route({
+          path: "/stack1/to/1",
+          build: (match, state, router) => {
+            component1.router = router;
+            component1.params = match.params;
+            return component1;
+          }
+        }),
+        new Route({
+          path: "/stack1/to/:id",
+          build: (match, state, router, view) => {
+            return component1;
+          }
+        })
+      ]
+    });
+
+    router1.name = "router1";
+
+    var router2 = Router.of({
+      path: "/stack2",
+      routes: [
+        new Route({
+          path: "/stack2/to/1",
+          build: (match, state, router) => {
+            component2.router = router;
+            component2.params = match.params;
+            return component2;
+          }
+        }),
+        new Route({
+          path: "/stack2/to/:id",
+          build: (match, state, router, view) => {
+            return component1;
+          }
+        })
+      ]
+    });
+
+    router2.name = "router2";
+
+    const router = new Router({
+      path: "/",
+      isRoot: true,
+      routes: [router1, router2]
+    });
+
+    router.push("/stack1/to/1", { name: "name" });
+    expect(component1.router === router1).toBe(true);
+    router.push("/stack2/to/1", { name: "name" });
+    expect(component2.router === router2).toBe(true);
   });
 });

@@ -118,7 +118,7 @@
  * @property {function} clear
  * @property {function} goBack
  * @property {function} goForward
- * @property {function(index: number):boolean}canGo
+ * @property {function(index: number):boolean} canGo
  * @property {function(fn: RouterBlockHandler):function} block
  * @property {function(fn: HistoryListener):function} listen
  *

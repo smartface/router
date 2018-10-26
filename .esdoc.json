@@ -4,27 +4,32 @@
   "includes": ["\\.js$"],
   "excludes": ["\\.config\\.js$"],
   "plugins": [
-  {
-    "name": "esdoc-standard-plugin",
-    "option": {
-      "lint": {"enable": true},
-      "coverage": {"enable": true},
-      "accessor": {"access": ["public", "protected", "private"], "autoPrivate": true},
-      "undocumentIdentifier": {"enable": false},
-      "unexportedIdentifier": {"enable": true},
-      "typeInference": {"enable": true},
-      "brand": {
-        "title": "Smartface NativeRouter",
-        "description": "Smartface NativeRouter",
-        "repository": "https://github.com/smartface/router",
-        "site": "http://smartface.io"
-      },
-      "test": {
-        "source": "./__test__/",
-        "interfaces": ["describe", "it", "context", "suite", "test"],
-        "includes": ["(spec|Spec|test|Test)\\.js$"],
-        "excludes": ["\\.config\\.js$"]
+    {
+      "name": "esdoc-standard-plugin",
+      "option": {
+        "lint": { "enable": true },
+        "coverage": { "enable": true },
+        "accessor": {
+          "access": ["public", "protected", "private", "package"],
+          "autoPrivate": true
+        },
+        "undocumentIdentifier": { "enable": false },
+        "unexportedIdentifier": { "enable": true },
+        "typeInference": { "enable": true },
+        "brand": {
+          "title": "Smartface NativeRouter",
+          "description": "Smartface NativeRouter",
+          "repository": "https://github.com/smartface/router",
+          "site": "http://smartface.io"
+        },
+        "test": {
+          "type": "jest",
+          "source": "./__test__",
+          "interfaces": ["describe", "it", "context", "suite", "test"],
+          "includes": ["(spec|Spec|test|Test)\\.js$"],
+          "excludes": ["\\.config\\.js$"]
+        }
       }
     }
-  }] 
+  ]
 }
