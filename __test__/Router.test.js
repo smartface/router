@@ -476,8 +476,7 @@ describe("Router", () => {
         new Route({
           path: "/stack2/to/:id",
           build: (match, state, router, view) => {
-            console.log(match);
-            component2.pathname = match.pathname;
+            component2.url = match.url;
             return component2;
           }
         })
@@ -494,9 +493,11 @@ describe("Router", () => {
 
     router.push("/stack1", { name: "name" });
     expect(component1.router).toBe(router1);
+
     component1.router.push("/stack2", { name: "name" });
     expect(component2.router).toBe(router2);
-    component2.router.push("/stack2/to/1", { name: "name" });
-    expect(component2.pathname).toBe("/stack2/to/1");
+
+    component2.router.push("/stack2/to/2", { name: "name" });
+    expect(component2.url).toBe("/stack2/to/2");
   });
 });
