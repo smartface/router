@@ -174,8 +174,8 @@ class NativeStackRouter extends NativeRouterBase {
    * @override
    */
   onRouteMatch(route, match, state, action) {
-    console.log(`onRouteMatch ${typeof view} ${action}`);
     const view = super.onRouteMatch(route, match, state);
+    console.log(`onRouteMatch ${typeof view} ${action}`);
     if (!view) return false;
 
     switch (action) {

@@ -5,7 +5,7 @@ const matchRoutes = require("../common/matchRoutes");
 const createHistory = require("../common/createHistory");
 let actions = [];
 
-let _historyController;
+let historyController;
 
 let _skipRender = false;
 
@@ -31,7 +31,7 @@ class Router extends Route {
    *
    * @param {RouterParams} props
    */
-  static of(props) {
+  static of(props={}) {
     return new Router(props);
   }
   /**
@@ -47,18 +47,31 @@ class Router extends Route {
     to = null,
     _historyController = null
   }) {
-    super({ path, build, routes, to });
+    super({ path, build, routes, to, isRoot });
     // console.log("Router created");
-    if (!_historyController) {
-      // console.log("Router history is creating");
+    if (!historyController) {
+      console.log(`Router history is creating ${this}`);
       /** @type {HistoryListener} */
-      _historyController = createHistory({
+      historyController = createHistory({
         getUserConfirmation: (blockerFn, callback) => {
           return blockerFn(callback);
         }
       });
       /** @type {HistoryListener} */
-      this._historyController = _historyController;
+      this._historyController = historyController;
+    } else {
+      this._historyController = historyController.createNode({
+        getUserConfirmation: (blockerFn, callback) => {
+          return blockerFn(callback);
+        }
+      });
+    }
+    
+    
+    if(isRoot === false){
+      this._historyController.listen((location, action) => {
+        console.log(`new history ${this} ${location.pathname}`);
+      })
     }
 
     routes.forEach(route => {
@@ -212,7 +225,7 @@ class Router extends Route {
           actions.forEach(item => item[0](item[1]));
         }
 
-        this.onRouterEnter && this.onRouterEnter(action);
+        // this.onRouterEnter && this.onRouterEnter(action);
         actions = [];
 
         return true;
@@ -253,6 +266,7 @@ class Router extends Route {
    * @param {string} action
    */
   redirectRoute(route, state, action) {
+    console.log(`redirectRoute`)
     // redirection of a route
     this.routeRollback(); // remove last route from history
     this.push(route.getRedirectto(), state.routeState.data); // and add new route
@@ -321,7 +335,7 @@ class Router extends Route {
    * @return {Router}
    */
   push(path, data = {}) {
-    console.log(`Push router ${path} ${this._historyController}`);
+    console.log(`Push router ${path} ${this}`);
     if (path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;
     }
