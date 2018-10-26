@@ -73,9 +73,9 @@ class Router extends Route {
         (location, action) => {
           console.log(`History is changed ${location.pathname}`);
           try {
-            if (!_skipRender) {
-              this.onHistoryChange(location, action);
-            }
+            // if (!_skipRender) {
+            this.onHistoryChange(location, action);
+            // }
           } catch (e) {
             throw e;
           } finally {
@@ -155,8 +155,8 @@ class Router extends Route {
    * @param {Object} action
    */
   onHistoryChange(location, action) {
+    console.log(`onHistoryChange ${this}`);
     this._matches = matchRoutes([this].concat(this._routes), location.pathname);
-
     this.renderMatches(this._matches, location.state, action);
   }
 
@@ -321,7 +321,6 @@ class Router extends Route {
    * @return {Router}
    */
   push(path, data = {}) {
-    // this._cache.get(path) ||
     console.log(`Push router ${path} ${this._historyController}`);
     if (path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;

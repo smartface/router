@@ -55,7 +55,6 @@ function createHistory(
     }
 
     /**
-     *
      * @param {object} props
      * @return {HistoryController}
      */

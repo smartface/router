@@ -153,7 +153,7 @@ class NativeStackRouter extends NativeRouterBase {
         // if user presses backbutton or uses gesture to back
         if (action.operation === NavigationController.OperationType.POP) {
           // set Router to skip next history change
-          Router.skipRender();
+          this._historyController.preventDefault();
           // and history goes back.
           this.goBack();
         }
@@ -174,8 +174,8 @@ class NativeStackRouter extends NativeRouterBase {
    * @override
    */
   onRouteMatch(route, match, state, action) {
-    const view = super.onRouteMatch(route, match, state);
     console.log(`onRouteMatch ${typeof view} ${action}`);
+    const view = super.onRouteMatch(route, match, state);
     if (!view) return false;
 
     switch (action) {
@@ -205,7 +205,7 @@ class NativeStackRouter extends NativeRouterBase {
   onRouterExit(action) {
     if (action === "POP")
       this._renderer.setRootController(new NavigationController());
-    // console.log(`onRouterExit ${this}`);
+    console.log(`onRouterExit ${this}`);
   }
 }
 
