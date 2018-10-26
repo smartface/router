@@ -44,41 +44,29 @@ class Router extends Route {
     routes = [],
     exact = false,
     isRoot = false,
-    to = null,
-    _historyController = null
+    to = null
   }) {
     super({ path, build, routes, to, isRoot });
     // console.log("Router created");
     if (!historyController) {
       console.log(`Router history is creating ${this}`);
       /** @type {HistoryListener} */
-      historyController = createHistory({
+      this._historyController = createHistory({
         getUserConfirmation: (blockerFn, callback) => {
           return blockerFn(callback);
         }
       });
       /** @type {HistoryListener} */
-      this._historyController = historyController;
-    } else {
-      this._historyController = historyController.createNode({
-        getUserConfirmation: (blockerFn, callback) => {
-          return blockerFn(callback);
-        }
+
+      routes.forEach(route => {
+        // if (route instanceof Router) {
+          route.initialize &&  route.initialize(this._historyController);
+        // }
       });
     }
     
-    
-    if(isRoot === false){
-      this._historyController.listen((location, action) => {
-        console.log(`new history ${this} ${location.pathname}`);
-      })
-    }
-
-    routes.forEach(route => {
-      if (route instanceof Router) {
-        route.initialize(this._historyController);
-      }
-    });
+    // if(isRoot === false){
+    // }
 
     this._historyUnlisten = () => null;
     if (isRoot) {
@@ -114,6 +102,16 @@ class Router extends Route {
       getUserConfirmation: (blockerFn, callback) => {
         return blockerFn(callback);
       }
+    });
+    
+    this._routes.forEach(route => {
+      // if (route instanceof Router) {
+        route.initialize &&  route.initialize(this._historyController);
+      // }
+    });
+    
+    this._historyController.listen((location, action) => {
+      console.log(`new history ${this} ${location.pathname}`);
     });
   }
 

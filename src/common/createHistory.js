@@ -88,9 +88,12 @@ function createHistory(
 
     /**
      * Calls history.goBack()
+     * @todo notify all listeners as action is rollback
      */
     rollback() {
+      _preventDefault = true;
       _history.rollback();
+      _preventDefault = false;
     }
 
     /**

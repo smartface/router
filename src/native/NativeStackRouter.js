@@ -153,9 +153,9 @@ class NativeStackRouter extends NativeRouterBase {
         // if user presses backbutton or uses gesture to back
         if (action.operation === NavigationController.OperationType.POP) {
           // set Router to skip next history change
-          this._historyController.preventDefault();
+          this._historyController.rollback();
           // and history goes back.
-          this.goBack();
+          // this.goBack();
         }
       }
     );
