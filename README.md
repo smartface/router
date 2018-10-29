@@ -2,13 +2,28 @@
 
 [Read Documentation](https://smartface.github.io/router/)
 
+# What is a Router
+
+Router is a concept that separates routing/navigation and the pages/views.
+
+## Types of Smartface Routers
+
+There are 5 types of routers
+
+- [NativeRouter](https://smartface.github.io/router/class/src/native/NativeRouter.js~NativeRouter.html)
+- [NativeStackRouter](https://smartface.github.io/router/class/src/native/NativeStackRouter.js~NativeStackRouter.html)
+- [NativeBottomTabBarRouter](https://smartface.github.io/router/class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html)
+- NativeModalRouter (in roadmap)
+- NativeSplitRouter (in roadmap)
+
+
 ## Installation
 
 ```
 (cd ~/workspace/scripts && npm i @smartface/router)
 ```
 
-## Usage
+## Common Usage
 
 ```javascript
 const Router = require("@smartface/router/src/native/NativeRouter");
@@ -83,10 +98,6 @@ router.push("/pages/page1");
 
 ## Blocking Routes
 
-### Limitation
-
-It doesn't work with iOS default headerbar's back-button and back gesture. If you want to use in these cases, you must use custom back button and disable back gesture.
-
 ```js
 router.addRouteBlocker((location, action, callback) => {
   alert({
@@ -112,6 +123,12 @@ router.addRouteBlocker((location, action, callback) => {
 });
 ```
 
+### Limitation
+
+There are several actions that user can take, which cannot be blocked by the blocker. Those cases include:
+- **iOS HeaderBar**: It doesn't work with iOS default headerbar's back-button and back gesture. If you want to use in these cases, you must use custom back button and disable back gesture.
+- **Bottom TabBar**: Switching between the tabs cannot be prevented.
+
 ## Listening history changes
 
 ```js
@@ -122,7 +139,14 @@ const unlisten = router.getHistory().listen((location, action) => {
 unlisten();
 ```
 
-## Contribute to Repository
+## Common features of Routers
+
+- Nested routes
+- Route redirection
+- Route blocking
+- History listening
+
+# Contribute to Repository
 
 - Clone repo to workspace root folder. (Feel free to clone into the /workspace/scripts/node_modules/@smartface folder)
 
@@ -147,20 +171,3 @@ npm run dev:link
 ```
 npx esdoc
 ```
-
-## Types of Routers
-
-There are 5 types of routers
-
-- NativeRouter
-- NativeStackRouter
-- NativeBottomTabBarRouter
-- NativeModalRouter (in roadmap)
-- NativeSplitRouter (in roadmap)
-
-## Common features of Routers
-
-- Nested routes
-- Route redirection
-- Route blocking
-- History listening
