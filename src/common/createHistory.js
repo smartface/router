@@ -15,6 +15,8 @@ function createHistory(
   } = {},
   parent = null
 ) {
+  let _preventDefault = false;
+
   /**
    * @type History
    */
@@ -24,17 +26,16 @@ function createHistory(
     keyLength: keyLength || 20, // The length of location.key
     // A function to use to confirm navigation with the user. Required
     // if you return string prompts from transition hooks (see below)
-    getUserConfirmation: getUserConfirmation
+    getUserConfirmation: (blockerFn, callback) => !_preventDefault && getUserConfirmation(blockerFn, callback) || callback(true)
   });
 
   const _listeners = new Set();
   const _unlistenAll = new Set();
   const _nodes = new Set();
-  let _preventDefault = false;
 
   function listener(location, action) {
     !_preventDefault &&
-      _listeners.forEach(listener => listener(location, action));
+      _listeners.forEach(handler => handler(location, action));
     _preventDefault = false;
   }
 
@@ -52,6 +53,11 @@ function createHistory(
     preventDefault() {
       _preventDefault = true;
       _nodes.forEach(node => node.preventDefault());
+    }
+    
+    clearPreventDefault(){
+      _preventDefault = false;
+      _nodes.forEach(node => node.clearPreventDefault());
     }
 
     /**
@@ -112,7 +118,7 @@ function createHistory(
     push(path, state = {}) {
       console.log(`history push`);
       _history.push(path, state);
-      _preventDefault = false;
+      _preventDefault && this.clearPreventDefault();
     }
 
     /**

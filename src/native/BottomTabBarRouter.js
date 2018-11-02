@@ -128,17 +128,17 @@ class BottomTabBarRouter extends NativeRouterBase {
       console.log("didSelectByIndex  : " + index + " : " + this._fromRouter);
       if (this._fromRouter === false) {
         const route = this.resolveRoute(index);
-        this._historyController.preventDefault();
+        // this._historyController.preventDefault();
         if (this.isVisited(index)) {
           // Will Not trigger next history change
-          // this._historyController.preventDefault();
+          this._historyController.preventDefault();
           this._historyController.push(this._visitedIndexes[index].path);
         } else {
-          this._historyController.push(this.resolveRoute(index).getUrlPath());
+          this._historyController.push(route.getRedirectto() || route.getUrlPath());
         }
-        if (route instanceof Router) {
-          route.onRouterEnter("PUSH");
-        }
+        // if (route instanceof Router) {
+        //   route.onRouterEnter(route.getCurrentUrl(), "PUSH");
+        // }
       }
 
       !this.isVisited(index) && this.routetoIndex(index);
