@@ -21,6 +21,36 @@ describe("Router", () => {
     });
     expect(routes.length).toBe(3);
   });
+
+  it("fires an event when history is changed", () => {
+    const router = new Router({
+      path: "/",
+      exact: false,
+      isRoot: true,
+      routes: [
+        new Route({
+          path: "/path/to/:name",
+          build: (props, match) => ({
+            type: "target1"
+          })
+        }),
+        new Route({
+          path: "/path/to/:id",
+          build: (props, match) => ({
+            type: "target2"
+          })
+        }),
+        new Route({ path: "*", build: (props, match) => ({ type: "target3" }) })
+      ]
+    });
+
+    // let matches = matchRoutes([router], "/path/to/1").map(
+    //   ({ match, route }) => ({ match, route: route.toObject(), view: route.build() })
+    // );
+    router.push("/path/to/1");
+    console.log(router.getHistory().entries);
+    expect(router.getHistory().length > 0).toBe(true);
+  });
   it("finds target by url", () => {
     const router = new Router({
       path: "/",
@@ -370,7 +400,7 @@ describe("Router", () => {
       routeState: { data: { name: "name" } }
     });
   });
-  it("can call nested Routers", () => {
+  it("can call child Routers", () => {
     let callCount = 0;
     var component1 = {};
     var component2 = {};
@@ -396,8 +426,6 @@ describe("Router", () => {
       ]
     });
 
-    router1.name = "router1";
-
     var router2 = Router.of({
       path: "/stack2",
       to: "/stack2/to/1",
@@ -418,8 +446,6 @@ describe("Router", () => {
         })
       ]
     });
-
-    router2.name = "router2";
 
     const router = new Router({
       path: "/",

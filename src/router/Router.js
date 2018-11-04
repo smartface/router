@@ -16,6 +16,9 @@ let _skipRender = false;
  * @property {boolean} exact If it's only exact match or not
  * @property {boolean} isRoot If it's root or not
  * @property {(string|null)} to Redirection path
+ * @property {boolean} strict
+ * @property {boolean} sensitive Path is case sensitive or not
+ *
  */
 
 /**
@@ -31,7 +34,7 @@ class Router extends Route {
    *
    * @param {RouterParams} props
    */
-  static of(props={}) {
+  static of(props = {}) {
     return new Router(props);
   }
   /**
@@ -43,50 +46,62 @@ class Router extends Route {
     build = null,
     routes = [],
     exact = false,
+    sensitive = true,
+    strict = true,
     isRoot = false,
     to = null
   }) {
     super({ path, build, routes, to, isRoot });
     // console.log("Router created");
-    if (!historyController) {
-      console.log(`Router history is creating ${this}`);
+
+    this._historyUnlisten = () => null;
+
+    if (isRoot) {
+      console.log("historycontroller create");
       /** @type {HistoryListener} */
       historyController = createHistory({
+        sensitive,
+        strict,
+        exact,
+        path,
         getUserConfirmation: (blockerFn, callback) => {
           return blockerFn(callback);
         }
       });
 
-      routes.forEach(route => {
-        // if (route instanceof Router) {
-          route.initialize && route.initialize(this._historyController);
-        // }
-      });
+      this.initialize(historyController);
+
+      // routes.forEach(route => {
+      //   // if (route instanceof Router) {
+      //   route.initialize && route.initialize(historyController);
+      //   // }
+      // });
     }
-    
+
     // if(isRoot === false){
     // }
 
-    this._historyUnlisten = () => null;
-    if (isRoot) {
-      this._historyUnlisten = this._historyController.listen(
-        (location, action) => {
-          console.log(`History is changed ${location.pathname}`);
-          try {
-            // if (!_skipRender) {
-            this.onHistoryChange(location, action);
-            // }
-          } catch (e) {
-            throw e;
-          } finally {
-            _skipRender = false;
-          }
-        }
-      );
-    }
+    // if (isRoot) {
+    // this._historyUnlisten = this._historyController.listen(
+    //   (location, action) => {
+    //     console.log(`History is changed ${location.pathname}`);
+    //     try {
+    //       // if (!_skipRender) {
+    //       this.onHistoryChange(location, action);
+    //       // }
+    //     } catch (e) {
+    //       throw e;
+    //     } finally {
+    //       _skipRender = false;
+    //     }
+    //   }
+    // );
+    // }
 
     this._isRoot = isRoot;
     this._exact = exact;
+    this._strict = strict;
+    this._sensitive = sensitive;
     // this._cache = new WeakMap();
     this._unblock = () => null;
   }
@@ -97,24 +112,31 @@ class Router extends Route {
    * @param {*} parentHistory
    */
   initialize(parentHistory) {
+    console.log("initialze", this.getUrlPath());
     this._historyController = parentHistory.createNode({
+      ...this._options,
       getUserConfirmation: (blockerFn, callback) => {
         return blockerFn(callback);
       }
     });
-    
+
     this._routes.forEach(route => {
       // if (route instanceof Router) {
-        route.initialize &&  route.initialize(this._historyController);
+      route.initialize && route.initialize(this._historyController);
       // }
     });
-    
+
     this._historyController.listen((location, action) => {
-      console.log(`new history ${this} ${location.pathname} ${JSON.stringify(this._historyController.history.entries.map(entry => entry.pathname))}`);
+      console.log(
+        `new history ${this} ${location.pathname} ${JSON.stringify(
+          this._historyController.history.entries.map(entry => entry.pathname)
+        )}`
+      );
+      this.onHistoryChange(location, action);
     });
   }
-  
-  getCurrentUrl(){
+
+  getCurrentUrl() {
     return this._currentUrl;
   }
 
@@ -145,7 +167,7 @@ class Router extends Route {
    * @param {RouterBlockHandler} fn
    */
   addRouteBlocker(fn) {
-    const unblock = this._historyController.history.block(
+    const unblock = this._historyController.block(
       (location, action) => callback => {
         fn(location, action, callback);
       }
@@ -191,9 +213,9 @@ class Router extends Route {
    * @param {RouteState} state
    * @param {string} action
    */
-  renderMatches(matches, state, action, fromParent=false) {
+  renderMatches(matches, state, action, fromParent = false) {
     matches.some(({ match, route }, index) => {
-      console.log("pathname : "+match.path);
+      console.log("pathname : " + match.path);
       if (route !== this && route instanceof Router) {
         console.log("not exact match : " + this);
         // if(index > 0 && this._isRoot)
@@ -216,11 +238,11 @@ class Router extends Route {
           actions = [];
           return this.redirectRoute(route, state, action);
         }
-        
+
         if (this.onRouteMatch(route, match, state, action)) {
           actions.forEach(item => item());
         }
-        
+
         this.onRouterEnter && this.onRouterEnter(match, action);
 
         actions = [];
@@ -339,7 +361,7 @@ class Router extends Route {
       path = this._path.getPath() + "/" + path;
     }
 
-    historyController.push(path, { routeState: { data } });
+    this._historyController.push(path, { routeState: { data } });
 
     return this;
   }

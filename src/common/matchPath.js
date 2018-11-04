@@ -1,6 +1,7 @@
 /* from react-router */
 
 const pathToRegexp = require("path-to-regexp");
+const parseUrl = require("./parseUrl");
 const patternCache = {};
 const cacheLimit = 10000;
 let cacheCount = 0;
@@ -72,7 +73,14 @@ const matchPath = (pathname, options = {}, parent) => {
   };
 };
 
+const matchUrl = (url, options) => {
+  const res = matchPath(parseUrl(url).pathname, options);
+  console.log("matchUrl", "url:", parseUrl(url).pathname, options, res);
+  return res;
+};
+
 module.exports = {
   compilePath,
-  matchPath
+  matchPath,
+  matchUrl
 };

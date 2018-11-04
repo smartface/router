@@ -2,6 +2,7 @@
 "use strict";
 
 const resolvePathname = require("resolve-pathname/umd/resolve-pathname");
+const parsePath = require("./parseUrl");
 
 const warning = require("./warning");
 const createPath = location => {
@@ -17,29 +18,10 @@ const createPath = location => {
   return path;
 };
 
-const parsePath = path => {
-  let pathname = path || "/";
-  let search = "";
-  let hash = "";
+const createTransitionManager = require("./createTransitionManager");
 
-  const hashIndex = pathname.indexOf("#");
-  if (hashIndex !== -1) {
-    hash = pathname.substr(hashIndex);
-    pathname = pathname.substr(0, hashIndex);
-  }
-
-  const searchIndex = pathname.indexOf("?");
-  if (searchIndex !== -1) {
-    search = pathname.substr(searchIndex);
-    pathname = pathname.substr(0, searchIndex);
-  }
-
-  return {
-    pathname,
-    search: search === "?" ? "" : search,
-    hash: hash === "#" ? "" : hash
-  };
-};
+const clamp = (n, lowerBound, upperBound) =>
+  Math.min(Math.max(n, lowerBound), upperBound);
 
 const createLocation = (path, state, key, currentLocation) => {
   let location;
@@ -107,11 +89,6 @@ const createLocation = (path, state, key, currentLocation) => {
   return location;
 };
 
-const createTransitionManager = require("./createTransitionManager");
-
-const clamp = (n, lowerBound, upperBound) =>
-  Math.min(Math.max(n, lowerBound), upperBound);
-
 /**
  * Creates a history object that stores locations in memory.
  * @ignore
@@ -151,6 +128,28 @@ const createMemoryHistory = (props = {}) => {
   // Public interface
 
   const createHref = createPath;
+
+  const confirmTransitionTo = (
+    path,
+    action,
+    state,
+    getUserConfirmation,
+    handler,
+    key = ""
+  ) => {
+    const location = createLocation(
+      path,
+      state,
+      key || createKey(),
+      history.location
+    );
+    transitionManager.confirmTransitionTo(
+      location,
+      action,
+      getUserConfirmation,
+      ok => handler(location, ok)
+    );
+  };
 
   const push = (path, state) => {
     warning(
@@ -251,6 +250,11 @@ const createMemoryHistory = (props = {}) => {
     );
   };
 
+  const getNextLocation = n => {
+    const nextIndex = clamp(history.index + n, 0, history.entries.length - 1);
+    return history.entries[nextIndex];
+  };
+
   const goBack = () => go(-1);
 
   const goForward = () => go(1);
@@ -305,7 +309,8 @@ const createMemoryHistory = (props = {}) => {
     goForward,
     canGo,
     block,
-    listen
+    listen,
+    confirmTransitionTo
   };
 
   return history;
