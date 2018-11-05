@@ -22,12 +22,14 @@ function createHistory(
   } = {},
   parent = null
 ) {
-  let routeBlocker = (blockerFn, callback) =>
-    !_preventDefault && getUserConfirmation
+  let routeBlocker = (blockerFn, callback) => {
+    console.log(`--- routeBlocker ${_preventDefault}`)
+    _preventDefault === false && getUserConfirmation
       ? getUserConfirmation(blockerFn, callback)
       : callback(true);
+  }
 
-  let _preventDefault = false;
+  let _preventDefault;
   const _options = {
     exact,
     sensitive,
@@ -35,7 +37,7 @@ function createHistory(
     path
   };
   /**
-   * @type History
+   * @type {History}
    */
   let _history = createMemoryHistory({
     initialEntries: initialEntries || [], // The initial URLs in the history stack
@@ -52,7 +54,7 @@ function createHistory(
   let _prompt = null;
 
   function listener(location, action) {
-    !_preventDefault &&
+    _preventDefault === false &&
       _listeners.forEach(handler => handler(location, action));
     _preventDefault = false;
   }
@@ -72,15 +74,16 @@ function createHistory(
      */
     preventDefault() {
       _preventDefault = true;
-      _nodes.forEach(node => node.preventDefault());
+      // _nodes.forEach(node => node.preventDefault());
     }
 
     clearPreventDefault() {
       _preventDefault = false;
-      _nodes.forEach(node => node.clearPreventDefault());
+      // _nodes.forEach(node => node.clearPreventDefault());
     }
 
     block(prompt) {
+      console.log('block : ');
       _prompt = prompt;
       const unblock = _history.block(_prompt);
       return () => {
@@ -101,24 +104,24 @@ function createHistory(
       // bubbles history goback to root if go back could be possible.
       node.onGoBack = block => {
         if (_history.length > 0) {
-          if (block) {
-            const unblock = this.block((location, action, okFn) => {
-              block(location, action, okFn);
-              unblock();
-            });
-          }
+          // if (block) {
+          //   const unblock = this.block((location, action, okFn) => {
+          //     block(location, action, okFn);
+          //     unblock();
+          //   });
+          // }
           _history.go(-1);
         } else this.onGoBack && this.onGoBack(block);
       };
       // bubbles history push to root if push could be possible.
       node.onPush = (path, data, block) => {
         if (this.canPush(path)) {
-          if (block) {
-            const unblock = _history.block((location, action, okFn) => {
-              block(location, action, okFn);
-              unblock();
-            });
-          }
+          // if (block) {
+          //   const unblock = _history.block((location, action, okFn) => {
+          //     block(location, action, okFn);
+          //     unblock();
+          //   });
+          // }
           this.push(path, data);
         } else {
           this.onPush && this.onPush(path, data);
@@ -137,7 +140,7 @@ function createHistory(
     }
 
     /**
-     * @return History
+     * @return {History}
      */
     get history() {
       return _history;
@@ -177,9 +180,10 @@ function createHistory(
      * @param {object} state
      */
     push(path, state = {}) {
+      console.log('historyController.push');
       this.canPush(path)
         ? _history.push(path, state)
-        : this.onPush && this.onPush(path, state, _prompt);
+        : !_preventDefault && this.onPush && this.onPush(path, state, _prompt);
       _preventDefault && this.clearPreventDefault();
     }
 
@@ -198,7 +202,8 @@ function createHistory(
     goBack() {
       this.canGoBack()
         ? _history.goBack()
-        : this.onGoBack && this.onGoBack(_prompt);
+        : !_preventDefault && this.onGoBack && this.onGoBack(_prompt);
+      _preventDefault && this.clearPreventDefault();
     }
 
     /**

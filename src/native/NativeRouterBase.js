@@ -10,7 +10,7 @@ class NativeRouterBase extends Router {
   setHeaderbarProps(props) {
     this._renderer._rootController &&
       this._renderer._rootController.headerBar &&
-      Object.assign(this._renderer._rootController.headerBar, props);
+      (this._renderer._rootController.headerBar = props);
   }
 }
 

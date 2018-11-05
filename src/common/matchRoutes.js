@@ -22,7 +22,8 @@ const matchRoutes = (routes, pathname, /*not public API*/ branch = []) => {
             isExact: pathname === "/"
           };
 
-    if (match && route.onPrematch(match)) {
+    if (match) {
+    // if (match && route.routeShouldMatch(match)) {
       branch.push({
         route: route,
         match

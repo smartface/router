@@ -68,32 +68,16 @@ class BottomTabBarRouter extends NativeRouterBase {
    * Builds OS specific NaitveRouter
    *
    * @static
-   * @param {RouteParams} param
+   * @param {BottomTabBarRouterParams} param
    */
-  static of({
-    path = "",
-    routes = [],
-    exact = false,
-    to = null,
-    items = [],
-    tabbarParams = {},
-    isRoot = false
-  }) {
-    return new BottomTabBarRouter({
-      path,
-      routes,
-      exact,
-      to,
-      items,
-      tabbarParams,
-      isRoot,
-      renderer: createRenderer()
-    });
+  static of (props) {
+    props.renderer = createRenderer()
+    return new BottomTabBarRouter(props);
   }
 
   /**
    * @constructor
-   * @param {{ path: string, target:object|null, routes: Array, exact: boolean }} param0
+   * @param {BottomTabBarRouterParams} param
    */
   constructor({
     path = "",
@@ -103,20 +87,27 @@ class BottomTabBarRouter extends NativeRouterBase {
     to = null,
     tabbarParams = {},
     items = [],
-    isRoot = false
+    isRoot = false,
+    routerDidEnter,
+    routerDidExit,
+    routeShouldMatch
   }) {
     super({
       path,
       routes,
       exact,
       to,
-      isRoot
+      isRoot,
+      routerDidEnter,
+      routerDidExit,
+      routeShouldMatch
     });
 
     this._renderer = renderer;
     this._renderer.setRootController(new BottomTabBarController(tabbarParams));
     this._visitedIndexes = { length: 0 };
     this._fromRouter = false;
+    this._items = items;
 
     this._renderer._rootController.shouldSelectByIndex = ({ index }) => {
       // TabbarItem should be changed
@@ -133,32 +124,34 @@ class BottomTabBarRouter extends NativeRouterBase {
           // Will Not trigger next history change
           this._historyController.preventDefault();
           this._historyController.push(this._visitedIndexes[index].path);
-        } else {
+        }
+        else {
           this._historyController.push(route.getRedirectto() || route.getUrlPath());
         }
-        // if (route instanceof Router) {
-        //   route.onRouterEnter(route.getCurrentUrl(), "PUSH");
-        // }
       }
 
       !this.isVisited(index) && this.routetoIndex(index);
     };
 
+    // Initilaze BottomTabBarController's TabBarItems
+    this._renderer._rootController.tabBar = tabbarParams();
+  }
+
+  initialize(parentHistory, onHistoryChange) {
+    super.initialize(parentHistory, onHistoryChange)
     // Assigns BottomTabBar props
-    // Clears child routers onRouteExit because of NatveStackRouter creates new NavigationController to clear all children.
-    this._routes.map(route => {
-      route.onRouterExit && (route.onRouteExit = () => null);
-    });
+    // Clears child routers onRouteExit because of NatveStackRouter 
+    // creates new NavigationController to clear all children.
+   /* this._routes.map(route => {
+      route.routerDidExit && (route.routerDidExit = (action) =>  route._routerDidExit(action));
+    });*/
     // Initilaze BottomTabBarController's child controllers
     this._renderer.setChildControllers(
-      this._routes.map(route => route.build(null, null, this))
+      this._routes.map(route => route.build(this, route))
     );
-    // Initilaze BottomTabBarController's TabBarItems
-    this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem));
-    // this._renderer.setTabBarItems(functionMaybe(items).map(createTabBarItem));
-    this._renderer._rootController.show();
-    this._renderer._rootController.tabBar = tabbarParams();
 
+    this._renderer.setTabBarItems(functionMaybe(this._items).map(createTabBarItem));
+    this._renderer._rootController.show();
     // Overrides build method
     this.build = () => this._renderer._rootController;
   }
@@ -178,10 +171,10 @@ class BottomTabBarRouter extends NativeRouterBase {
   /**
    * @override
    */
-  renderMatches(matches, state, action) {
+  renderMatches(matches, state, action, target) {
     this._fromRouter = true;
 
-    console.log(`Render matches ${matches.map(match => match.path)}`);
+    console.log(`Render matches ${matches.length} ${matches.map(match => match.url)}`);
     if (matches.length > 0) {
       const { match: next } = matches[matches.length - 1];
       const { match } = matches[1] || matches[0];
@@ -195,7 +188,7 @@ class BottomTabBarRouter extends NativeRouterBase {
       this.setVisited(index, next.path);
     }
 
-    super.renderMatches(matches, state, action);
+    super.renderMatches(matches, state, action, target);
 
     this._fromRouter = false;
   }
@@ -253,27 +246,18 @@ class BottomTabBarRouter extends NativeRouterBase {
     super.dispose();
     this._unlistener();
     this._renderer._rootController.didSelectByIndex = () => null;
+    this._items = null;
   }
 
   /**
-   * Handler of requested path is matched to route
+   * Before route entered
    *
-   * @override
    * @event
    * @protected
    */
-  onRouteMatch(route, match, state, action) {
-    // const view = super.onRouteMatch(route, match, state);
-
-    // if (!view) return false;
-
-    //if the path has already opened then skip routing
-    // if (!this.isInitialPath(match.path)) {
-    this.routetoIndex(this.resolveIndex(match.path));
-    // return true;
-    // }
-
-    return super.onRouteMatch(route, match, state);
+  routeWillEnter(route) {
+    const state = route.getState();
+    this.routetoIndex(this.resolveIndex(state.match.path));
   }
 
   /**

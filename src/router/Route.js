@@ -93,8 +93,7 @@ class Route {
     exact = false,
     sensitive = true,
     strict = true,
-    onBeforeMatch = null,
-    onBeforePush = null
+    routeShouldMatch = null
   }) {
     this._options = {
       exact,
@@ -109,8 +108,24 @@ class Route {
     this._routes = routes;
     this.map = mapComposer.call(this, this._routes);
     this._to = to;
-    this._onBeforeMatch = onBeforeMatch;
-    this._onBeforePush = onBeforePush;
+    this._routeShouldMatch = routeShouldMatch;
+    this._state = {
+      match: {},
+      route: {},
+      view: null
+    };
+  }
+  
+  setState(state){
+    this._state = Object.assign({}, this._state, state);
+  }
+  
+  /**
+   * Returns Route's current state
+   * @return {RouteState}
+   */
+  getState(){
+    return this._state;
   }
 
   /**
@@ -162,20 +177,22 @@ class Route {
    * @param {Page} view = null - If the route has been built once, the previous view (page) is given. Otherwise it is null. If view is not null, returning the view back makes it singleton.
    */
   build(match, state, router, view) {
-    return (this._build && this._build(match, state, router, view)) || null;
+    return this._build ? this._build(match, state, router, view) : null;
   }
 
   /**
    * Triggered before when an exact match happends.
-   * If the onBeforeMatch eventhandler is set
-   * and onBeforeMatch returns 'true' then match happends
-   * or onBeforeMatch returns 'false' then match is blocked
-   *
+   * If the routeShouldMatch eventhandler is set
+   * and routeShouldMatch returns 'true' then match happends
+   * or routeShouldMatch returns 'false' then match is blocked
+   * 
+   * @protected
+   * @emit {routeShouldMatch}
    * @param {RouteMatch} match
    * @return {boolean}
    */
-  onPrematch(match) {
-    return (this._onBeforeMatch && this._onBeforeMatch(match)) || true;
+  routeShouldMatch(match) {
+    return this._routeShouldMatch ? this._routeShouldMatch(match) : true;
   }
 
   /**

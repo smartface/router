@@ -78,31 +78,16 @@ class NativeStackRouter extends NativeRouterBase {
    * Builds OS specific NaitveRouter
    *
    * @static
-   * @param {RouterParams} param
+   * @param {NativeStackRouterParams} param
    */
-  static of({
-    path = "",
-    routes = [],
-    exact = false,
-    renderer = null,
-    to = null,
-    isRoot = false,
-    headerBarParams = () => {}
-  }) {
-    return new NativeStackRouter({
-      path,
-      routes,
-      exact,
-      to,
-      isRoot,
-      headerBarParams,
-      renderer: createRenderer()
-    });
+  static of (props) {
+    props.renderer = createRenderer();
+    return new NativeStackRouter(props);
   }
 
   /**
    * @constructor
-   * @param {{ path: string, routes: Array, exact: boolean, headerBarParams: function }} param0
+   * @param {NativeStackRouterParams} param0
    */
   constructor({
     path = "",
@@ -112,9 +97,22 @@ class NativeStackRouter extends NativeRouterBase {
     renderer = null,
     to = null,
     isRoot = false,
-    headerBarParams = () => {}
+    headerBarParams = () => {},
+    routerDidEnter,
+    routerDidExit,
+    routeShouldMatch
   }) {
-    super({ path, build, routes, exact, to, isRoot });
+    super({
+      path,
+      build,
+      routes,
+      exact,
+      to,
+      isRoot,
+      routerDidEnter,
+      routerDidExit,
+      routeShouldMatch
+    });
     console.log("new StackRouter created");
     this._fromRouter = true;
     this._renderer = renderer;
@@ -144,6 +142,12 @@ class NativeStackRouter extends NativeRouterBase {
     return this._renderer._rootController.headerBar;
   }
 
+  routeShouldMatch(prevState, nextState) {
+    if (this.isUrlCurrent(nextState.match.url, nextState.action))
+      return false;
+    return super.routeShouldMatch(prevState, nextState);
+  }
+
   /**
    * @private
    * Add new listener to listen NavigationController transitions.
@@ -157,10 +161,13 @@ class NativeStackRouter extends NativeRouterBase {
           // set Router to skip next history change
           this._fromRouter = false;
           try {
+            this._historyController.preventDefault();
             this._historyController.goBack();
-          } catch(e){
+          }
+          catch (e) {
             throw e;
-          } finally {
+          }
+          finally {
             this._fromRouter = true;
           }
           // and history goes back.
@@ -179,31 +186,20 @@ class NativeStackRouter extends NativeRouterBase {
     this._unlistener();
   }
 
-  /**
-   * @override
-   */
-  onRouteMatch(route, match, state, action) {
-    console.log(`onRouteMatch ${this.getCurrentUrl()} === ${match.url}`);
-    if(this._fromRouter === false || (this.getCurrentUrl() && this.getCurrentUrl() === match.url))
-      return;
-    
-    const view = super.onRouteMatch(route, match, state);
-    if (!view) return false;
-
-    switch (action) {
+  routeWillEnter(route) {
+    const state = route.getState();
+    switch (state.action) {
       case "REPLACE":
       case "PUSH":
         console.log(
-          `PUSH ${typeof view} ${action} name : ${this._renderer.name}`
+          `PUSH ${typeof view} ${state.action} name : ${this._renderer.constructor.name}`
         );
-        this._renderer.pushChild(view);
+        this._renderer.pushChild(state.view);
         break;
       case "POP":
         if (Router.currentRouter === this) this._renderer.popChild();
         break;
     }
-
-    return true;
   }
 
   /**
@@ -215,8 +211,9 @@ class NativeStackRouter extends NativeRouterBase {
    * @param {string} action
    */
   onRouterExit(action) {
+    super.onRouterExit(action);
     // if (action === "POP")
-      // this._renderer.setRootController(new NavigationController());
+    // this._renderer.setRootController(new NavigationController());
     console.log(`onRouterExit ${this}`);
   }
 }

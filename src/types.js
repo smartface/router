@@ -84,12 +84,18 @@
 
 /**
  * @typedef {object} RouteState
- * @property {objec} userState
+ * @property {object} routeData
+ * @property {string} action
+ * @property {RouteMatch} match
  * @property {Object} view
  */
 
 /**
- * @typedef {function(match: RouteMatch, state: object, router: Router, view: Page)} RouteBuildHandler
+ * @typedef {function(route: Route, nextState: RouteState)} RouteShouldMatchHandler
+ */
+
+/**
+ * @typedef {function(route: Route, nextState: RouteState)} RouteBuildHandler
  */
 
 /**
