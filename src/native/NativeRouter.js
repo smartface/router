@@ -91,7 +91,6 @@ class NativeRouter extends NativeRouterBase {
    * @param {NativeRouter[]|NativeStackRouter[]|BottomTabBarRouter[]} router
    */
   addChildRouter(router) {
-    console.log(`addChildRouter ${router}`);
     this._renderer.show(router._renderer._rootController);
   }
 

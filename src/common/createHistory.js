@@ -191,6 +191,7 @@ function createHistory(
      * @param {object} state
      */
     push(path, state = {}) {
+      console.log(`history push ${path}`);
       this.canPush(path)
         ? _history.push(path, state)
         : !_preventDefault && this.onPush && this.onPush(path, state, _prompt);

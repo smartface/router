@@ -113,7 +113,6 @@ class NativeStackRouter extends NativeRouterBase {
       routerDidExit,
       routeShouldMatch
     });
-    console.log("new StackRouter created");
     this._fromRouter = true;
     this._renderer = renderer;
     this._renderer.setRootController(new NavigationController());
@@ -154,7 +153,6 @@ class NativeStackRouter extends NativeRouterBase {
   addNavigatorChangeListener() {
     this._unlistener = this._renderer.onNavigationControllerTransition(
       action => {
-        console.log("addNavigatorChangeListener");
         // if user presses backbutton or uses gesture to back
         if (action.operation === NavigationController.OperationType.POP) {
           // set Router to skip next history change
@@ -188,12 +186,9 @@ class NativeStackRouter extends NativeRouterBase {
     switch (state.action) {
       case "REPLACE":
       case "PUSH":
-        console.log(
-          `PUSH ${typeof view} ${state.action} name : ${
-            this._renderer.constructor.name
-          }`
-        );
-        this._renderer.pushChild(state.view);
+        console.log(`push ${this._currentUrl} - ${route.getUrlPath()}`);
+        if(this._currentUrl !== route.getUrlPath())
+          this._renderer.pushChild(state.view);
         break;
       case "POP":
         if (Router.currentRouter === this) this._renderer.popChild();
@@ -213,7 +208,6 @@ class NativeStackRouter extends NativeRouterBase {
     super.onRouterExit(action);
     // if (action === "POP")
     // this._renderer.setRootController(new NavigationController());
-    console.log(`onRouterExit ${this}`);
   }
 }
 

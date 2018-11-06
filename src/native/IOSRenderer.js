@@ -53,7 +53,6 @@ class IOSRenderer extends Renderer {
    * @override
    */
   pushChild(page, animated = true) {
-    console.log(`pushChild ${this._rootController}`);
     this.makeRootVisible();
     this._rootController.push &&
       this._rootController.push({ controller: page, animated });
@@ -111,10 +110,7 @@ class IOSRenderer extends Renderer {
    * @override
    */
   show(page) {
-    console.log("enter show");
     if (this._currentPage === page) return;
-
-    console.log("show" + page.constructor.name);
 
     if (this._currentPage) {
       // this.showWithTransition(this._currentPage, page);

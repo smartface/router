@@ -8,7 +8,7 @@ let actions = [];
 let historyController;
 
 let _skipRender = false;
-
+let _lastRoute;
 /**
  * @typedef {object} RouterParams
  * @property {string} path Routing path
@@ -35,9 +35,16 @@ class Router extends Route {
    *
    * @param {RouterParams} props
    */
-  static of(props = {}) {
+  static of (props = {}) {
     return new Router(props);
   }
+  
+  static createBlocker(fn) {
+    return (router, path, routeData, action, doneFn) => {
+      fn(path, routeData, action, ok => ok && doneFn());
+    };
+  }
+  
   /**
    * @constructor
    * @param {RouterParams} param
@@ -79,33 +86,7 @@ class Router extends Route {
       this.initialize(historyController, (location, action, target) =>
         this.onHistoryChange(location, action, target)
       );
-
-      // routes.forEach(route => {
-      //   // if (route instanceof Router) {
-      //   route.initialize && route.initialize(historyController);
-      //   // }
-      // });
     }
-
-    // if(isRoot === false){
-    // }
-
-    // if (isRoot) {
-    // this._historyUnlisten = this._historyController.listen(
-    //   (location, action) => {
-    //     console.log(`History is changed ${location.pathname}`);
-    //     try {
-    //       // if (!_skipRender) {
-    //       this.onHistoryChange(location, action);
-    //       // }
-    //     } catch (e) {
-    //       throw e;
-    //     } finally {
-    //       _skipRender = false;
-    //     }
-    //   }
-    // );
-    // }
 
     this._isRoot = isRoot;
     this._exact = exact;
@@ -175,11 +156,13 @@ class Router extends Route {
    * @param {RouterBlockHandler} fn
    */
   addRouteBlocker(fn) {
-    const unblock = this._historyController.block(
+    Router.blocker = Router.createBlocker(fn);
+    const unblock = () => Router.blocker = null;
+    /*this._historyController.block(
       (location, action) => callback => {
         fn(location, action, callback);
       }
-    );
+    );*/
 
     this._unblock = unblock;
 
@@ -231,12 +214,12 @@ class Router extends Route {
         );
 
         return true;
-      } else if (match.isExact === true) {
+      }
+      else if (match.isExact === true) {
         // route has redirection
-        if (
-          route.routeShouldMatch(route, { match, action, routeData }) === true
-        ) {
+        if (route.routeShouldMatch(route, { match, action, routeData }) === true) {
           if (route.getRedirectto()) {
+            console.log(`redirection ${route}`)
             actions = [];
             return this.redirectRoute(route, routeData, action);
           }
@@ -247,14 +230,10 @@ class Router extends Route {
                 match,
                 action,
                 routeData
-              })) ||
-            {};
+              })) || {};
           route.setState({ match, action, routeData, routingState });
           if (target != this) {
             // if (!this.isUrlCurrent(match.url, action)) {
-            this._currentAction = action;
-            this._currentUrl = match.url;
-
             this._historyController.preventDefault();
             switch (action) {
               case "PUSH":
@@ -265,19 +244,38 @@ class Router extends Route {
                 break;
             }
           }
-
+          
+          
+          console.log(`match ${route}`)
+          _lastRoute && _lastRoute.routeDidExit(this);
           this.routeDidMatch(route);
           const view = this.renderRoute(route);
           route.setState({ view });
           this.routeWillEnter && this.routeWillEnter(route);
           actions.forEach(item => item());
           this.routerDidEnter && this.routerDidEnter(route);
+          route.routeDidEnter(this);
+          _lastRoute = route;
+          this._currentAction = action;
+          this._currentUrl = match.url;
         }
 
         actions = [];
         return true;
       }
     });
+  }
+
+  routeDidEnter(router) {
+    if (router != this) {
+      this._lastRoute && this._lastRoute.routeDidEnter(this);
+    }
+  }
+
+  routeDidExit(router) {
+    if (router != this) {
+      this._lastRoute && this._lastRoute.routeDidExit(this);
+    }
   }
 
   isUrlCurrent(url, action) {
@@ -360,8 +358,8 @@ class Router extends Route {
    * @throw {TypeError}
    */
   renderRoute(route) {
-    const view = route.build(this, route);
-    if (!view) throw new TypeError("View cannot be empty!");
+    const view = route.build(this);
+    if (!view) throw new TypeError(`${route} 's View cannot be empty!`);
 
     return view;
   }
@@ -388,6 +386,11 @@ class Router extends Route {
       path = this._path.getPath() + "/" + path;
     }
 
+    if(Router.blocker){
+      Router.blocker(this, path, routeData, 'PUSH', () => this._historyController.push(path, { routeData }));
+      
+      return this;
+    }
     this._historyController.push(path, { routeData });
 
     return this;
@@ -395,7 +398,7 @@ class Router extends Route {
 
   /**
    * Replaces specified path's state
-   *
+   * @ignore
    * @param {string} path
    * @param {data} data
    */
@@ -408,6 +411,12 @@ class Router extends Route {
    * @fires
    */
   goBack() {
+    if(Router.blocker){
+      Router.blocker(this, null, null, 'POP', () => this._historyController.goBack());
+      
+      return this;
+    }
+    
     this._historyController.goBack();
   }
 

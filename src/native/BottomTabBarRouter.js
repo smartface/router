@@ -19,6 +19,12 @@ function createTabBarItem(item) {
   return item instanceof TabBarItem ? item : new TabBarItem(item);
 }
 
+const userTabStatus = {
+  IDLE: 0,
+  WAITING: 1,
+  DONE: 2
+}
+
 /**
  * It creates {@link BottomTabbarController} and manages its behavours and routes.
  *
@@ -108,6 +114,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     this._visitedIndexes = { length: 0 };
     this._fromRouter = false;
     this._items = items;
+    this._tabStatus = userTabStatus.IDLE;
 
     this._renderer._rootController.shouldSelectByIndex = ({ index }) => {
       // TabbarItem should be changed
@@ -116,8 +123,7 @@ class BottomTabBarRouter extends NativeRouterBase {
 
     this._renderer._rootController.didSelectByIndex = ({ index }) => {
       // TabbarItem did change
-      console.log("didSelectByIndex  : " + index + " : " + this._fromRouter);
-      if (this._fromRouter === false) {
+      /*if (this._fromRouter === false) {
         const route = this.resolveRoute(index);
         // this._historyController.preventDefault();
         if (this.isVisited(index)) {
@@ -131,7 +137,7 @@ class BottomTabBarRouter extends NativeRouterBase {
         }
       }
 
-      !this.isVisited(index) && this.routetoIndex(index);
+      !this.isVisited(index) && this.routetoIndex(index);*/
     };
 
     // Initilaze BottomTabBarController's TabBarItems
@@ -166,9 +172,15 @@ class BottomTabBarRouter extends NativeRouterBase {
    */
   shouldSelectByIndex(index) {
     // var res = index !== this._currentIndex;
-    // // console.log(`shouldSelectByIndex ${index} ${this._currentIndex}`);
     // this._currentIndex = index;
-    return true;
+    if((this._tabStatus === userTabStatus.IDLE && index !== this._currentIndex) || this._tabStatus === userTabStatus.WAITING){
+      this._tabStatus = userTabStatus.WAITING;
+      setTimeout(() => this.pushRoute(this._routes[index]), 0);
+    }
+
+    console.log(`shouldSelectByIndex ${index} ${this._currentIndex} ${this._tabStatus}`);
+    
+    return this._tabStatus === userTabStatus.IDLE;
   }
 
   /**
@@ -177,9 +189,6 @@ class BottomTabBarRouter extends NativeRouterBase {
   renderMatches(matches, state, action, target) {
     this._fromRouter = true;
 
-    console.log(
-      `Render matches ${matches.length} ${matches.map(match => match.url)}`
-    );
     if (matches.length > 0) {
       const { match: next } = matches[matches.length - 1];
       const { match } = matches[1] || matches[0];
@@ -189,13 +198,27 @@ class BottomTabBarRouter extends NativeRouterBase {
       // selects target tabbaritem by index
       this._renderer.setSelectedIndex(index);
       this._renderer._rootController.show();
-      // console.log(`current : ${match.path} - next : ${next.path}`);
+      // this.isVisited(index) && this.activateIndex(index);
       this.setVisited(index, next.path);
+      this._currentIndex = index;
+      if(userTabStatus.WAITING)
+        this._tabStatus = userTabStatus.IDLE;
     }
 
     super.renderMatches(matches, state, action, target);
 
     this._fromRouter = false;
+  }
+  
+  /**
+   * @ignore
+   *
+   */
+  activateIndex(index){
+    this._lastRoute && this._lastRoute.routeDidExit(this);
+    var route = this._routes[index];
+    route.routeDidEnter(this);
+    this._lastRoute = route;
   }
 
   /**
@@ -273,13 +296,13 @@ class BottomTabBarRouter extends NativeRouterBase {
    */
   routetoIndex(index) {
     index = index < 0 ? 0 : index;
-    console.log("routetoIndex : " + index);
     this._renderer.setSelectedIndex(index);
     this._renderer._rootController.show();
     const route = this.resolveRoute(index);
-    this.setVisited(index, route.getUrlPath());
     route instanceof Router && this.pushRoute(route);
-    console.log("end of routetoIndex : " + route);
+    // this.isVisited(index) && this.activateIndex(index);
+    this.setVisited(index, route.getUrlPath());
+    this._currentIndex = index;
   }
 }
 

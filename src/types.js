@@ -79,7 +79,9 @@
  * @property {string} path
  * @property {Array<Route>} routes
  * @property {boolean} exact
- * @property {function(match: RouteMatch)} onBeforeMatch
+ * @property {function(route: Route, nextState: RouteState)} routeShouldMatch Handles if route is mathed as request url
+ * @property {function(Router: Router, route: Route)} routeDidEnter Handles if route is displayed
+ * @property {function(Router: Router, route: Route)} routeDidExit Handles if route is removed
  */
 
 /**
@@ -87,7 +89,8 @@
  * @property {object} routeData
  * @property {string} action
  * @property {RouteMatch} match
- * @property {Object} view
+ * @property {object} view 
+ * @property {object} routingState Keeps user data when route runs
  */
 
 /**
@@ -99,7 +102,7 @@
  */
 
 /**
- * @typedef {function(location: RouteLocation, action: string)} RouterBlockHandler
+ * @typedef {function(path: string, routeData: object, action: string, okFn: function(ok: boolean))} RouterBlockHandler
  *
  */
 

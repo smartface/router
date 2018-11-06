@@ -93,7 +93,9 @@ class Route {
     exact = false,
     sensitive = true,
     strict = true,
-    routeShouldMatch = null
+    routeShouldMatch = null,
+    routeDidEnter,
+    routeDidExit
   }) {
     this._options = {
       exact,
@@ -109,15 +111,23 @@ class Route {
     this.map = mapComposer.call(this, this._routes);
     this._to = to;
     this._routeShouldMatch = routeShouldMatch;
-    this._state = {
+    this._routeDidEnter = routeDidEnter;
+    this._routeDidExit = routeDidExit;
+    this._state = Object.seal({
       match: {},
-      route: {},
-      view: null
-    };
+      routeData: {},
+      view: null,
+      routingState: {},
+      action: null
+    });
   }
-
+  
+  /**
+   * Merges specified state to current route state
+   * @param {object}
+   */
   setState(state) {
-    this._state = Object.assign({}, this._state, state);
+    this._state = Object.assign(this._state, state);
   }
 
   /**
@@ -174,10 +184,10 @@ class Route {
    * @param {RouteMatch} match
    * @param {RouteState} state
    * @param {Router} router - Not the root router, the router which the route belongs to.
-   * @param {Page} view = null - If the route has been built once, the previous view (page) is given. Otherwise it is null. If view is not null, returning the view back makes it singleton.
+   * @return {Page} view = null - If the route has been built once, the previous view (page) is given. Otherwise it is null. If view is not null, returning the view back makes it singleton.
    */
-  build(match, state, router, view) {
-    return this._build ? this._build(match, state, router, view) : null;
+  build(router) {
+    return this._build ? this._build(router, this) : null;
   }
 
   /**
@@ -187,12 +197,34 @@ class Route {
    * or routeShouldMatch returns 'false' then match is blocked
    *
    * @protected
+   * @event
    * @emit {routeShouldMatch}
    * @param {RouteMatch} match
    * @return {boolean}
    */
-  routeShouldMatch(match) {
-    return this._routeShouldMatch ? this._routeShouldMatch(match) : true;
+  routeShouldMatch(router) {
+    return this._routeShouldMatch ? this._routeShouldMatch(router, this) : true;
+  }
+  
+  /**
+   * When route is matched and displayed
+   * @emit {routeDidEnter}
+   * @event
+   * @param {Router} router
+   */
+  routeDidEnter(router) {
+    return this._routeDidEnter ? this._routeDidEnter(router, this) : true;
+  }
+
+  /**
+   * When route is removed
+   * 
+   * @emit {routeDidExit}
+   * @event
+   * @param {Router} router
+   */
+  routeDidExit(router) {
+    return this._routeDidExit ? this._routeDidExit(router, this) : true;
   }
 
   /**
