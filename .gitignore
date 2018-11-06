@@ -29,6 +29,7 @@ maven-eclipse.xml
 *.ipr
 *.iws
 .idea/
+docs
 
 .vscode/
 
