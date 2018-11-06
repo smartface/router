@@ -1,20 +1,19 @@
-'use strict';
+"use strict";
 
 const Page = require("sf-core/ui/page");
 const Application = require("sf-core/application");
 
-
 /**
  * Abstract Renderer Strategy
  * It encapsulates displaying strategies for child views.
- * 
+ *
  * @access package
  * @abstract
  */
 class Renderer {
   /**
    * Helper method sets statically rootController of the Application by DeviceOS
-   * 
+   *
    * @static
    * @param {BottomTabBarController|Page|NavigationController} rootController
    */
@@ -49,13 +48,13 @@ class Renderer {
       Application.setRootController(rootController);
     }
   }
-  
-  makeRootVisible(){
+
+  makeRootVisible() {
     var sfWindow = SF.requireClass("UIApplication").sharedApplication()
-        .keyWindow;
+      .keyWindow;
     sfWindow.makeKeyAndVisible();
   }
-  
+
   /**
    * Only use if rootpage is Page instancea
    *
@@ -68,7 +67,7 @@ class Renderer {
   showWithTransition(fromPage, toPage, duration = 0, options = 0) {
     throw new Error("onNavigatorChange method must be overridden");
   }
-  
+
   /**
    * Template method sets specified controller as root controller
    * @param {BottomTabBarController|Page|NavigationController} controller
@@ -76,12 +75,12 @@ class Renderer {
   setRootController(controller) {
     this._rootController = controller;
   }
-  
+
   /**
    * NavigationController child page is changed handler
    * Only use if rootpage is NavigationController.
    * Must be Implemented
-   * 
+   *
    * @param {function(e:NavigationControllerTransformEvent)} fn
    */
   onNavigationControllerTransition(fn) {
@@ -90,27 +89,27 @@ class Renderer {
 
   /**
    * Set TabBarItems to BottomTabBarController
-   * 
+   *
    * @param {Array<TabBarItem>} items
    */
   setTabBarItems(items) {
     this._rootController.tabBar.items = items;
   }
-  
+
   /**
    * Set NavigationController selected index
-   * 
+   *
    * @param {nummer} index
    */
   setSelectedIndex(index) {
     this._rootController.selectedIndex = index;
     // this._rootController.hasOwnProperty('selectedIndex') ? (this._rootController.selectedIndex = index) : (this.setIndex(index));
   }
-  
+
   /**
    * Set NavigationController child controllers.
    * Must be implemented.
-   * 
+   *
    * @params {Array<NavigationController>} children
    */
   setChildControllers(children) {
@@ -120,27 +119,27 @@ class Renderer {
   /**
    * Remove child from root page
    * Must be implemented.
-   * 
+   *
    * @param {Page} page
    */
   removeChild(page) {
     throw new Error("removeChild must be overridden");
   }
-  
+
   /**
    * Add child from root page
    * Must be implemented.
-   * 
+   *
    * @param {Page} page
    */
   addChild(page) {
     throw new Error("addChild must be overridden");
   }
-  
+
   /**
    * Push child from root NavigationController.
    * Must be implemented.
-   * 
+   *
    * @param {Page} page
    * @param {boolean} [animated=true] animmated
    */
@@ -151,20 +150,20 @@ class Renderer {
   /**
    * Pop child from root NavigationController.
    * Must be implemented.
-   * 
+   *
    * @param {boolean} [animated=true] animmated
    */
   popChild(animated = true) {
     throw new Error("popChild must be overridden");
   }
-  
+
   /**
    * Displays specified page
    * Only use if root conttroller is a Page instance
    *
    * @param {Page} page
    */
-  show(page){
+  show(page) {
     throw new Error("popChild must be overridden");
   }
 }

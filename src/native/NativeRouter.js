@@ -38,7 +38,7 @@ class NativeRouter extends NativeRouterBase {
   /**
    * Create OS specific NativeRouter instance
    * @static
-   * @param {object} options - 
+   * @param {object} options -
    * @param {string} [options.path=""] - Absolute path of the router
    * @param {function|null} [options.build=null] - Build method of the route
    * @param {Route[]|NativeRouter[]|NativeStackRouter[]|BottomTabBarRouter[]} [options.routes=[]] - Routes defined within the router
@@ -48,8 +48,8 @@ class NativeRouter extends NativeRouterBase {
    * @param {boolean} [options.isRoot=false] - Specifies whether this router is the root router
    * @returns {NativeRouter}
    */
-  static of (options) {
-    options.renderer = createRenderer()
+  static of(options) {
+    options.renderer = createRenderer();
     return new NativeRouter(options);
   }
   constructor({
@@ -91,7 +91,7 @@ class NativeRouter extends NativeRouterBase {
    * @param {NativeRouter[]|NativeStackRouter[]|BottomTabBarRouter[]} router
    */
   addChildRouter(router) {
-    console.log(`addChildRouter ${router}`)
+    console.log(`addChildRouter ${router}`);
     this._renderer.show(router._renderer._rootController);
   }
 

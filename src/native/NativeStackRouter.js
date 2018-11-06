@@ -80,7 +80,7 @@ class NativeStackRouter extends NativeRouterBase {
    * @static
    * @param {NativeStackRouterParams} param
    */
-  static of (props) {
+  static of(props) {
     props.renderer = createRenderer();
     return new NativeStackRouter(props);
   }
@@ -143,8 +143,7 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   routeShouldMatch(prevState, nextState) {
-    if (this.isUrlCurrent(nextState.match.url, nextState.action))
-      return false;
+    if (this.isUrlCurrent(nextState.match.url, nextState.action)) return false;
     return super.routeShouldMatch(prevState, nextState);
   }
 
@@ -155,7 +154,7 @@ class NativeStackRouter extends NativeRouterBase {
   addNavigatorChangeListener() {
     this._unlistener = this._renderer.onNavigationControllerTransition(
       action => {
-        console.log('addNavigatorChangeListener');
+        console.log("addNavigatorChangeListener");
         // if user presses backbutton or uses gesture to back
         if (action.operation === NavigationController.OperationType.POP) {
           // set Router to skip next history change
@@ -163,11 +162,9 @@ class NativeStackRouter extends NativeRouterBase {
           try {
             this._historyController.preventDefault();
             this._historyController.goBack();
-          }
-          catch (e) {
+          } catch (e) {
             throw e;
-          }
-          finally {
+          } finally {
             this._fromRouter = true;
           }
           // and history goes back.
@@ -192,7 +189,9 @@ class NativeStackRouter extends NativeRouterBase {
       case "REPLACE":
       case "PUSH":
         console.log(
-          `PUSH ${typeof view} ${state.action} name : ${this._renderer.constructor.name}`
+          `PUSH ${typeof view} ${state.action} name : ${
+            this._renderer.constructor.name
+          }`
         );
         this._renderer.pushChild(state.view);
         break;

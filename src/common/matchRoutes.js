@@ -23,7 +23,7 @@ const matchRoutes = (routes, pathname, /*not public API*/ branch = []) => {
           };
 
     if (match) {
-    // if (match && route.routeShouldMatch(match)) {
+      // if (match && route.routeShouldMatch(match)) {
       branch.push({
         route: route,
         match

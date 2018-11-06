@@ -35,7 +35,7 @@ class Router extends Route {
    *
    * @param {RouterParams} props
    */
-  static of (props = {}) {
+  static of(props = {}) {
     return new Router(props);
   }
   /**
@@ -65,7 +65,6 @@ class Router extends Route {
     };
 
     if (isRoot) {
-      console.log("historycontroller create");
       /** @type {HistoryListener} */
       historyController = createHistory({
         sensitive,
@@ -77,7 +76,9 @@ class Router extends Route {
         }
       });
 
-      this.initialize(historyController, (location, action, target) => this.onHistoryChange(location, action, target));
+      this.initialize(historyController, (location, action, target) =>
+        this.onHistoryChange(location, action, target)
+      );
 
       // routes.forEach(route => {
       //   // if (route instanceof Router) {
@@ -111,7 +112,6 @@ class Router extends Route {
     this._strict = strict;
     this._sensitive = sensitive;
     // this._cache = new WeakMap();
-    this._unblock = () => null;
   }
 
   /**
@@ -121,35 +121,28 @@ class Router extends Route {
    * @param {function} onHistoryChange Root onHistoryChange handler
    */
   initialize(parentHistory, onHistoryChange) {
-    console.log("initialze : " + onHistoryChange);
-
     this._historyController = parentHistory.createNode(
-      Object.assign({},
-        this._options, {
-          getUserConfirmation: (blockerFn, callback) => {
-            return blockerFn(callback);
-          }
-        })
+      Object.assign({}, this._options, {
+        getUserConfirmation: (blockerFn, callback) => {
+          return blockerFn(callback);
+        }
+      })
     );
 
     this._routes.forEach(route => {
       // if (route instanceof Router) {
-      route.initialize && route.initialize(this._historyController, onHistoryChange);
+      route.initialize &&
+        route.initialize(this._historyController, onHistoryChange);
       // }
     });
 
     this._historyController.listen((location, action) => {
-      console.log(
-        `new history ${this} ${location.pathname} ${JSON.stringify(
-          this.getHistoryasArray()
-        )}`
-      );
       onHistoryChange(location, action, this);
     });
   }
 
   /**
-   * 
+   *
    * @ignore
    *
    */
@@ -159,7 +152,7 @@ class Router extends Route {
 
   /**
    * Return current url path
-   * 
+   *
    * @return {string}
    */
   getCurrentUrl() {
@@ -200,7 +193,6 @@ class Router extends Route {
    * @param {Object} action
    */
   onHistoryChange(location, action, target) {
-    console.log(`onHistoryChange ${this} ${target}`);
     this._matches = matchRoutes([this].concat(this._routes), location.pathname);
     this.renderMatches(this._matches, location.state, action, target);
   }
@@ -218,17 +210,15 @@ class Router extends Route {
    * Renders route matches by requested path
    *
    * @protected
-   * 
+   *
    * @emit {RouteShouldMatchHandler}
    * @param {Array<{isExact: boolean,params: object,path: string,url: string}>} matches
    * @param {RouteState} state
    * @param {string} action
    */
   renderMatches(matches, routeData, action, target) {
-    console.log(`renderMatches ${target} ${this}`);
     matches.some(({ match, route }, index) => {
       if (route !== this && route instanceof Router) {
-        console.log("not exact match : " + match.url);
         // if(index > 0 && this._isRoot)
         this.addChildRouter &&
           actions.push(this.addChildRouter.bind(this, route));
@@ -241,36 +231,39 @@ class Router extends Route {
         );
 
         return true;
-      }
-      else if (match.isExact === true) {
-        console.log("exact match : " + route + " : ");
+      } else if (match.isExact === true) {
         // route has redirection
-        if (route.routeShouldMatch(route, { match, action, routeData }) === true) {
+        if (
+          route.routeShouldMatch(route, { match, action, routeData }) === true
+        ) {
           if (route.getRedirectto()) {
-            console.log("redirection  : " + route.getRedirectto());
             actions = [];
             return this.redirectRoute(route, routeData, action);
           }
 
-          const routingState = route.getRoutingState && route.getRoutingState(route._state, { match, action, routeData }) || {};
+          const routingState =
+            (route.getRoutingState &&
+              route.getRoutingState(route._state, {
+                match,
+                action,
+                routeData
+              })) ||
+            {};
           route.setState({ match, action, routeData, routingState });
           if (target != this) {
-            console.log(`is not target ${target} ${this}`);
-          // if (!this.isUrlCurrent(match.url, action)) {
-            this._currentAction = action
+            // if (!this.isUrlCurrent(match.url, action)) {
+            this._currentAction = action;
             this._currentUrl = match.url;
-            
+
             this._historyController.preventDefault();
             switch (action) {
-              case 'PUSH':
+              case "PUSH":
                 this._historyController.push(match.path, routeData);
                 break;
-              case 'POP':
+              case "POP":
                 this._historyController.goBack();
                 break;
             }
-            
-            console.log(`is not target ${JSON.stringify(this.getHistoryasArray())}`);
           }
 
           this.routeDidMatch(route);
@@ -288,8 +281,7 @@ class Router extends Route {
   }
 
   isUrlCurrent(url, action) {
-    const res = (this._currentUrl === url && this._currentAction === action);
-    console.log(`isUrlCurrent ${url} ${action} ${this._currentUrl} ${this._currentAction} ${res}`);
+    const res = this._currentUrl === url && this._currentAction === action;
     return res;
   }
 
@@ -353,8 +345,7 @@ class Router extends Route {
    * @return {(object | null)}
    */
   routeDidMatch(route) {
-    const { match, action, routeData } = route.getState()
-    console.log(`routerDidEnter ${match.url}`);
+    const { match, action, routeData } = route.getState();
     if (match.isExact) {
       const prevUrl = this._currentUrl;
       this.setasActiveRouter(action);
@@ -370,7 +361,7 @@ class Router extends Route {
    */
   renderRoute(route) {
     const view = route.build(this, route);
-    if (!view) throw new TypeError('View cannot be empty!');
+    if (!view) throw new TypeError("View cannot be empty!");
 
     return view;
   }
@@ -393,7 +384,6 @@ class Router extends Route {
    * @return {Router}
    */
   push(path, routeData = {}) {
-    console.log(`Push router ${path} ${this}`);
     if (path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;
     }
@@ -459,7 +449,7 @@ class Router extends Route {
 
   /**
    * Adds new route
-   * 
+   *
    * @experimental
    * @param {Route} route
    */

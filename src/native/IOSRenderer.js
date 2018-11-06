@@ -6,7 +6,7 @@ const Animator = require("./iOSAnimator");
 /**
  * Rendering strategy for iOS
  * It encapsulates all logic to display pages on iOS
- * 
+ *
  * @class
  * @access package
  * @extends {Renderer}
@@ -28,8 +28,8 @@ class IOSRenderer extends Renderer {
 
   setSelectedIndex(index) {
     // if (this._rootController.shouldSelectByIndex({index})) {
-      super.setSelectedIndex(index);
-      // this._rootController.didSelectByIndex({index});
+    super.setSelectedIndex(index);
+    // this._rootController.didSelectByIndex({index});
     // }
   }
 
@@ -129,7 +129,7 @@ class IOSRenderer extends Renderer {
     // }
 
     this._currentPage = page;
-    
+
     this.makeRootVisible();
   }
 }

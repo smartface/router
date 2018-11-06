@@ -115,16 +115,16 @@ class Route {
       view: null
     };
   }
-  
-  setState(state){
+
+  setState(state) {
     this._state = Object.assign({}, this._state, state);
   }
-  
+
   /**
    * Returns Route's current state
    * @return {RouteState}
    */
-  getState(){
+  getState() {
     return this._state;
   }
 
@@ -185,7 +185,7 @@ class Route {
    * If the routeShouldMatch eventhandler is set
    * and routeShouldMatch returns 'true' then match happends
    * or routeShouldMatch returns 'false' then match is blocked
-   * 
+   *
    * @protected
    * @emit {routeShouldMatch}
    * @param {RouteMatch} match

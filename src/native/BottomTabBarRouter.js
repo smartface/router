@@ -70,8 +70,8 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @static
    * @param {BottomTabBarRouterParams} param
    */
-  static of (props) {
-    props.renderer = createRenderer()
+  static of(props) {
+    props.renderer = createRenderer();
     return new BottomTabBarRouter(props);
   }
 
@@ -124,9 +124,10 @@ class BottomTabBarRouter extends NativeRouterBase {
           // Will Not trigger next history change
           this._historyController.preventDefault();
           this._historyController.push(this._visitedIndexes[index].path);
-        }
-        else {
-          this._historyController.push(route.getRedirectto() || route.getUrlPath());
+        } else {
+          this._historyController.push(
+            route.getRedirectto() || route.getUrlPath()
+          );
         }
       }
 
@@ -138,11 +139,11 @@ class BottomTabBarRouter extends NativeRouterBase {
   }
 
   initialize(parentHistory, onHistoryChange) {
-    super.initialize(parentHistory, onHistoryChange)
+    super.initialize(parentHistory, onHistoryChange);
     // Assigns BottomTabBar props
-    // Clears child routers onRouteExit because of NatveStackRouter 
+    // Clears child routers onRouteExit because of NatveStackRouter
     // creates new NavigationController to clear all children.
-   /* this._routes.map(route => {
+    /* this._routes.map(route => {
       route.routerDidExit && (route.routerDidExit = (action) =>  route._routerDidExit(action));
     });*/
     // Initilaze BottomTabBarController's child controllers
@@ -150,7 +151,9 @@ class BottomTabBarRouter extends NativeRouterBase {
       this._routes.map(route => route.build(this, route))
     );
 
-    this._renderer.setTabBarItems(functionMaybe(this._items).map(createTabBarItem));
+    this._renderer.setTabBarItems(
+      functionMaybe(this._items).map(createTabBarItem)
+    );
     this._renderer._rootController.show();
     // Overrides build method
     this.build = () => this._renderer._rootController;
@@ -174,7 +177,9 @@ class BottomTabBarRouter extends NativeRouterBase {
   renderMatches(matches, state, action, target) {
     this._fromRouter = true;
 
-    console.log(`Render matches ${matches.length} ${matches.map(match => match.url)}`);
+    console.log(
+      `Render matches ${matches.length} ${matches.map(match => match.url)}`
+    );
     if (matches.length > 0) {
       const { match: next } = matches[matches.length - 1];
       const { match } = matches[1] || matches[0];
