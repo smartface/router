@@ -50,17 +50,21 @@ const userTabStatus = {
  *      ],
  *      routes: [
  *        Route.of({
+ *          routeDidEnter: (router, route) => {
+ *          },
+ *          routeDidExit: (router, route) => {
+ *          },
  *          path: "/tabs/page1",
- *          build((match, state, router, view) => {
+ *          build((router, route) => {
  *            const Page1 = require('/pages/Page1');
- *            return new Page1(state.data, router);
+ *            return new Page1(route.getState().routeData, router);
  *          })
  *        }),
  *        Route.of({
  *          path: "/tabs/page2",
- *          build((match, state, router, view) => {
+ *          build((router, route) => {
  *            const Page2 = require('/pages/Page2');
- *            return new Page2(state.data, router);
+ *            return new Page2(route.getState().routeData, router);
  *          });
  *        });
  *      ]
@@ -146,12 +150,6 @@ class BottomTabBarRouter extends NativeRouterBase {
 
   initialize(parentHistory, onHistoryChange) {
     super.initialize(parentHistory, onHistoryChange);
-    // Assigns BottomTabBar props
-    // Clears child routers onRouteExit because of NatveStackRouter
-    // creates new NavigationController to clear all children.
-    /* this._routes.map(route => {
-      route.routerDidExit && (route.routerDidExit = (action) =>  route._routerDidExit(action));
-    });*/
     // Initilaze BottomTabBarController's child controllers
     this._renderer.setChildControllers(
       this._routes.map(route => route.build(this, route))
@@ -182,10 +180,6 @@ class BottomTabBarRouter extends NativeRouterBase {
       setTimeout(() => this.pushRoute(this._routes[index]));
     }
 
-    console.log(
-      `shouldSelectByIndex ${index} ${this._currentIndex} ${this._tabStatus}`
-    );
-
     return this._tabStatus === userTabStatus.IDLE;
   }
 
@@ -213,17 +207,6 @@ class BottomTabBarRouter extends NativeRouterBase {
     super.renderMatches(matches, state, action, target);
 
     this._fromRouter = false;
-  }
-
-  /**
-   * @ignore
-   *
-   */
-  activateIndex(index) {
-    this._lastRoute && this._lastRoute.routeDidExit(this);
-    var route = this._routes[index];
-    route.routeDidEnter(this);
-    this._lastRoute = route;
   }
 
   /**
@@ -278,8 +261,10 @@ class BottomTabBarRouter extends NativeRouterBase {
   dispose() {
     super.dispose();
     this._unlistener();
+    this._renderer.dispose();
     this._renderer._rootController.didSelectByIndex = () => null;
     this._items = null;
+    this._renderer = null;
   }
 
   /**

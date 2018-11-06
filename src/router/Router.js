@@ -28,7 +28,97 @@ let _lastRoute;
  *
  * @class
  * @example
- * 
+ ```js
+  const router = Router.of({
+    path: "/",
+    to: "/pages/page2",
+    isRoot: true,
+    routes: [
+        Route.of({
+            path: "/pages/page2",
+            build: (match, state) => {
+                let Page2 = require("pages/page2");
+                return new Page2();
+            }
+        }),
+        StackRouter.of({
+            path: "/stack",
+            to: "/stack/path1",
+            headerBarParams: () => { ios: { translucent: true } },
+            routes: [
+                Route.of({
+                    path: "/stack/path1",
+                    build: (match, state, router) => new Page1(state.data, router)
+                }),
+                Route.of({
+                    path: "/stack/path2",
+                    routeShouldMatch: (route, nextState) => {
+                        console.log('routeShouldMatch');
+                        if (!nextState.routeData.applied) {
+                            // blocks route changing
+                            return false;
+                        }
+                        return false;
+                    },
+                    build: (router, route) => {
+                        const { routeData, view } = route.getState();
+                        return new Page2(routeData, router);
+                    }
+                })
+            ]
+        }),
+        BottomTabBarRouter.of({
+            path: "/bottom",
+            to: "/bottom/stack2/path1",
+            tabbarParams: () => ({
+                ios: { translucent: false },
+                itemColor: Color.RED,
+                unselectedItemColor: Color.YELLOW,
+                backgroundColor: Color.BLUE
+            }),
+            items: () => [{ title: "page1" }, { title: "page2" }, { title: "page3" }],
+            routes: [
+                StackRouter.of({
+                    path: "/bottom/stack",
+                    to: "/bottom/stack/path1",
+                    headerBarParams: () => { ios: { translucent: false } },
+                    routes: [
+                        Route.of({
+                            path: "/bottom/stack/path1",
+                            build: (router, route) => new Page1(route.getState().routeData, router, "/stack/path2")
+                        }),
+                        Route.of({
+                            path: "/bottom/stack/path2",
+                            build: (router, route) => {
+                                const { routeData, view } = route.getState();
+
+                                return new Page2(routeData, router, "/bottom/stack2/path1");
+                            }
+                        })
+                    ]
+                }),
+                StackRouter.of({
+                    path: "/bottom/stack2",
+                    to: "/bottom/stack2/path1",
+                    headerBarParams: () => { ios: { translucent: false } },
+                    routes: [
+                        Route.of({
+                            path: "/bottom/stack2/path1",
+                            build: (router, route) => new Page1(route.getState().routeData, router, "/bottom/stack/path2")
+                        }),
+                        Route.of({
+                            path: "/bottom/stack2/path2",
+                            build: (router, route) => {
+                                return new Page2(route.getState().routeData, router);
+                            }
+                        })
+                    ]
+                })
+            ]
+        })
+    ]
+});
+```
  * @extends {Route}
  */
 class Router extends Route {
@@ -97,9 +187,10 @@ class Router extends Route {
   }
 
   /**
-   * @ignore
+   * Router is initialized by parent
+   *
    * @private
-   * @param {*} parentHistory
+   * @param {HistoryListener} parentHistory
    * @param {function} onHistoryChange Root onHistoryChange handler
    */
   initialize(parentHistory, onHistoryChange) {
@@ -119,14 +210,12 @@ class Router extends Route {
     });
 
     this._historyController.listen((location, action) => {
-      onHistoryChange(location, action, this);
+      onHistoryChange(location, action, this); // fires root's onHistoryChange
     });
   }
 
   /**
-   *
    * @ignore
-   *
    */
   getHistory() {
     return this._historyController.history;
@@ -175,7 +264,7 @@ class Router extends Route {
    *  ]
    *  });
    * });
-   * 
+   *
    * @param {RouterBlockHandler} fn
    */
   addRouteBlocker(fn) {
@@ -191,6 +280,9 @@ class Router extends Route {
   }
 
   /**
+   * Handles history changes. Just Root router, because routing flow mmust be always root to children,
+   * in order to change display logic all the time.
+   *
    * @protected
    * @param {RouteLocation} location
    * @param {Object} action
@@ -203,6 +295,7 @@ class Router extends Route {
   /**
    * Removes last entry from history.
    *
+   * @ignore
    * @protected
    */
   routeRollback() {
@@ -214,7 +307,7 @@ class Router extends Route {
    *
    * @protected
    *
-   * @emit {RouteShouldMatchHandler}
+   * @emits RouteShouldMatchHandler
    * @param {Array<{isExact: boolean,params: object,path: string,url: string}>} matches
    * @param {RouteState} state
    * @param {string} action
@@ -224,7 +317,7 @@ class Router extends Route {
       if (route !== this && route instanceof Router) {
         // if(index > 0 && this._isRoot)
         this.addChildRouter &&
-          actions.push(this.addChildRouter.bind(this, route));
+          actions.push(this.addChildRouter.bind(this, route)); // add new router display logic from root to children
         // move routes to child router
         route.renderMatches(
           matches.slice(index, matches.length),
@@ -268,32 +361,56 @@ class Router extends Route {
 
           // console.log(`matched ${_lastRoute} ${route}`);
           _lastRoute && _lastRoute.routeDidExit(this);
-          this.routeDidMatch(route);
-          const view = this.renderRoute(route);
-          route.setState({ view });
-          this.routeWillEnter && this.routeWillEnter(route);
-          actions.forEach(item => item());
-          this.routerDidEnter && this.routerDidEnter(route);
-          route.routeDidEnter(this);
-          _lastRoute = route;
+          this.routeDidMatch(route); // fires routeDidMatch
+          const view = this.renderRoute(route); // build route's view
+          route.setState({ view }); // keep view in the route's state
+          this.routeWillEnter && this.routeWillEnter(route); // fires routeWillEnter
+          actions.forEach(item => item()); // display routers' view
+          this.routerDidEnter && this.routerDidEnter(route); // fires routerDidEnter
+          route.routeDidEnter(this); // fires routeDidEnter
+          _lastRoute = route; // save matched route as last route
           this._currentAction = action;
           this._currentUrl = match.url;
         }
 
-        actions = [];
+        actions = []; // clear display actions
         return true;
       }
     });
   }
 
+  /**
+   * Handles a new route activated in the router
+   *
+   * @event
+   * @protected
+   * @param {Route} route
+   */
+  routerWillEnter(route) {}
+
+  /**
+   * @ignore
+   * @param {string} url
+   * @param {string} action
+   */
   isUrlCurrent(url, action) {
     const res = this._currentUrl === url && this._currentAction === action;
     return res;
   }
 
   /**
-   * Life-cycle event handles Router is displayed
+   * Life-cycle event handler handles Router is activated
+   * @example
+   * ....
+   * Router.of({
+   *  routerDidEnter: (router, route) => {
+   *    ...
+   *  }
+   * })
    *
+   * ...
+   *
+   * @emits routerDidEnter
    * @protected
    * @param {RouteState} Route
    */
@@ -315,6 +432,21 @@ class Router extends Route {
     Router.currentRouter = this;
   }
 
+  /**
+   * Handles router is deactivated.
+   *
+   * @example
+   * ....
+   * Router.of({
+   *  routerDidExit: (router, action) => {
+   *    ...
+   *  }
+   * })
+   *
+   * ...
+   * @emits routerDidExit
+   * @param {string} action
+   */
   routerDidExit(action) {
     this._handlers.routerDidExit && this._handlers.routerDidExit(this, action);
   }
@@ -334,7 +466,7 @@ class Router extends Route {
   }
 
   /**
-   * @protected
+   * @private
    * @ignore
    * @param {Page} view
    */
@@ -344,6 +476,7 @@ class Router extends Route {
 
   /**
    * Route is matched handler
+   *
    * @protected
    * @param {Route} route
    * @param {RouteState} nextState
@@ -362,7 +495,7 @@ class Router extends Route {
    *
    * @protected
    * @param {Route} route
-   * @throw {TypeError}
+   * @throws {TypeError}
    */
   renderRoute(route) {
     const view = route.build(this);
@@ -407,6 +540,7 @@ class Router extends Route {
 
   /**
    * Replaces specified path's state
+   *
    * @ignore
    * @param {string} path
    * @param {data} data
@@ -417,7 +551,6 @@ class Router extends Route {
 
   /**
    * Rewinds the history
-   *
    */
   goBack() {
     if (Router.blocker) {
@@ -442,6 +575,7 @@ class Router extends Route {
 
   /**
    * Returns History entries as Array
+   *
    * @return {Array<string>}
    */
   getHistoryasArray() {
@@ -471,6 +605,7 @@ class Router extends Route {
   /**
    * Adds new route
    *
+   * @ignore
    * @experimental
    * @param {Route} route
    */
@@ -481,7 +616,7 @@ class Router extends Route {
   /**
    * Iterates child routes
    *
-   * @paramms {function} fn
+   * @param {function} fn
    * @return {Array}
    */
   map(fn) {

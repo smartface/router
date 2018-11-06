@@ -14,19 +14,20 @@ const Page = require("sf-core/ui/page");
  *
  * var router = Router.of({
  *  path: "/",
+ *  isRoot: true,
  *  routes: [
  *    Route.of({
  *      path: "/tabs/page1",
- *      build((match, state, router, view) => {
+ *      build((router, route) => {
  *        const Page1 = require('/pages/Page1');
- *          return new Page1(state.data, router);
+ *          return new Page1(route.getState().routeData, router);
  *         })
  *      }),
  *      Route.of({
  *        path: "/tabs/page2",
- *        build((match, state, router, view) => {
+ *        build((router, route) => {
  *          const Page2 = require('/pages/Page2');
- *          return new Page2(state.data, router);
+ *          return new Page2(route.getState().routeData, router);
  *        });
  *      });
  *    ]
@@ -87,13 +88,16 @@ class NativeRouter extends NativeRouterBase {
   }
 
   /**
-   *
+   * @protected
    * @param {NativeRouter[]|NativeStackRouter[]|BottomTabBarRouter[]} router
    */
   addChildRouter(router) {
     this._renderer.show(router._renderer._rootController);
   }
 
+  /**
+   * @override
+   */
   routeWillEnter(route) {
     this._renderer.show(route.getState().view);
   }

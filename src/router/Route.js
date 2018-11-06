@@ -28,6 +28,7 @@ class RoutePath {
   }
 
   /**
+   * Returns route path
    * @return {string}
    */
   getPath() {
@@ -35,6 +36,8 @@ class RoutePath {
   }
 
   /**
+   * Returns route is root or not.
+   *
    * @returns {boolean}
    */
   isRoot() {
@@ -42,7 +45,9 @@ class RoutePath {
   }
 
   /**
-   * @returns {Object}
+   * Return quick representaion of the route-path
+   *
+   * @returns {{path: string, isRoot: boolean}}
    */
   toObject() {
     return {
@@ -59,6 +64,8 @@ class RoutePath {
   }
 
   /**
+   * Return path is empty or not
+   *
    * @return {boelean}
    */
   hasPath() {
@@ -124,6 +131,7 @@ class Route {
 
   /**
    * Merges specified state to current route state
+   *
    * @param {object}
    */
   setState(state) {
@@ -132,6 +140,7 @@ class Route {
 
   /**
    * Returns Route's current state
+   *
    * @return {RouteState}
    */
   getState() {
@@ -139,6 +148,8 @@ class Route {
   }
 
   /**
+   * Simple Object representation of the route
+   *
    * @return {{path: string, routes: Array<object>}}
    */
   toObject() {
@@ -149,7 +160,7 @@ class Route {
   }
 
   /**
-   * String presentation of the component
+   * String representation of the route
    *
    * @return {string}
    */
@@ -195,10 +206,18 @@ class Route {
    * If the routeShouldMatch eventhandler is set
    * and routeShouldMatch returns 'true' then match happends
    * or routeShouldMatch returns 'false' then match is blocked
+   * @example
+   * ....
+   * Route.of({
+   *  routeShouldMatch: (router, route) => {
+   *    return true;
+   *  }
+   * })
    *
+   * ...
    * @protected
    * @event
-   * @emit {routeShouldMatch}
+   * @emits routeShouldMatch
    * @param {RouteMatch} match
    * @return {boolean}
    */
@@ -207,8 +226,18 @@ class Route {
   }
 
   /**
-   * When route is matched and displayed
-   * @emit {routeDidEnter}
+   * Handles route is matched and displayed
+   *
+   * @example
+   * ....
+   * Route.of({
+   *  routeDidEnter: (router, route) => {
+   *    ...
+   *  }
+   * })
+   *
+   * ...
+   * @emits routeDidEnter
    * @event
    * @param {Router} router
    */
@@ -217,9 +246,17 @@ class Route {
   }
 
   /**
-   * When route is removed
+   * Handles route is removed
+   * @example
+   * ....
+   * Route.of({
+   *  routeDidExit: (router, route) => {
+   *    ...
+   *  }
+   * })
    *
-   * @emit {routeDidExit}
+   * ...
+   * @emits routeDidExit
    * @event
    * @param {Router} router
    */
@@ -271,7 +308,7 @@ class Route {
 
   /**
    * Clones new instance of the route
-   *
+   * @ignore
    * @returns {Route}
    */
   clone() {

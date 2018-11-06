@@ -16,7 +16,6 @@ There are 5 types of routers
 - NativeModalRouter (in roadmap)
 - NativeSplitRouter (in roadmap)
 
-
 ## Installation
 
 ```
@@ -26,74 +25,144 @@ There are 5 types of routers
 ## Common Usage
 
 ```javascript
-const Router = require("@smartface/router/src/native/NativeRouter");
-const RouterBase = require("@smartface/router/src/router/Router");
-const StackRouter = require("@smartface/router/src/native/NativeStackRouter");
-const BottomTabBarRouter = require("@smartface/router/src/native/BottomTabBarRouter");
-const Route = require("@smartface/router/src/router/Route");
+const {
+  NativeRouter: Router,
+  Router: RouterBase
+  NativeStackRouter: StackRouter,
+  BottomTabBarRouter,
+  Route
+} = require("@smartface/router");
 const Color = require("sf-core/ui/color");
 const Image = require("sf-core/ui/image");
 
-var tabbar1 = Image.createFromFile("images://tabbar1.png");
-
 const router = Router.of({
-  path: "/",
-  to: "/pages/page1",
-  isRoot: true,
-  routes: [
-    BottomTabBarRouter.of({
-      path: "/pages",
-      tabbarParams: () => ({
-        ios: { translucent: false },
-        itemColor: Color.RED,
-        unselectedItemColor: Color.YELLOW,
-        backgroundColor: Color.BLUE,
-        height: 100
-      }),
-      items: () => [{ title: "Page1" }, { title: "Page2", icon: tabbar1 }],
-      routes: [
-        Route.of({
-          path: "/pages/page1",
-          build: (match, state, router) => {
-            let Page1 = require("pages/page1");
-            return new Page1(router);
-          }
-        }),
-        Route.of({
-          path: "/pages/page2",
-          build: (match, state, router, view) => {
-            // if (view) {
-            //     view.routeData = state.data;
-            //     return view;
-            // }
-
-            let Page2 = require("pages/page2");
-            return new Page2({}, router);
-          }
-        })
-      ]
-    }),
-    StackRouter.of({
-      path: "/user",
-      routes: [
-        Route.of({
-          path: "/user/login",
-          build: (match, state, router, view) => {
-            // if checked is false
-            if (state.data.checked) {
-              // then blocks route
-              return null;
+    path: "/",
+    to: "/pages/page2",
+    isRoot: true,
+    routes: [
+        Route.of(routeBinder({
+            path: "/pages/page2",
+            build: (match, state) => {
+                let Page2 = require("pages/page2");
+                return new Page2();
             }
-            let Page2 = require("pages/page2");
-            return new Page2({ message: "user login page" }, router);
-          }
+        })),
+        Route.of(routeBinder({
+            path: "/pages/:name([0-9]*)",
+            build: (router, route) => {
+                const { routeData, view } = route.getState();
+                let Page1 = require("pages/page1");
+                return new Page1(routeData, router);
+            }
+        })),
+        StackRouter.of({
+            path: "/stack",
+            to: "/stack/path1",
+            headerBarParams: () => { ios: { translucent: true } },
+            routes: [
+                Route.of(routeBinder({
+                    path: "/stack/path1",
+                    build: (match, state, router) => new Page1(state.data, router)
+                })),
+                Route.of(routeBinder({
+                    path: "/stack/path2",
+                    routeShouldMatch: (route, nextState) => {
+                        if (!nextState.routeData.applied) {
+                            // blocks route changing
+                            return false;
+                        }
+                        return false;
+                    },
+                    build: (router, route) => {
+                        const { routeData, view } = route.getState();
+                        return new Page2(routeData, router);
+                    }
+                }))
+            ]
+        }),
+        BottomTabBarRouter.of({
+            path: "/bottom",
+            to: "/bottom/stack2/path1",
+            tabbarParams: () => ({
+                ios: { translucent: false },
+                itemColor: Color.RED,
+                unselectedItemColor: Color.YELLOW,
+                backgroundColor: Color.BLUE
+            }),
+            items: () => [{ title: "page1" }, { title: "page2" }, { title: "page3" }],
+            routes: [
+                StackRouter.of({
+                    path: "/bottom/stack",
+                    to: "/bottom/stack/path1",
+                    headerBarParams: () => { ios: { translucent: false } },
+                    routes: [
+                        Route.of(routeBinder({
+                            path: "/bottom/stack/path1",
+                            build: (router, route) => new Page1(route.getState().routeData, router, "/stack/path2")
+                        })),
+                        Route.of(routeBinder({
+                            path: "/bottom/stack/path2",
+                            build: (router, route) => {
+                                const { routeData, view } = route.getState();
+
+                                return new Page2(routeData, router, "/bottom/stack2/path1");
+                            }
+                        }))
+                    ]
+                }),
+                StackRouter.of({
+                    path: "/bottom/stack2",
+                    to: "/bottom/stack2/path1",
+                    headerBarParams: () => { ios: { translucent: false } },
+                    routes: [
+                        Route.of(routeBinder({
+                            path: "/bottom/stack2/path1",
+                            build: (router, route) => new Page1(route.getState().routeData, router, "/bottom/stack/path2")
+                        })),
+                        Route.of(routeBinder({
+                            path: "/bottom/stack2/path2",
+                            build: (router, route) => {
+                                return new Page2(route.getState().routeData, router);
+                            }
+                        }))
+                    ]
+                }),
+                Route.of(routeBinder({
+                    path: "/bottom/page1",
+                    build: (router, route) => {
+                        console.log(`route ${route}`);
+                        return new Page1(route.getState().routeData, router, "/bottom/stack/path1");
+                    }
+                }))
+            ]
         })
-      ]
-    })
-  ]
+    ]
 });
 
-router.push("/pages/page1");
+function routeBinder(params){
+
+    return Object.assign({},
+        params,
+        {
+            routeDidEnter: (router, route) => {
+                const {view} = route.getState();
+                view.onRouteEnter && view.onRouteEnter(router, route);
+                params.routeDidEnter && params.routeDidEnter(router, route)
+            },
+            routeDidExit: (router, route) => {
+                const {view} = route.getState();
+                view.onRouteExit && view.onRouteExit(router, route);
+                params.routeDidExit && params.routeDidExit(router, route)
+            }
+        });
+}
+
+const unlisten = router.listen((location, action) => {
+    // location.state.userState
+    console.log(` ---- new route location: ${location.pathname}`);
+});
+
+router.push("/bottom");
 ```
 
 ## Blocking Routes
@@ -128,6 +197,7 @@ unload();
 ### Limitation
 
 There are several actions that user can take, which cannot be blocked by the blocker. Those cases include:
+
 - **iOS HeaderBar**: It doesn't work with iOS default headerbar's back-button and back gesture. If you want to use in these cases, you must use custom back button and disable back gesture.
 - **Bottom TabBar**: Switching between the tabs cannot be prevented.
 
