@@ -121,7 +121,7 @@ class Route {
       action: null
     });
   }
-  
+
   /**
    * Merges specified state to current route state
    * @param {object}
@@ -205,7 +205,7 @@ class Route {
   routeShouldMatch(router) {
     return this._routeShouldMatch ? this._routeShouldMatch(router, this) : true;
   }
-  
+
   /**
    * When route is matched and displayed
    * @emit {routeDidEnter}
@@ -218,7 +218,7 @@ class Route {
 
   /**
    * When route is removed
-   * 
+   *
    * @emit {routeDidExit}
    * @event
    * @param {Router} router

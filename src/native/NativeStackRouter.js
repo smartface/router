@@ -187,7 +187,7 @@ class NativeStackRouter extends NativeRouterBase {
       case "REPLACE":
       case "PUSH":
         console.log(`push ${this._currentUrl} - ${route.getUrlPath()}`);
-        if(this._currentUrl !== route.getUrlPath())
+        if (this._currentUrl !== route.getUrlPath())
           this._renderer.pushChild(state.view);
         break;
       case "POP":

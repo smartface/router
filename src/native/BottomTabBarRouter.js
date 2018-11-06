@@ -23,7 +23,7 @@ const userTabStatus = {
   IDLE: 0,
   WAITING: 1,
   DONE: 2
-}
+};
 
 /**
  * It creates {@link BottomTabbarController} and manages its behavours and routes.
@@ -173,13 +173,19 @@ class BottomTabBarRouter extends NativeRouterBase {
   shouldSelectByIndex(index) {
     // var res = index !== this._currentIndex;
     // this._currentIndex = index;
-    if((this._tabStatus === userTabStatus.IDLE && index !== this._currentIndex) || this._tabStatus === userTabStatus.WAITING){
+    if (
+      (this._tabStatus === userTabStatus.IDLE &&
+        index !== this._currentIndex) ||
+      this._tabStatus === userTabStatus.WAITING
+    ) {
       this._tabStatus = userTabStatus.WAITING;
-      setTimeout(() => this.pushRoute(this._routes[index]), 0);
+      setTimeout(() => this.pushRoute(this._routes[index]));
     }
 
-    console.log(`shouldSelectByIndex ${index} ${this._currentIndex} ${this._tabStatus}`);
-    
+    console.log(
+      `shouldSelectByIndex ${index} ${this._currentIndex} ${this._tabStatus}`
+    );
+
     return this._tabStatus === userTabStatus.IDLE;
   }
 
@@ -201,20 +207,19 @@ class BottomTabBarRouter extends NativeRouterBase {
       // this.isVisited(index) && this.activateIndex(index);
       this.setVisited(index, next.path);
       this._currentIndex = index;
-      if(userTabStatus.WAITING)
-        this._tabStatus = userTabStatus.IDLE;
+      if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
     }
 
     super.renderMatches(matches, state, action, target);
 
     this._fromRouter = false;
   }
-  
+
   /**
    * @ignore
    *
    */
-  activateIndex(index){
+  activateIndex(index) {
     this._lastRoute && this._lastRoute.routeDidExit(this);
     var route = this._routes[index];
     route.routeDidEnter(this);
@@ -285,7 +290,7 @@ class BottomTabBarRouter extends NativeRouterBase {
    */
   routeWillEnter(route) {
     const state = route.getState();
-    this.routetoIndex(this.resolveIndex(state.match.path));
+    // this.routetoIndex(this.resolveIndex(state.match.path));
   }
 
   /**

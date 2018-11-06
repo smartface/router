@@ -99,7 +99,7 @@ router.push("/pages/page1");
 ## Blocking Routes
 
 ```js
-router.addRouteBlocker((location, action, callback) => {
+var unload = router.addRouteBlocker((path, routeData, action, ok) => {
   alert({
     message: "Would you like to answer?",
     title: "Question", //optional
@@ -108,19 +108,21 @@ router.addRouteBlocker((location, action, callback) => {
         text: "Yes",
         type: AlertView.Android.ButtonType.POSITIVE,
         onClick: function() {
-          callback(true);
+          ok(true);
         }
       },
       {
         text: "No",
         type: AlertView.Android.ButtonType.NEGATIVE,
         onClick: function() {
-          callback(false);
+          ok(false);
         }
       }
     ]
   });
 });
+
+unload();
 ```
 
 ### Limitation

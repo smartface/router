@@ -11,13 +11,13 @@ let _skipRender = false;
 let _lastRoute;
 /**
  * @typedef {object} RouterParams
- * @property {string} path Routing path
- * @property {Array<Route>} routes Child routes
- * @property {boolean} exact If it's only exact match or not
- * @property {boolean} isRoot If it's root or not
+ * @property {string} [=false]path Routing path
+ * @property {Array<Route>} [=[]] routes Child routes
+ * @property {boolean} [=false] exact If it's only exact match or not
+ * @property {boolean} [=false] isRoot If it's root router
  * @property {(string|null)} to Redirection path
- * @property {boolean} strict
- * @property {boolean} sensitive Path is case sensitive or not
+ * @property {boolean} [=false] strict
+ * @property {boolean} [=false] sensitive Path is case sensitive or not
  * @property {function(router: Router, prevUrl: string, currentUrl: stirng, action: {('PUSH'| 'POP')})} routerDidEnter Handles the Router is actived.
  * @property {function(router: Router, prevUrl: action: {('PUSH'| 'POP')})} routerDidExit Handles the Router is deactived.
  */
@@ -27,6 +27,8 @@ let _lastRoute;
  * Base Router implementation
  *
  * @class
+ * @example
+ * 
  * @extends {Route}
  */
 class Router extends Route {
@@ -35,16 +37,16 @@ class Router extends Route {
    *
    * @param {RouterParams} props
    */
-  static of (props = {}) {
+  static of(props = {}) {
     return new Router(props);
   }
-  
+
   static createBlocker(fn) {
     return (router, path, routeData, action, doneFn) => {
       fn(path, routeData, action, ok => ok && doneFn());
     };
   }
-  
+
   /**
    * @constructor
    * @param {RouterParams} param
@@ -63,7 +65,6 @@ class Router extends Route {
     routeShouldMatch
   }) {
     super({ path, build, routes, to, isRoot, routeShouldMatch });
-    // console.log("Router created");
 
     this._historyUnlisten = () => null;
     this._handlers = {
@@ -152,25 +153,44 @@ class Router extends Route {
   /**
    * Adds route block handler to history. When history is changed in anywhere
    * then the handler intercepts before history is changed.
-   *
+   * @example
+   * var unload = router.addRouteBlocker((path, routeData, action, ok) => {
+   * alert({
+   *  message: "Would you like to answer?",
+   *  title: "Question", //optional
+   *  buttons: [{
+   *  text: "Yes",
+   *      type: AlertView.Android.ButtonType.POSITIVE,
+   *      onClick: function() {
+   *        ok(true);
+   *      }
+   *    },
+   *    {
+   *      text: "No",
+   *      type: AlertView.Android.ButtonType.NEGATIVE,
+   *      onClick: function() {
+   *        ok(false);
+   *      }
+   *    }
+   *  ]
+   *  });
+   * });
+   * 
    * @param {RouterBlockHandler} fn
    */
   addRouteBlocker(fn) {
     Router.blocker = Router.createBlocker(fn);
-    const unblock = () => Router.blocker = null;
+    this._unblock = () => (Router.blocker = null);
     /*this._historyController.block(
       (location, action) => callback => {
         fn(location, action, callback);
       }
     );*/
 
-    this._unblock = unblock;
-
-    return unblock;
+    return this._unblock;
   }
 
   /**
-   * @listens
    * @protected
    * @param {RouteLocation} location
    * @param {Object} action
@@ -214,12 +234,12 @@ class Router extends Route {
         );
 
         return true;
-      }
-      else if (match.isExact === true) {
+      } else if (match.isExact === true) {
         // route has redirection
-        if (route.routeShouldMatch(route, { match, action, routeData }) === true) {
+        if (
+          route.routeShouldMatch(route, { match, action, routeData }) === true
+        ) {
           if (route.getRedirectto()) {
-            console.log(`redirection ${route}`)
             actions = [];
             return this.redirectRoute(route, routeData, action);
           }
@@ -230,7 +250,8 @@ class Router extends Route {
                 match,
                 action,
                 routeData
-              })) || {};
+              })) ||
+            {};
           route.setState({ match, action, routeData, routingState });
           if (target != this) {
             // if (!this.isUrlCurrent(match.url, action)) {
@@ -244,9 +265,8 @@ class Router extends Route {
                 break;
             }
           }
-          
-          
-          console.log(`match ${route}`)
+
+          // console.log(`matched ${_lastRoute} ${route}`);
           _lastRoute && _lastRoute.routeDidExit(this);
           this.routeDidMatch(route);
           const view = this.renderRoute(route);
@@ -266,25 +286,13 @@ class Router extends Route {
     });
   }
 
-  routeDidEnter(router) {
-    if (router != this) {
-      this._lastRoute && this._lastRoute.routeDidEnter(this);
-    }
-  }
-
-  routeDidExit(router) {
-    if (router != this) {
-      this._lastRoute && this._lastRoute.routeDidExit(this);
-    }
-  }
-
   isUrlCurrent(url, action) {
     const res = this._currentUrl === url && this._currentAction === action;
     return res;
   }
 
   /**
-   * Handles if Router is activate router
+   * Life-cycle event handles Router is displayed
    *
    * @protected
    * @param {RouteState} Route
@@ -320,7 +328,6 @@ class Router extends Route {
    * @param {string} action
    */
   redirectRoute(route, state, action) {
-    console.log(`redirectRoute`);
     // redirection of a route
     this.routeRollback(); // remove last route from history
     this.push(route.getRedirectto(), state && state.data); // and add new route
@@ -371,7 +378,7 @@ class Router extends Route {
    * @param {Route} route
    */
   pushRoute(route) {
-    this.push(route.getUrlPath());
+    this.push(route.getRedirectto() || route.getUrlPath());
   }
 
   /**
@@ -386,9 +393,11 @@ class Router extends Route {
       path = this._path.getPath() + "/" + path;
     }
 
-    if(Router.blocker){
-      Router.blocker(this, path, routeData, 'PUSH', () => this._historyController.push(path, { routeData }));
-      
+    if (Router.blocker) {
+      Router.blocker(this, path, routeData, "PUSH", () =>
+        this._historyController.push(path, { routeData })
+      );
+
       return this;
     }
     this._historyController.push(path, { routeData });
@@ -407,16 +416,18 @@ class Router extends Route {
   }
 
   /**
-   * Rewinds history
-   * @fires
+   * Rewinds the history
+   *
    */
   goBack() {
-    if(Router.blocker){
-      Router.blocker(this, null, null, 'POP', () => this._historyController.goBack());
-      
+    if (Router.blocker) {
+      Router.blocker(this, null, null, "POP", () =>
+        this._historyController.goBack()
+      );
+
       return this;
     }
-    
+
     this._historyController.goBack();
   }
 
@@ -448,6 +459,7 @@ class Router extends Route {
    * Changes route by history index.
    *
    * @experimental
+   * @ignore
    * @param {number} index
    * @return {boolean}
    */

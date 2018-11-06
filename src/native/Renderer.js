@@ -18,7 +18,7 @@ class Renderer {
    * @param {BottomTabBarController|Page|NavigationController} rootController
    */
   static setasRoot(rootController) {
-    if (Device.deviceOS === "iOS") {
+    /*if (Device.deviceOS === "iOS") {
       var sfWindow = SF.requireClass("UIApplication").sharedApplication()
         .keyWindow;
       sfWindow.rootViewController = rootController.nativeObject;
@@ -46,7 +46,11 @@ class Renderer {
       // currentChild = controller;
     } else {
       Application.setRootController(rootController);
-    }
+    }*/
+    Application.setRootController({
+      controller: rootController,
+      animated: true
+    });
   }
 
   makeRootVisible() {
