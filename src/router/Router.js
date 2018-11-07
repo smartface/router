@@ -7,8 +7,12 @@ let actions = [];
 
 let historyController;
 
-let _skipRender = false;
 let _lastRoute;
+const listeners = new Set();
+const dispatch = (location, action) => {
+  listeners.forEach(listener => listener(location, action));
+};
+
 /**
  * @typedef {object} RouterParams
  * @property {!string} [=false] path Routing path
@@ -236,7 +240,9 @@ class Router extends Route {
    * @param {HistoryListener} fn
    */
   listen(fn) {
-    return historyController.listen(fn);
+    listeners.add(fn);
+    
+    return () => listeners.delete(fn);
   }
 
   /**
@@ -289,7 +295,7 @@ class Router extends Route {
    */
   onHistoryChange(location, action, target) {
     this._matches = matchRoutes([this].concat(this._routes), location.pathname);
-    this.renderMatches(this._matches, location.state, action, target);
+    this.renderMatches(this._matches, location, action, target);
   }
 
   /**
@@ -312,7 +318,8 @@ class Router extends Route {
    * @param {RouteState} state
    * @param {string} action
    */
-  renderMatches(matches, routeData, action, target) {
+  renderMatches(matches, location, action, target) {
+    const routeData = location.state;
     matches.some(({ match, route }, index) => {
       if (route !== this && route instanceof Router) {
         // if(index > 0 && this._isRoot)
@@ -321,7 +328,7 @@ class Router extends Route {
         // move routes to child router
         route.renderMatches(
           matches.slice(index, matches.length),
-          routeData,
+          location,
           action,
           target
         );
@@ -371,7 +378,7 @@ class Router extends Route {
           _lastRoute = route; // save matched route as last route
           this._currentAction = action;
           this._currentUrl = match.url;
-          historyController.push(match.url, routeData);
+          dispatch(location, action);
         }
 
         actions = []; // clear display actions
