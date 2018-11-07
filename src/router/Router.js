@@ -236,7 +236,7 @@ class Router extends Route {
    * @param {HistoryListener} fn
    */
   listen(fn) {
-    return this._historyController.listen(fn);
+    return historyController.listen(fn);
   }
 
   /**
@@ -371,6 +371,7 @@ class Router extends Route {
           _lastRoute = route; // save matched route as last route
           this._currentAction = action;
           this._currentUrl = match.url;
+          historyController.push(match.url, routeData);
         }
 
         actions = []; // clear display actions
