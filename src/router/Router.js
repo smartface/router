@@ -11,15 +11,15 @@ let _skipRender = false;
 let _lastRoute;
 /**
  * @typedef {object} RouterParams
- * @property {string} [=false]path Routing path
- * @property {Array<Route>} [=[]] routes Child routes
- * @property {boolean} [=false] exact If it's only exact match or not
- * @property {boolean} [=false] isRoot If it's root router
- * @property {(string|null)} to Redirection path
- * @property {boolean} [=false] strict
- * @property {boolean} [=false] sensitive Path is case sensitive or not
- * @property {function(router: Router, prevUrl: string, currentUrl: stirng, action: {('PUSH'| 'POP')})} routerDidEnter Handles the Router is actived.
- * @property {function(router: Router, prevUrl: action: {('PUSH'| 'POP')})} routerDidExit Handles the Router is deactived.
+ * @property {!string} [=false] path Routing path
+ * @property {!Array<Route>} [=[]] routes Child routes
+ * @property {?boolean} [=false] exact If it's only exact match or not
+ * @property {?boolean} [=false] isRoot If it's root router
+ * @property {?(string|null)} to Redirection path
+ * @property {?boolean} [=false] strict
+ * @property {?boolean} [=false] sensitive Path is case sensitive or not
+ * @property {?function(router: Router, prevUrl: string, currentUrl: stirng, action: {('PUSH'| 'POP')})} routerDidEnter Handles the Router is actived.
+ * @property {?function(router: Router, prevUrl: action: {('PUSH'| 'POP')})} routerDidExit Handles the Router is deactived.
  */
 
 /**

@@ -160,6 +160,8 @@ class NativeStackRouter extends NativeRouterBase {
           try {
             this._historyController.preventDefault();
             this._historyController.goBack();
+            this._currentUrl = this._historyController.history.location.pathname;
+            this._currentAction = 'POP';
           } catch (e) {
             throw e;
           } finally {

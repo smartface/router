@@ -36,7 +36,7 @@ const Page = require("sf-core/ui/page");
  *
  * @since 1.0.0
  */
-class NativeRouter extends NativeRouterBase {
+class NativeModalRouter extends NativeRouterBase {
   /**
    * Create OS specific NativeRouter instance
    * @static
@@ -45,7 +45,7 @@ class NativeRouter extends NativeRouterBase {
    */
   static of(options) {
     options.renderer = createRenderer();
-    return new NativeRouter(options);
+    return new NativeModalRouter(options);
   }
   
   /**
@@ -58,7 +58,6 @@ class NativeRouter extends NativeRouterBase {
     routes = [],
     exact = false,
     renderer = null,
-    isRoot = false,
     to = null,
     routerDidEnter,
     routerDidExit,
@@ -69,7 +68,7 @@ class NativeRouter extends NativeRouterBase {
       build,
       routes,
       exact,
-      isRoot,
+      isRoot: false,
       to,
       routerDidEnter,
       routerDidExit,
@@ -102,4 +101,4 @@ class NativeRouter extends NativeRouterBase {
   }
 }
 
-module.exports = NativeRouter;
+module.exports = NativeModalRouter;
