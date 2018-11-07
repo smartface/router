@@ -10,8 +10,8 @@
  */
 const matchRoutes = (routes, pathname, /*not public API*/ branch = []) => {
   routes.some(route => {
-    const match = route.hasPath() // changed
-      ? route.matchPath(pathname) // changed
+    const match = route.hasPath()
+      ? route.matchPath(pathname)
       : branch.length
         ? branch[branch.length - 1].match
         : {

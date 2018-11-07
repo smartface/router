@@ -88,7 +88,6 @@ function createHistory(
     }
 
     block(prompt) {
-      console.log("block : ");
       _prompt = prompt;
       this.clearBlocker();
       _unblock = _history.block(_prompt);
@@ -109,33 +108,33 @@ function createHistory(
       // _unlistenAll.add(node.listen(listener));
       _nodes.add(node);
       // bubbles history goback to root if go back could be possible.
-      node.onGoBack = block => {
+      node.onGoBack = () => {
         if (_history.length > 0) {
-          if (block) {
-            const unblock = this.block((location, action, okFn) => {
-              block(location, action, v => {
-                okFn(v);
-                unblock();
-              });
-            });
-          }
+          // if (block) {
+          //   const unblock = this.block((location, action, okFn) => {
+          //     block(location, action, v => {
+          //       okFn(v);
+          //       unblock();
+          //     });
+          //   });
+          // }
           _history.go(-1);
-        } else this.onGoBack && this.onGoBack(block);
+        } else this.onGoBack && this.onGoBack();
       };
       // bubbles history push to root if push could be possible.
-      node.onPush = (path, data, block) => {
+      node.onPush = (path, data) => {
         if (this.canPush(path)) {
-          if (block) {
-            const unblock = _history.block((location, action, okFn) => {
-              return block(location, action, v => {
-                okFn(v);
-                unblock();
-              });
-            });
-          }
+          // if (block) {
+          //   const unblock = _history.block((location, action, okFn) => {
+          //     return block(location, action, v => {
+          //       okFn(v);
+          //       unblock();
+          //     });
+          //   });
+          // }
           this.push(path, data);
         } else {
-          this.onPush && this.onPush(path, data, block);
+          this.onPush && this.onPush(path, data);
         }
       };
 

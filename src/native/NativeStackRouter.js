@@ -158,9 +158,13 @@ class NativeStackRouter extends NativeRouterBase {
           // set Router to skip next history change
           // this._fromRouter = false;
           try {
+            console.log(JSON.stringify(this.getHistoryasArray()))
             this._historyController.preventDefault();
             this._historyController.goBack();
-            this.onHistoryChange(this._historyController.history.location, 'POP', this);
+            console.log(JSON.stringify(this.getHistoryasArray()))
+            this._fromRouter = false;
+            this.dispatch(this._historyController.history.location, 'POP', this);
+            this._fromRouter = true;
           } catch (e) {
             throw e;
           } finally {
@@ -181,6 +185,18 @@ class NativeStackRouter extends NativeRouterBase {
     super.dispose();
     this._unlistener();
   }
+  
+  push(path, routeData={}){
+    console.log(`nav push ${path} ${this._currentUrl}`);
+    if(path === this._currentUrl){
+      Object.assign(this._historyController.history.location.state.routeData, routeData);
+      this.dispatch(this._historyController.history.location, 'PUSH', this);
+      
+      return this;
+    }
+    
+    return super.push(path, routeData);
+  }
 
   routeWillEnter(route) {
     const state = route.getState();
@@ -188,11 +204,11 @@ class NativeStackRouter extends NativeRouterBase {
       case "REPLACE":
       case "PUSH":
         console.log(`push ${this._currentUrl} - ${route.getUrlPath()}`);
-        if (this._currentUrl !== route.getUrlPath())
+        if (this._fromRouter && this._currentUrl !== route.getUrlPath())
           this._renderer.pushChild(state.view);
         break;
       case "POP":
-        if (Router.currentRouter === this) this._renderer.popChild();
+        if (this._fromRouter && Router.currentRouter === this) this._renderer.popChild();
         break;
     }
   }

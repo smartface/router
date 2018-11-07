@@ -1,11 +1,10 @@
-"use strict";
+'use strict';
 
 const Router = require("../router/Router");
 const NativeRouterBase = require("./NativeRouterBase");
 const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
 const createRenderer = require("./createRenderer");
 const TabBarItem = require("sf-core/ui/tabbaritem");
-// const console = {log: _ => _};
 
 function functionMaybe(val) {
   return typeof val === "function" ? val() : val;
@@ -143,7 +142,9 @@ class BottomTabBarRouter extends NativeRouterBase {
 
       !this.isVisited(index) && this.routetoIndex(index);*/
     };
-
+    
+    this._fromRouter = true;
+    
     // Initilaze BottomTabBarController's TabBarItems
     this._renderer._rootController.tabBar = tabbarParams();
   }
@@ -166,21 +167,26 @@ class BottomTabBarRouter extends NativeRouterBase {
   /**
    * @ignore
    * @protected
-   * @param {*} index
+   * @param {number} index
    */
   shouldSelectByIndex(index) {
-    // var res = index !== this._currentIndex;
-    // this._currentIndex = index;
+    this._fromRouter = false;
     if (
       (this._tabStatus === userTabStatus.IDLE &&
         index !== this._currentIndex) ||
       this._tabStatus === userTabStatus.WAITING
     ) {
       this._tabStatus = userTabStatus.WAITING;
-      setTimeout(() => this.pushRoute(this._routes[index]));
+      (async function(scope) { 
+          console.log(`${scope} ${scope._routes[index]} ${index}`);
+          scope.pushRoute(scope._routes[index]);
+          return scope;
+        }(this))
+        .then((scope) => { scope._fromRouter = true})
+        .catch(e => alert(e.message+" "+e.stack, 'Error'));
     }
 
-    return this._tabStatus === userTabStatus.IDLE;
+    return this._currentIndex != index && this._tabStatus === userTabStatus.IDLE;
   }
 
   /**
@@ -242,7 +248,7 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @param {string} path
    */
   resolveIndex(path) {
-    return this._routes.findIndex(route => route.getUrlPath() === path);
+    return this._routes.findIndex(route => route.getUrlPath() === path || route.getRedirectto() === path);
   }
 
   /**
@@ -266,6 +272,19 @@ class BottomTabBarRouter extends NativeRouterBase {
     this._items = null;
     this._renderer = null;
   }
+  
+  push(path, routeData = {}) {
+    console.log(`${path} ${this._fromRouter} ${this.resolveIndex(path)} ${this._tabStatus}`);
+    if (this._fromRouter === false) {
+      console.log(`bottombar.push`);
+      const index = this.resolveIndex(path);
+      if(this.isVisited(index)){
+        return super.push(this._visitedIndexes[index].path, routeData);
+      }
+    }
+    
+    return super.push(path, routeData);
+  }
 
   /**
    * Before route entered
@@ -274,26 +293,26 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @protected
    */
   routeWillEnter(route) {
-    const state = route.getState();
+    // const state = route.getState();
     // this.routetoIndex(this.resolveIndex(state.match.path));
   }
 
-  /**
-   * Pushes a new route by index
-   *
-   * @protected
-   * @param {number} index
-   */
-  routetoIndex(index) {
-    index = index < 0 ? 0 : index;
-    this._renderer.setSelectedIndex(index);
-    this._renderer._rootController.show();
-    const route = this.resolveRoute(index);
-    route instanceof Router && this.pushRoute(route);
-    // this.isVisited(index) && this.activateIndex(index);
-    this.setVisited(index, route.getUrlPath());
-    this._currentIndex = index;
-  }
+  // /**
+  // * Pushes a new route by index
+  // *
+  // * @protected
+  // * @param {number} index
+  // */
+  // routetoIndex(index) {
+  //   index = index < 0 ? 0 : index;
+  //   this._renderer.setSelectedIndex(index);
+  //   this._renderer._rootController.show();
+  //   const route = this.resolveRoute(index);
+  //   route instanceof Router && this.pushRoute(route);
+  //   // this.isVisited(index) && this.activateIndex(index);
+  //   this.setVisited(index, route.getUrlPath());
+  //   this._currentIndex = index;
+  // }
 }
 
 module.exports = BottomTabBarRouter;

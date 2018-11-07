@@ -9,7 +9,9 @@ let historyController;
 
 let _lastRoute;
 const listeners = new Set();
+const history = [];
 const dispatch = (location, action) => {
+  history.push([location.pathnamme, action]);
   listeners.forEach(listener => listener(location, action));
 };
 
@@ -126,6 +128,14 @@ const dispatch = (location, action) => {
  * @extends {Route}
  */
 class Router extends Route {
+  
+  static getHistoryStack(){
+    return history.slice();
+  }
+  
+  static getHistoryByIndex(index){
+    return history[index];
+  }
   /**
    * Factory method to create a new Router instance
    *
@@ -216,6 +226,10 @@ class Router extends Route {
     this._historyController.listen((location, action) => {
       onHistoryChange(location, action, this); // fires root's onHistoryChange
     });
+    
+    this.dispatch = (location, action, target) => {
+      onHistoryChange(location, action, target);
+    };
   }
 
   /**
@@ -321,6 +335,7 @@ class Router extends Route {
   renderMatches(matches, location, action, target) {
     const routeData = location.state;
     matches.some(({ match, route }, index) => {
+      console.log(`renderMatche ${route}`);
       if (route !== this && route instanceof Router) {
         // if(index > 0 && this._isRoot)
         this.addChildRouter &&
@@ -353,7 +368,7 @@ class Router extends Route {
               })) ||
             {};
           route.setState({ match, action, routeData, routingState });
-          if (target != this) {
+          if (target != this && this._currentUrl !== match.url) {
             // if (!this.isUrlCurrent(match.url, action)) {
             this._historyController.preventDefault();
             switch (action) {
@@ -366,7 +381,7 @@ class Router extends Route {
             }
           }
 
-          // console.log(`matched ${_lastRoute} ${route}`);
+          console.log(`matched ${_lastRoute} ${route}`);
           _lastRoute && _lastRoute.routeDidExit(this);
           this.routeDidMatch(route); // fires routeDidMatch
           const view = this.renderRoute(route); // build route's view
@@ -386,7 +401,7 @@ class Router extends Route {
       }
     });
   }
-
+  
   /**
    * Handles a new route activated in the router
    *
@@ -519,6 +534,9 @@ class Router extends Route {
    * @param {Route} route
    */
   pushRoute(route) {
+    if(!(route instanceof Route))
+      throw new TypeError(`route must be instance of Route`);
+    console.log(`route : ${route}`);
     this.push(route.getRedirectto() || route.getUrlPath());
   }
 
@@ -530,6 +548,8 @@ class Router extends Route {
    * @return {Router}
    */
   push(path, routeData = {}) {
+    if(!path)
+      throw new TypeError(`path must not be empty`);
     if (path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;
     }
