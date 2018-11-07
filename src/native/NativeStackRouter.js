@@ -187,7 +187,7 @@ class NativeStackRouter extends NativeRouterBase {
   }
   
   push(path, routeData={}){
-    console.log(`nav push ${path} ${this._currentUrl}`);
+    // console.log(`nav push ${path} ${this._currentUrl}`);
     if(path === this._currentUrl){
       Object.assign(this._historyController.history.location.state.routeData, routeData);
       this.dispatch(this._historyController.history.location, 'PUSH', this);

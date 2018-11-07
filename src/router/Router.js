@@ -350,7 +350,6 @@ class Router extends Route {
 
         return true;
       } else if (match.isExact === true) {
-        // route has redirection
         if (
           route.routeShouldMatch(route, { match, action, routeData }) === true
         ) {
@@ -368,6 +367,8 @@ class Router extends Route {
               })) ||
             {};
           route.setState({ match, action, routeData, routingState });
+          
+          // If child router then push route to child route's history
           if (target != this && this._currentUrl !== match.url) {
             // if (!this.isUrlCurrent(match.url, action)) {
             this._historyController.preventDefault();
@@ -381,7 +382,6 @@ class Router extends Route {
             }
           }
 
-          console.log(`matched ${_lastRoute} ${route}`);
           _lastRoute && _lastRoute.routeDidExit(this);
           this.routeDidMatch(route); // fires routeDidMatch
           const view = this.renderRoute(route); // build route's view
