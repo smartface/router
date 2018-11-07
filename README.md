@@ -15,6 +15,7 @@ There are 5 types of routers
 - [NativeBottomTabBarRouter](https://smartface.github.io/router/class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html)
 - NativeModalRouter (in roadmap)
 - NativeSplitRouter (in roadmap)
+- NativeTopTabBarRouter (in roadmap)
 
 ## Installation
 
@@ -42,7 +43,7 @@ const router = Router.of({
     routes: [
         Route.of(routeBinder({
             path: "/pages/page2",
-            build: (match, state) => {
+            build: (router, route) => {
                 let Page2 = require("pages/page2");
                 return new Page2();
             }
@@ -62,7 +63,7 @@ const router = Router.of({
             routes: [
                 Route.of(routeBinder({
                     path: "/stack/path1",
-                    build: (match, state, router) => new Page1(state.data, router)
+                    build: (router, route) => new Page1(state.data, router)
                 })),
                 Route.of(routeBinder({
                     path: "/stack/path2",
