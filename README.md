@@ -159,11 +159,11 @@ function routeBinder(params){
 }
 
 const unlisten = router.listen((location, action) => {
-    // location.state.userState
-    console.log(` ---- new route location: ${location.pathname}`);
+    console.log(` ---- new route location: ${location.pathname} ${}`);
 });
 
 router.push("/bottom");
+
 ```
 
 ## Blocking Routes

@@ -1,5 +1,33 @@
 "use strict";
 
+/**
+ * @typedef {RouterParams} NativeStackRouterParams
+ * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
+ * @property {function():HeaderBarParams} headerBarParams See {@link NavigationController}
+ */
+
+/**
+ * @typedef {object} HeaderBarParams For more info {@link NavigationController}
+ * @property {{ transulent: boolean, 
+ *              alpha: number, 
+ *              backIndicatorImage: Image, 
+ *              backIndicatorTransitionMaskImage: Image, 
+ *              prefersLargeTitles: boolean}} ios
+ * @property {boolean} borderVisibility
+ * @property {Color} titleColor
+ * @property {boolean} transparent
+ * @property {boolean} visible
+ * @property {Color} backgroundColor
+ */
+
+/**
+ * @typedef NavigationControllerTransformEvent
+ * @property {Page} frompage
+ * @property {Page} topage
+ * @property {{operation: number}} operation
+ */
+
+
 const NativeRouterBase = require("./NativeRouterBase");
 const Router = require("../router/Router");
 const NavigationController = require("sf-core/ui/navigationcontroller");

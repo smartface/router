@@ -4,8 +4,8 @@ const { matchUrl } = require("./matchPath");
 
 /**
  * Creates a new HistoryController instance
+ * 
  * @param {{?initialEntries: Array, ?initialIndex: number, ?keyLength: number, ?getUserConfirmation: function, sensitive: boolean, strict: boolean}} param0
- * @param {HistoryController} parent
  * @return {HistoryController}
  */
 function createHistory(
@@ -18,8 +18,7 @@ function createHistory(
     sensitive = true,
     strict = false,
     path
-  } = {},
-  parent = null
+  } = {}
 ) {
   let routeBlocker = (blockerFn, callback) => {
     // console.log(`--- routeBlocker ${blockerFn} ${_preventDefault}`);
@@ -242,7 +241,6 @@ function createHistory(
       _unlistenAll.clear();
       _listeners.clear();
       _history = null;
-      parent = null;
       this.onGoBack = null;
     }
   }

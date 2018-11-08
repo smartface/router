@@ -23,77 +23,6 @@
  */
 
 /**
- * @typedef {object<string,string|object>} BottomTabBarItem Represent {@link TabBarItem} params
- * @property {Image} icon
- * @property {string} title
- */
-
-/**
- * @typedef {RouterParams} BottomTabBarRouterParams
- * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
- * @property {object} tabbarParams See {@link BottomTabbarController}
- */
-
-/**
- * @typedef {RouterParams} NativeStackRouterParams
- * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
- * @property {function():HeaderBarParams} headerBarParams See {@link NavigationController}
- */
-
-/**
- * @typedef {object} HeaderBarParams
- * @property {{transulent: boolean, alpha: number, backIndicatorImage: Image, backIndicatorTransitionMaskImage: Image, prefersLargeTitles: boolean}} ios
- * @property {boolean} borderVisibility
- * @property {Color} titleColor
- * @property {boolean} transparent
- * @property {boolean} visible
- * @property {Color} backgroundColor
- */
-
-/**
- * @typedef NavigationControllerTransformEvent
- * @property {Page} frompage
- * @property {Page} topage
- * @property {{operation: number}} operation
- */
-
-/**
- * @typedef {object} RouteMatch
- * @property {boolean} isExact if Requested path is an exact match or not.
- * @property {Object} params
- * @property {string} path
- * @property {string} url
- */
-
-/**
- * @typedef {object} RouteLocation
- * @property {string} pathname
- * @property {string} search
- * @property {string} hash
- * @property {RouteState} state
- * @property {string} key
- */
-
-/**
- * @typedef {object} RouteParams
- * @property {string} path
- * @property {Array<Route>} routes
- * @property {boolean} exact
- * @property {function(route: Route, nextState: RouteState)} routeShouldMatch Handles if route is mathed as request url
- * @property {function(Router: Router, route: Route)} routeDidEnter Handles if route is displayed
- * @property {function(Router: Router, route: Route)} routeDidExit Handles if route is removed
- */
-
-/**
- * @typedef {object} RouteState
- * @property {object} routeData
- * @property {string} action
- * @property {RouteMatch} match
- * @property {object} view 
- * @property {object} routingState Keeps user data when route runs
- */
-
-/**
  * @typedef {function(route: Route, nextState: RouteState)} RouteShouldMatchHandler
  */
 
@@ -114,21 +43,20 @@
  *
  * @typedef {object} History
  *
- * @property {number} length
- * @property {string} action
- * @property {number} index
+ * @property {number} length Length of the history stack
+ * @property {string} action Last action
+ * @property {number} index Current active index of the history
  * @property {Array<RouteLocation>} entries
- * @property {function} createHref
- * @property {function(path: string, data: object)} push
- * @property {function(path: string)} silencePush
- * @property {function(path: string, data: object)} replace
- * @property {function} rollback
- * @property {function(index: number)} go
- * @property {function} clear
- * @property {function} goBack
- * @property {function} goForward
- * @property {function(index: number):boolean} canGo
- * @property {function(fn: RouterBlockHandler):function} block
- * @property {function(fn: HistoryListener):function} listen
+ * @property {function} createHref Creates an appropriate url given data
+ * @property {function(path: string, data: object)} push Pushes a new entry
+ * @property {function(path: string, data: object)} replace Replaces specified history entry with a desired one
+ * @property {function} rollback Rollback last entry
+ * @property {function(index: number)} go Jumps to desired history entry by index
+ * @property {function} clear Clears all history
+ * @property {function} goBack Jumps to previous entry
+ * @property {function} goForward Jumps to next entry
+ * @property {function(index: number):boolean} canGo Checks if history goes back or not
+ * @property {function(fn: RouterBlockHandler):function} block Blocks history changes to ask user or run an another process then resume or break it.
+ * @property {function(fn: HistoryListener):function} listen Adds event-handlers to listen history changes.
  *
  */

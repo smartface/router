@@ -1,5 +1,42 @@
 "use strict";
 
+
+/**
+ * @typedef {object} RouteMatch Object seperately keeps parsed and matched data of the request for every route
+ * @property {boolean} isExact if Requested path is an exact match or not.
+ * @property {Object} params Request params like id or name is represented by '/path/:id' or '/path2/:name'
+ * @property {string} path Matched route's path
+ * @property {string} url Requested route path
+ */
+
+/**
+ * @typedef {object} RouteLocation History entry of a request
+ * @property {!string} pathname Requested url
+ * @property {?string} search Url's search data
+ * @property {?string} hash Url's hash data
+ * @property {?RouteState} state Route state
+ * @property {!string} key Unique key
+ */
+
+/**
+ * @typedef {object} RouteParams
+ * @property {!string} path Route Path definition
+ * @property {?Array<Route>} [=[]] routes Route children
+ * @property {?boolean} [=false] exact Points that a route match must be exact or not
+ * @property {?function(route: Route, nextState: RouteState)} routeShouldMatch Handles if route is mathed as request url
+ * @property {?function(Router: Router, route: Route)} routeDidEnter Handles if route is displayed
+ * @property {?function(Router: Router, route: Route)} routeDidExit Handles if route is removed
+ */
+
+/**
+ * @typedef {object} RouteState
+ * @property {?object} [={}] routeData Requested data by user
+ * @property {!string} action Request action 'PUSH', 'POP' or 'REPLACE'
+ * @property {!RouteMatch} match Request's match result
+ * @property {!object} view Keeps requested route's view
+ * @property {?object} [={}] routingState Keeps user data when route runs 
+ */
+
 const matchPath = require("../common/matchPath").matchPath;
 const mapComposer = require("../utils/map");
 
@@ -8,12 +45,14 @@ const mapComposer = require("../utils/map");
  * For internal use
  * @access private
  * @class
+ * @since 1.0.0
  */
 class RoutePath {
   /**
    * Factory method to create a new instance
    *
    * @param {string} path
+   * @since 1.0.0
    */
   static of(path) {
     return new RoutePath(path);
@@ -22,6 +61,7 @@ class RoutePath {
   /**
    * @constructor
    * @param {string} path
+   * @since 1.0.0
    */
   constructor(path) {
     this._path = path;
@@ -30,6 +70,7 @@ class RoutePath {
   /**
    * Returns route path
    * @return {string}
+   * @since 1.0.0
    */
   getPath() {
     return this._path;
@@ -39,6 +80,7 @@ class RoutePath {
    * Returns route is root or not.
    *
    * @returns {boolean}
+   * @since 1.0.0
    */
   isRoot() {
     return this._path === "/";
@@ -47,6 +89,7 @@ class RoutePath {
   /**
    * Return quick representaion of the route-path
    *
+   * @since 1.0.0
    * @returns {{path: string, isRoot: boolean}}
    */
   toObject() {
@@ -57,6 +100,7 @@ class RoutePath {
   }
 
   /**
+   * @since 1.0.0
    * @returns {RoutePath}
    */
   clone() {
@@ -66,6 +110,7 @@ class RoutePath {
   /**
    * Return path is empty or not
    *
+   * @since 1.0.0
    * @return {boelean}
    */
   hasPath() {
@@ -75,12 +120,15 @@ class RoutePath {
 
 /**
  * Route implementation
+ * 
+ * @since 1.0.0
  * @class
  */
 class Route {
   /**
    * Static helper method to create a new instance of Route
    *
+   * @since 1.0.0
    * @static
    * @param {RouteParams} param
    * @return {Route}
@@ -132,6 +180,7 @@ class Route {
   /**
    * Merges specified state to current route state
    *
+   * @since 1.0.0
    * @param {object}
    */
   setState(state) {
@@ -141,6 +190,7 @@ class Route {
   /**
    * Returns Route's current state
    *
+   * @since 1.0.0
    * @return {RouteState}
    */
   getState() {
@@ -150,6 +200,7 @@ class Route {
   /**
    * Simple Object representation of the route
    *
+   * @since 1.0.0
    * @return {{path: string, routes: Array<object>}}
    */
   toObject() {
@@ -162,6 +213,7 @@ class Route {
   /**
    * String representation of the route
    *
+   * @since 1.0.0
    * @return {string}
    */
   toString() {
@@ -171,6 +223,7 @@ class Route {
   /**
    * Helper method to return excat path of the component
    *
+   * @since 1.0.0
    * @return {string}
    */
   get routePath() {
@@ -180,6 +233,7 @@ class Route {
   /**
    * Returns redirection path
    *
+   * @since 1.0.0
    * @return {string}
    */
   getRedirectto() {
@@ -192,6 +246,8 @@ class Route {
    * There are some exceptions:
    * - going into a tab, which the tab is created before
    * - for iOS, goingBack via gesture or headerBar back
+   * 
+   * @since 1.0.0
    * @param {RouteMatch} match
    * @param {RouteState} state
    * @param {Router} router - Not the root router, the router which the route belongs to.
@@ -215,7 +271,9 @@ class Route {
    * })
    *
    * ...
+   * 
    * @protected
+   * @since 1.0.0
    * @event
    * @emits routeShouldMatch
    * @param {RouteMatch} match
@@ -246,7 +304,7 @@ class Route {
   }
 
   /**
-   * Handles route is removed
+   * Handles that route is removed by router
    * @example
    * ....
    * Route.of({
@@ -256,6 +314,7 @@ class Route {
    * })
    *
    * ...
+   * @since 1.0.0
    * @emits routeDidExit
    * @event
    * @param {Router} router
@@ -265,8 +324,9 @@ class Route {
   }
 
   /**
-   * Route has a path
+   * If Route has a path or not
    *
+   * @since 1.0.0
    * @returns {boolean}
    */
   hasPath() {
@@ -291,6 +351,7 @@ class Route {
   /**
    * Returns route path as string
    *
+   * @since 1.0.0
    * @returns {string}
    */
   getUrlPath() {
@@ -300,6 +361,7 @@ class Route {
   /**
    * Clones route's path and returns
    *
+   * @since 1.0.0
    * @return {RoutePath}
    */
   getPath() {
@@ -308,6 +370,7 @@ class Route {
 
   /**
    * Clones new instance of the route
+   * @since 1.0.0
    * @ignore
    * @returns {Route}
    */

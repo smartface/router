@@ -34,97 +34,97 @@ const dispatch = (location, action) => {
  *
  * @class
  * @example
- ```js
-  const router = Router.of({
-    path: "/",
-    to: "/pages/page2",
-    isRoot: true,
-    routes: [
-        Route.of({
-            path: "/pages/page2",
-            build: (match, state) => {
-                let Page2 = require("pages/page2");
-                return new Page2();
-            }
-        }),
-        StackRouter.of({
-            path: "/stack",
-            to: "/stack/path1",
-            headerBarParams: () => { ios: { translucent: true } },
-            routes: [
-                Route.of({
-                    path: "/stack/path1",
-                    build: (match, state, router) => new Page1(state.data, router)
-                }),
-                Route.of({
-                    path: "/stack/path2",
-                    routeShouldMatch: (route, nextState) => {
-                        console.log('routeShouldMatch');
-                        if (!nextState.routeData.applied) {
-                            // blocks route changing
-                            return false;
-                        }
-                        return false;
-                    },
-                    build: (router, route) => {
-                        const { routeData, view } = route.getState();
-                        return new Page2(routeData, router);
-                    }
-                })
-            ]
-        }),
-        BottomTabBarRouter.of({
-            path: "/bottom",
-            to: "/bottom/stack2/path1",
-            tabbarParams: () => ({
-                ios: { translucent: false },
-                itemColor: Color.RED,
-                unselectedItemColor: Color.YELLOW,
-                backgroundColor: Color.BLUE
-            }),
-            items: () => [{ title: "page1" }, { title: "page2" }, { title: "page3" }],
-            routes: [
-                StackRouter.of({
-                    path: "/bottom/stack",
-                    to: "/bottom/stack/path1",
-                    headerBarParams: () => { ios: { translucent: false } },
-                    routes: [
-                        Route.of({
-                            path: "/bottom/stack/path1",
-                            build: (router, route) => new Page1(route.getState().routeData, router, "/stack/path2")
-                        }),
-                        Route.of({
-                            path: "/bottom/stack/path2",
-                            build: (router, route) => {
-                                const { routeData, view } = route.getState();
-
-                                return new Page2(routeData, router, "/bottom/stack2/path1");
-                            }
-                        })
-                    ]
-                }),
-                StackRouter.of({
-                    path: "/bottom/stack2",
-                    to: "/bottom/stack2/path1",
-                    headerBarParams: () => { ios: { translucent: false } },
-                    routes: [
-                        Route.of({
-                            path: "/bottom/stack2/path1",
-                            build: (router, route) => new Page1(route.getState().routeData, router, "/bottom/stack/path2")
-                        }),
-                        Route.of({
-                            path: "/bottom/stack2/path2",
-                            build: (router, route) => {
-                                return new Page2(route.getState().routeData, router);
-                            }
-                        })
-                    ]
-                })
-            ]
-        })
-    ]
-});
-```
+ *  const router = Router.of({
+ *   path: "/",
+ *   to: "/pages/page2",
+ *   isRoot: true,
+ *   routes: [
+ *       Route.of({
+ *           path: "/pages/page2",
+ *           build: (match, state) => {
+ *               let Page2 = require("pages/page2");
+ *               return new Page2();
+ *           }
+ *       }),
+ *       StackRouter.of({
+ *           path: "/stack",
+ *           to: "/stack/path1",
+ *           headerBarParams: () => { ios: { translucent: true } },
+ *           routes: [
+ *               Route.of({
+ *                   path: "/stack/path1",
+ *                   build: (match, state, router) => new Page1(state.data, router)
+ *               }),
+ *               Route.of({
+ *                   path: "/stack/path2",
+ *                   routeShouldMatch: (route, nextState) => {
+ *                       console.log('routeShouldMatch');
+ *                       if (!nextState.routeData.applied) {
+ *                           // blocks route changing
+ *                           return false;
+ *                       }
+ *                       return false;
+ *                   },
+ *                   build: (router, route) => {
+ *                       const { routeData, view } = route.getState();
+ *                       return new Page2(routeData, router);
+ *                   }
+ *               })
+ *           ]
+ *       }),
+ *       BottomTabBarRouter.of({
+ *           path: "/bottom",
+ *           to: "/bottom/stack2/path1",
+ *           tabbarParams: () => ({
+ *               ios: { translucent: false },
+ *               itemColor: Color.RED,
+ *               unselectedItemColor: Color.YELLOW,
+ *               backgroundColor: Color.BLUE
+ *           }),
+ *           items: () => [{ title: "page1" }, { title: "page2" }, { title: "page3" }],
+ *           routes: [
+ *               StackRouter.of({
+ *                   path: "/bottom/stack",
+ *                   to: "/bottom/stack/path1",
+ *                   headerBarParams: () => { ios: { translucent: false } },
+ *                   routes: [
+ *                       Route.of({
+ *                           path: "/bottom/stack/path1",
+ *                           build: (router, route) => new Page1(route.getState().routeData, router, "/stack/path2")
+ *                       }),
+ *                       Route.of({
+ *                           path: "/bottom/stack/path2",
+ *                           build: (router, route) => {
+ *                               const { routeData, view } = route.getState();
+ *
+ *                               return new Page2(routeData, router, "/bottom/stack2/path1");
+ *                           }
+ *                       })
+ *                   ]
+ *               }),
+ *               StackRouter.of({
+ *                   path: "/bottom/stack2",
+ *                   to: "/bottom/stack2/path1",
+ *                   headerBarParams: () => { ios: { translucent: false } },
+ *                   routes: [
+ *                       Route.of({
+ *                           path: "/bottom/stack2/path1",
+ *                           build: (router, route) => new Page1(route.getState().routeData, router, "/bottom/stack/path2")
+ *                       }),
+ *                       Route.of({
+ *                           path: "/bottom/stack2/path2",
+ *                           build: (router, route) => {
+ *                               return new Page2(route.getState().routeData, router);
+ *                           }
+ *                       })
+ *                   ]
+ *               })
+ *           ]
+ *       })
+ *   ]
+ * });
+ * 
+ * @since 1.0.0
  * @extends {Route}
  */
 class Router extends Route {
@@ -202,7 +202,8 @@ class Router extends Route {
   /**
    * Router is initialized by parent
    *
-   * @private
+   * @protected
+   * @since 1.0.0
    * @param {HistoryListener} parentHistory
    * @param {function} onHistoryChange Root onHistoryChange handler
    */
@@ -233,14 +234,16 @@ class Router extends Route {
 
   /**
    * @ignore
+   * @since 1.0.0
    */
   getHistory() {
     return this._historyController.history;
   }
 
   /**
-   * Return current url path
+   * Return current url
    *
+   * @since 1.0.0
    * @return {string}
    */
   getCurrentUrl() {
@@ -248,8 +251,13 @@ class Router extends Route {
   }
 
   /**
-   * Adds specified eventlistener to handle history changes
+   * Adds eventlisteners to listen history changes
+   * @example
+   * const unlisten = router.listen((location, action) => {
+   *     console.log(` ---- new route location: ${location.pathname} action : ${action}`);
+   * });
    *
+   * @since 1.0.0
    * @param {HistoryListener} fn
    */
   listen(fn) {
@@ -284,6 +292,7 @@ class Router extends Route {
    *  });
    * });
    *
+   * @since 1.0.0
    * @param {RouterBlockHandler} fn
    */
   addRouteBlocker(fn) {
@@ -302,6 +311,7 @@ class Router extends Route {
    * Handles history changes. Just Root router, because routing flow mmust be always root to children,
    * in order to change display logic all the time.
    *
+   * @since 1.0.0
    * @protected
    * @param {RouteLocation} location
    * @param {Object} action
@@ -314,6 +324,7 @@ class Router extends Route {
   /**
    * Removes last entry from history.
    *
+   * @since 1.0.0
    * @ignore
    * @protected
    */
@@ -326,6 +337,7 @@ class Router extends Route {
    *
    * @protected
    *
+   * @since 1.0.0
    * @emits RouteShouldMatchHandler
    * @param {Array<{isExact: boolean,params: object,path: string,url: string}>} matches
    * @param {RouteState} state
@@ -403,6 +415,7 @@ class Router extends Route {
   /**
    * Handles a new route activated in the router
    *
+   * @since 1.0.0
    * @event
    * @protected
    * @param {Route} route
@@ -410,6 +423,7 @@ class Router extends Route {
   routerWillEnter(route) {}
 
   /**
+   * @since 1.0.0
    * @ignore
    * @param {string} url
    * @param {string} action
@@ -431,6 +445,7 @@ class Router extends Route {
    *
    * ...
    *
+   * @since 1.0.0
    * @emits routerDidEnter
    * @protected
    * @param {RouteState} Route
@@ -442,6 +457,7 @@ class Router extends Route {
   /**
    * Sets the router statically as active router
    *
+   * @since 1.0.0
    * @protected
    * @param {string} action
    */
@@ -456,6 +472,7 @@ class Router extends Route {
   /**
    * Handles router is deactivated.
    *
+   * @since 1.0.0
    * @example
    * ....
    * Router.of({
@@ -487,6 +504,7 @@ class Router extends Route {
   }
 
   /**
+   * @since 1.0.0
    * @private
    * @ignore
    * @param {Page} view
@@ -498,6 +516,7 @@ class Router extends Route {
   /**
    * Route is matched handler
    *
+   * @since 1.0.0
    * @protected
    * @param {Route} route
    * @param {RouteState} nextState
@@ -514,6 +533,7 @@ class Router extends Route {
   /**
    * Render route
    *
+   * @since 1.0.0
    * @protected
    * @param {Route} route
    * @throws {TypeError}
@@ -528,6 +548,7 @@ class Router extends Route {
   /**
    * Helper method that pushes the route's url to history
    *
+   * @since 1.0.0
    * @protected
    * @param {Route} route
    */
@@ -565,6 +586,7 @@ class Router extends Route {
   /**
    * Replaces specified path's state
    *
+   * @since 1.0.0
    * @ignore
    * @param {string} path
    * @param {data} data
@@ -575,6 +597,7 @@ class Router extends Route {
 
   /**
    * Rewinds the history
+   * @since 1.0.0
    */
   goBack() {
     if (Router.blocker) {
@@ -591,6 +614,7 @@ class Router extends Route {
   /**
    * Returns last location of history
    *
+   * @since 1.0.0
    * @return {RouteLocation}
    */
   getLocation() {
@@ -600,6 +624,7 @@ class Router extends Route {
   /**
    * Returns History entries as Array
    *
+   * @since 1.0.0
    * @return {Array<string>}
    */
   getHistoryasArray() {
@@ -608,6 +633,7 @@ class Router extends Route {
 
   /**
    * Forwards history
+   * @since 1.0.0
    */
   goForward() {
     this._historyController.history.goForward();
@@ -617,6 +643,7 @@ class Router extends Route {
    * Changes route by history index.
    *
    * @experimental
+   * @since 1.0.0
    * @ignore
    * @param {number} index
    * @return {boolean}
@@ -629,6 +656,7 @@ class Router extends Route {
   /**
    * Adds new route
    *
+   * @since 1.0.0
    * @ignore
    * @experimental
    * @param {Route} route
@@ -640,6 +668,7 @@ class Router extends Route {
   /**
    * Iterates child routes
    *
+   * @since 1.0.0
    * @param {function} fn
    * @return {Array}
    */
@@ -649,6 +678,7 @@ class Router extends Route {
 
   /**
    * Unloads the router
+   * @since 1.0.0
    */
   dispose() {
     this._historyUnlisten();

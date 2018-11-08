@@ -91,14 +91,19 @@ class NativeRouter extends NativeRouterBase {
    * @param {NativeRouter[]|NativeStackRouter[]|BottomTabBarRouter[]} router
    */
   addChildRouter(router) {
-    this._renderer.show(router._renderer._rootController);
+    const Renderer = require("./Renderer");
+    // this._renderer.show(router._renderer._rootController);
+    Renderer.setasRoot(router._renderer._rootController);
   }
 
   /**
    * @override
    */
   routeWillEnter(route) {
-    this._renderer.show(route.getState().view);
+    const Renderer = require("./Renderer");
+    // this._renderer.show(router._renderer._rootController);
+    Renderer.setasRoot(route.getState().view);
+    // this._renderer.show(route.getState().view);
   }
 }
 

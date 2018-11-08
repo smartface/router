@@ -1,6 +1,17 @@
 "use strict";
 
-const Router = require("../router/Router");
+/**
+ * @typedef {object<string,string|object>} BottomTabBarItem Represent {@link TabBarItem} params
+ * @property {Image} icon
+ * @property {string} title
+ */
+
+/**
+ * @typedef {RouterParams} BottomTabBarRouterParams
+ * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
+ * @property {object} tabbarParams See {@link BottomTabbarController}
+ */
+
 const NativeRouterBase = require("./NativeRouterBase");
 const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
 const createRenderer = require("./createRenderer");
