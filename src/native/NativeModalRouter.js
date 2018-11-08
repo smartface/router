@@ -40,14 +40,14 @@ class NativeModalRouter extends NativeRouterBase {
   /**
    * Create OS specific NativeRouter instance
    * @static
-   * @param {RouterParams} options 
+   * @param {RouterParams} options
    * @returns {NativeRouter}
    */
   static of(options) {
     options.renderer = createRenderer();
     return new NativeModalRouter(options);
   }
-  
+
   /**
    * @constructor
    * @param {RouterParams} param

@@ -1,7 +1,6 @@
 "use strict";
 const createMemoryHistory = require("./history");
 const { matchUrl } = require("./matchPath");
-const createTransitionMManager = require("./createTransitionManager");
 
 /**
  * Creates a new HistoryController instance
@@ -68,8 +67,6 @@ function createHistory(
   class HistoryController {
     constructor() {}
 
-    globalListener() {}
-
     clearBlocker() {
       _unblock && _unblock();
     }
@@ -79,12 +76,10 @@ function createHistory(
      */
     preventDefault() {
       _preventDefault = true;
-      // _nodes.forEach(node => node.preventDefault());
     }
 
     clearPreventDefault() {
       _preventDefault = false;
-      // _nodes.forEach(node => node.clearPreventDefault());
     }
 
     block(prompt) {
@@ -98,40 +93,27 @@ function createHistory(
       };
     }
 
+    getHistoryasArray() {
+      return _history.entries.map(item => item.pathname);
+    }
+
     /**
-     * @param {object} props
+     * @param {object} [={}] props Node properties
      * @return {HistoryController}
      */
     createNode(props = {}) {
       const node = createHistory(props, this);
-      // _listeners.forEach(listener => _unlistenAll.add(node.listen(listener)));
-      // _unlistenAll.add(node.listen(listener));
       _nodes.add(node);
       // bubbles history goback to root if go back could be possible.
       node.onGoBack = () => {
         if (_history.length > 0) {
-          // if (block) {
-          //   const unblock = this.block((location, action, okFn) => {
-          //     block(location, action, v => {
-          //       okFn(v);
-          //       unblock();
-          //     });
-          //   });
-          // }
+          // _listeners.forEach(listener => listener(_history.location, 'POP'))
           _history.go(-1);
         } else this.onGoBack && this.onGoBack();
       };
       // bubbles history push to root if push could be possible.
       node.onPush = (path, data) => {
         if (this.canPush(path)) {
-          // if (block) {
-          //   const unblock = _history.block((location, action, okFn) => {
-          //     return block(location, action, v => {
-          //       okFn(v);
-          //       unblock();
-          //     });
-          //   });
-          // }
           this.push(path, data);
         } else {
           this.onPush && this.onPush(path, data);
@@ -157,7 +139,8 @@ function createHistory(
     }
 
     /**
-     * Calls history.goBack()
+     * Removes last history entry
+     *
      * @todo notify all listeners as action is rollback
      */
     rollback() {
@@ -174,9 +157,9 @@ function createHistory(
     }
 
     /**
+     * If the url is available to push or not.
      *
-     * @param {string} url
-     * @param {{path: string, exact: string, }}} param1
+     * @param {string} url - Url will be pushed.
      */
     canPush(url) {
       const res = matchUrl(url, _options);
@@ -184,21 +167,22 @@ function createHistory(
     }
 
     /**
-     * Calls history.push
+     * Pushes a new url to history
      *
-     * @param {string} path
-     * @param {object} state
+     * @param {string} url - Url will be pushed.
+     * @param {object} routeData - Requested route data
      */
-    push(path, state = {}) {
-      console.log(`history push ${path}`);
-      this.canPush(path)
-        ? _history.push(path, state)
-        : !_preventDefault && this.onPush && this.onPush(path, state, _prompt);
+    push(url, routeData = {}) {
+      this.canPush(url)
+        ? _history.push(url, routeData)
+        : !_preventDefault &&
+          this.onPush &&
+          this.onPush(url, routeData, _prompt);
       _preventDefault && this.clearPreventDefault();
     }
 
     /**
-     * Calls and returns History.canGo to test history can go back.
+     * If history can be gone back or not
      *
      * @return boolean
      */
@@ -212,15 +196,15 @@ function createHistory(
     goBack() {
       this.canGoBack()
         ? _history.goBack()
-        : !_preventDefault && this.onGoBack && this.onGoBack(_prompt);
+        : !_preventDefault && this.onGoBack && this.onGoBack();
       _preventDefault && this.clearPreventDefault();
     }
 
     /**
      * Adds history change handler and returns unlisten function
      *
-     * @param {HistoryListener} fn
-     * @return {function}
+     * @param {HistoryListener} fn Event handler callback
+     * @return {function} unlisten function
      */
     listen(fn) {
       const unlisten = new Set();

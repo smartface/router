@@ -32,14 +32,14 @@ const createRenderer = require("./createRenderer");
  *      routes: [
  *        Route.of({
  *          path: "/pages/page1",
- *          build((match, state, router, view) => {
+ *          build((router, route) => {
  *            const Page1 = require('/pages/Page1');
  *            return new Page1(state.data, router);
  *          })
  *        }),
  *        Route.of({
  *          path: "/pages/page2",
- *          build((match, state, router, view) => {
+ *          build((router, route) => {
  *            const Page2 = require('/pages/Page2');
  *            return new Page2(state.data, router);
  *          });
@@ -158,12 +158,16 @@ class NativeStackRouter extends NativeRouterBase {
           // set Router to skip next history change
           // this._fromRouter = false;
           try {
-            console.log(JSON.stringify(this.getHistoryasArray()))
+            console.log(JSON.stringify(this.getHistoryasArray()));
             this._historyController.preventDefault();
             this._historyController.goBack();
-            console.log(JSON.stringify(this.getHistoryasArray()))
+            console.log(JSON.stringify(this.getHistoryasArray()));
             this._fromRouter = false;
-            this.dispatch(this._historyController.history.location, 'POP', this);
+            this.dispatch(
+              this._historyController.history.location,
+              "POP",
+              this
+            );
             this._fromRouter = true;
           } catch (e) {
             throw e;
@@ -185,16 +189,19 @@ class NativeStackRouter extends NativeRouterBase {
     super.dispose();
     this._unlistener();
   }
-  
-  push(path, routeData={}){
+
+  push(path, routeData = {}) {
     // console.log(`nav push ${path} ${this._currentUrl}`);
-    if(path === this._currentUrl){
-      Object.assign(this._historyController.history.location.state.routeData, routeData);
-      this.dispatch(this._historyController.history.location, 'PUSH', this);
-      
+    if (path === this._currentUrl) {
+      Object.assign(
+        this._historyController.history.location.state.routeData,
+        routeData
+      );
+      this.dispatch(this._historyController.history.location, "PUSH", this);
+
       return this;
     }
-    
+
     return super.push(path, routeData);
   }
 
@@ -208,7 +215,8 @@ class NativeStackRouter extends NativeRouterBase {
           this._renderer.pushChild(state.view);
         break;
       case "POP":
-        if (this._fromRouter && Router.currentRouter === this) this._renderer.popChild();
+        if (this._fromRouter && Router.currentRouter === this)
+          this._renderer.popChild();
         break;
     }
   }
