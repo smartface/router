@@ -30,26 +30,105 @@ describe("Router", () => {
       routes: [
         new Route({
           path: "/path/to/:name",
-          build: (props, match) => ({
+          build: (router, route) => ({
             type: "target1"
           })
         }),
         new Route({
           path: "/path/to/:id",
-          build: (props, match) => ({
+          build: (router, route) => ({
             type: "target2"
           })
         }),
         new Route({ path: "*", build: (props, match) => ({ type: "target3" }) })
       ]
     });
-
     // let matches = matchRoutes([router], "/path/to/1").map(
     //   ({ match, route }) => ({ match, route: route.toObject(), view: route.build() })
     // );
     router.push("/path/to/1");
     expect(router.getHistory().length > 0).toBe(true);
   });
+
+  it("should add last route to child owner router.", () => {
+    let _router1;
+    let _router2;
+    let lastUrl;
+    const router = new Router({
+      path: "/",
+      exact: false,
+      isRoot: true,
+      routes: [
+        new Router({
+          path: "/path",
+          routes: [
+            new Router({
+              path: "/path/to",
+              routes: [
+                new Route({
+                  path: "/path/to/the/:id",
+                  build: (router, route) => {
+                    _router1 = router;
+                    lastUrl = route.getState().match.url;
+                    return { type: "target2" };
+                  }
+                })
+              ]
+            })
+          ]
+        }),
+        new Router({
+          path: "/path2",
+          build: (router, route) => ({
+            type: "target1"
+          }),
+          routes: [
+            new Route({
+              path: "/path2/to/:id",
+              build: (router, route) => {
+                lastUrl = route.getState().match.url;
+                _router2 = router;
+                return { type: "target2" };
+              }
+            })
+          ]
+        }),
+        new Route({ path: "*", build: (props, match) => ({ type: "target3" }) })
+      ]
+    });
+    // let matches = matchRoutes([router], "/path/to/1").map(
+    //   ({ match, route }) => ({ match, route: route.toObject(), view: route.build() })
+    // );
+    router.push("/path/to/the/1");
+    expect(lastUrl).toBe("/path/to/the/1");
+
+    _router1.push("/path2/to/1");
+    expect(lastUrl).toBe("/path2/to/1");
+
+    _router2.push("/path/to/the/2");
+    expect(lastUrl).toBe("/path/to/the/2");
+
+    _router1.goBack();
+    expect(lastUrl).toBe("/path/to/the/1");
+
+    _router2.goBack();
+    expect(lastUrl).toBe("/path2/to/1");
+
+    _router2.goBack();
+    expect(lastUrl).toBe("/path/to/the/1");
+
+    expect(router.getHistoryasArray()).toEqual([
+      "/path/to/the/1",
+      "/path2/to/1",
+      "/path/to/the/2"
+    ]);
+    expect(_router1.getHistoryasArray()).toEqual([
+      "/path/to/the/1",
+      "/path/to/the/2"
+    ]);
+    expect(_router2.getHistoryasArray()).toEqual(["/path2/to/1"]);
+  });
+
   it("finds target by url", () => {
     const router = new Router({
       path: "/",
