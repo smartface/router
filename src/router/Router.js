@@ -123,7 +123,7 @@ const dispatch = (location, action) => {
  *       })
  *   ]
  * });
- * 
+ *
  * @since 1.0.0
  * @extends {Route}
  */
@@ -196,7 +196,6 @@ class Router extends Route {
     this._exact = exact;
     this._strict = strict;
     this._sensitive = sensitive;
-    // this._cache = new WeakMap();
   }
 
   /**
@@ -208,6 +207,7 @@ class Router extends Route {
    * @param {function} onHistoryChange Root onHistoryChange handler
    */
   initialize(parentHistory, onHistoryChange) {
+    /** @type {HistoryController} */
     this._historyController = parentHistory.createNode(
       Object.assign({}, this._options, {
         getUserConfirmation: (blockerFn, callback) => {
@@ -227,6 +227,7 @@ class Router extends Route {
       onHistoryChange(location, action, this); // fires root's onHistoryChange
     });
 
+    // changes route without history
     this.dispatch = (location, action, target) => {
       onHistoryChange(location, action, target);
     };
@@ -317,12 +318,13 @@ class Router extends Route {
    * @param {Object} action
    */
   onHistoryChange(location, action, target) {
+    // console.log(location, action);
     this._matches = matchRoutes([this].concat(this._routes), location.pathname);
     this.renderMatches(this._matches, location, action, target);
   }
 
   /**
-   * Removes last entry from history.
+   * Removes last entry from history without trigger history is changed.
    *
    * @since 1.0.0
    * @ignore
@@ -340,7 +342,7 @@ class Router extends Route {
    * @since 1.0.0
    * @emits RouteShouldMatchHandler
    * @param {Array<{isExact: boolean,params: object,path: string,url: string}>} matches
-   * @param {RouteState} state
+   * @param {RouteLocation} location
    * @param {string} action
    */
   renderMatches(matches, location, action, target) {
@@ -376,6 +378,7 @@ class Router extends Route {
                 routeData
               })) ||
             {};
+
           route.setState({ match, action, routeData, routingState });
 
           // If child router then push or pop route to child route's history
@@ -384,7 +387,7 @@ class Router extends Route {
             this._historyController.preventDefault();
             switch (action) {
               case "PUSH":
-                this._historyController.push(match.path, routeData);
+                this._historyController.push(match.url, routeData);
                 break;
               case "POP":
                 this._historyController.goBack();
@@ -494,13 +497,13 @@ class Router extends Route {
    *
    * @protected
    * @param {Route} route
-   * @param {RouteState} state
+   * @param {object} routeData
    * @param {string} action
    */
-  redirectRoute(route, state, action) {
+  redirectRoute(route, routeData, action) {
     // redirection of a route
     this.routeRollback(); // remove last route from history
-    this.push(route.getRedirectto(), state && state.data); // and add new route
+    this.push(route.getRedirectto(), routeData); // and add new route
   }
 
   /**
@@ -562,7 +565,7 @@ class Router extends Route {
    * Change history by specified path
    *
    * @param {object|string} path - Path or matches of the route
-   * @param {!object} [data={}] data - Routing data
+   * @param {!object} [routeData={}] routeData - Routing data
    * @return {Router}
    */
   push(path, routeData = {}) {
@@ -573,12 +576,12 @@ class Router extends Route {
 
     if (Router.blocker) {
       Router.blocker(this, path, routeData, "PUSH", () =>
-        this._historyController.push(path, { routeData })
+        this._historyController.push(path, routeData)
       );
 
       return this;
     }
-    this._historyController.push(path, { routeData });
+    this._historyController.push(path, routeData);
 
     return this;
   }
@@ -592,7 +595,7 @@ class Router extends Route {
    * @param {data} data
    */
   replace(path, routeData) {
-    this._historyController.history.replace(path, { routeData });
+    this._historyController.history.replace(path, routeData);
   }
 
   /**
