@@ -350,8 +350,7 @@ class Router extends Route {
     matches.some(({ match, route }, index) => {
       if (route !== this && route instanceof Router) {
         // if(index > 0 && this._isRoot)
-        this.addChildRouter &&
-          actions.push(this.addChildRouter.bind(this, route)); // add new router display logic from root to children
+        actions.push([this, route]); // add new router display logic from root to children
         // move routes to child router
         route.renderMatches(
           matches.slice(index, matches.length),
@@ -400,7 +399,7 @@ class Router extends Route {
           const view = this.renderRoute(route); // build route's view
           route.setState({ view }); // keep view in the route's state
           this.routeWillEnter && this.routeWillEnter(route); // fires routeWillEnter
-          actions.forEach(item => item()); // display routers' view
+          actions.forEach(([parent, child]) => parent.addChildRouter && parent.addChildRouter(child)); // display routers' view
           this.routerDidEnter && this.routerDidEnter(route); // fires routerDidEnter
           route.routeDidEnter(this); // fires routeDidEnter
           _lastRoute = route; // save matched route as last route
