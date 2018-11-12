@@ -61,6 +61,7 @@ describe("Router", () => {
       routes: [
         new Router({
           path: "/path",
+          to: "/path/to/the/3",
           routes: [
             new Router({
               path: "/path/to",
@@ -105,13 +106,155 @@ describe("Router", () => {
     _router1.push("/path2/to/1");
     expect(lastUrl).toBe("/path2/to/1");
 
-    _router2.push("/path/to/the/2");
-    expect(lastUrl).toBe("/path/to/the/2");
+    _router2.push("/path");
+    expect(lastUrl).toBe("/path/to/the/3");
+
+    expect(router.getHistoryasArray()).toEqual([
+      "/path/to/the/1",
+      "/path2/to/1",
+      "/path/to/the/3"
+    ]);
 
     _router1.goBack();
     expect(lastUrl).toBe("/path/to/the/1");
 
     _router2.goBack();
+    expect(lastUrl).toBe("/path2/to/1");
+
+    _router2.goBack();
+    expect(lastUrl).toBe("/path/to/the/1");
+
+    expect(router.getHistoryasArray()).toEqual([
+      "/path/to/the/1",
+      "/path2/to/1",
+      "/path/to/the/3"
+    ]);
+    expect(_router1.getHistoryasArray()).toEqual([
+      "/path/to/the/1",
+      "/path/to/the/3"
+    ]);
+    expect(_router2.getHistoryasArray()).toEqual(["/path2/to/1"]);
+  });
+
+  it("should call route's build when history goes back", () => {
+    let lastUrl, router1;
+    const router = new Router({
+      path: "/",
+      isRoot: true,
+      routes: [
+        new Router({
+          path: "/path2",
+          build: (router, route) => ({
+            type: "target1"
+          }),
+          routes: [
+            new Route({
+              path: "/path2/to/:id",
+              build: (router, route) => {
+                lastUrl = route.getState().match.url;
+                router1 = router;
+                return { type: "target2" };
+              }
+            })
+          ]
+        })
+      ]
+    });
+
+    router.push("/path2/to/0");
+    expect(lastUrl).toBe("/path2/to/0");
+    router1.push("/path2/to/1");
+    expect(lastUrl).toBe("/path2/to/1");
+    router1.goBack();
+    expect(lastUrl).toBe("/path2/to/0");
+  });
+  it("should add last route to root router whenever a route redirects.", () => {
+    let _router1;
+    let _router2;
+    let lastUrl;
+    const router = new Router({
+      path: "/",
+      to: "/path/to/the/1",
+      exact: false,
+      isRoot: true,
+      routes: [
+        new Router({
+          path: "/path",
+          to: "/path/to/the/2",
+          routes: [
+            new Router({
+              path: "/path/to",
+              routes: [
+                new Route({
+                  path: "/path/to/the/:id",
+                  build: (router, route) => {
+                    _router1 = router;
+                    lastUrl = route.getState().match.url;
+                    return { type: "target2" };
+                  }
+                })
+              ]
+            })
+          ]
+        }),
+        new Router({
+          path: "/path2",
+          build: (router, route) => ({
+            type: "target1"
+          }),
+          routes: [
+            new Route({
+              path: "/path2/to/:id",
+              build: (router, route) => {
+                lastUrl = route.getState().match.url;
+                _router2 = router;
+                return { type: "target2" };
+              }
+            })
+          ]
+        }),
+        new Route({
+          path: "*",
+          build: (props, match) => ({ type: "target3" })
+        })
+      ]
+    });
+    // let matches = matchRoutes([router], "/path/to/1").map(
+    //   ({ match, route }) => ({ match, route: route.toObject(), view: route.build() })
+    // );
+
+    // router.listen((location, action) => {
+    //   console.log("---------------");
+    //   console.log(location.pathname, action);
+    //   console.log(router.getHistoryasArray());
+    // });
+    router.push("/");
+    expect(lastUrl).toBe("/path/to/the/1");
+    expect(_router1.getHistoryasArray()).toEqual(["/path/to/the/1"]);
+
+    _router1.push("/path2/to/1");
+    console.log(_router2.getHistoryasArray(), _router1.getHistoryasArray());
+    expect(lastUrl).toBe("/path2/to/1");
+    expect(_router2.getHistoryasArray()).toEqual(["/path2/to/1"]);
+
+    _router2.push("/path");
+    expect(lastUrl).toBe("/path/to/the/2");
+    expect(router.getHistoryasArray()).toEqual([
+      "/path/to/the/1",
+      "/path2/to/1",
+      "/path/to/the/2"
+    ]);
+
+    _router1.goBack();
+    expect(lastUrl).toBe("/path/to/the/1");
+    expect(_router1.getHistoryasArray()).toEqual([
+      "/path/to/the/1",
+      "/path/to/the/2"
+    ]);
+
+    _router2.goBack();
+    console.log(router.getHistoryasArray(), _router2.getHistoryasArray());
+
     expect(lastUrl).toBe("/path2/to/1");
 
     _router2.goBack();

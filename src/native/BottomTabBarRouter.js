@@ -88,11 +88,11 @@ class BottomTabBarRouter extends NativeRouterBase {
    * Builds OS specific NaitveRouter
    *
    * @static
-   * @param {BottomTabBarRouterParams} param
+   * @param {BottomTabBarRouterParams} params
    */
-  static of(props) {
-    props.renderer = createRenderer();
-    return new BottomTabBarRouter(props);
+  static of(params) {
+    params.renderer = createRenderer();
+    return new BottomTabBarRouter(params);
   }
 
   /**
@@ -135,8 +135,7 @@ class BottomTabBarRouter extends NativeRouterBase {
       return this.shouldSelectByIndex(index);
     };
 
-    this._renderer._rootController.didSelectByIndex = ({ index }) => {
-    };
+    this._renderer._rootController.didSelectByIndex = ({ index }) => {};
 
     this._fromRouter = true;
 
@@ -181,11 +180,11 @@ class BottomTabBarRouter extends NativeRouterBase {
           scope._fromRouter = true;
         })
         .catch(e => alert(e.message + " " + e.stack, "Error"));*/
-        
-        setTimeout(() => {
-          this.pushRoute(this._routes[index]);
-          this._fromRouter = true;
-        });
+
+      setTimeout(() => {
+        this.pushRoute(this._routes[index]);
+        this._fromRouter = true;
+      });
     }
 
     return (
@@ -280,13 +279,7 @@ class BottomTabBarRouter extends NativeRouterBase {
   }
 
   push(path, routeData = {}) {
-    console.log(
-      `${path} ${this._fromRouter} ${this.resolveIndex(path)} ${
-        this._tabStatus
-      }`
-    );
     if (this._fromRouter === false) {
-      console.log(`bottombar.push`);
       const index = this.resolveIndex(path);
       if (this.isVisited(index)) {
         return super.push(this._visitedIndexes[index].path, routeData);

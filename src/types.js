@@ -31,7 +31,7 @@
  */
 
 /**
- * @typedef {function(path: string, routeData: object, action: string, okFn: function(ok: boolean))} RouterBlockHandler
+ * @typedef {function(path: string, routeData: object, action: string, okFn: function)} RouterBlockHandler
  *
  */
 

@@ -1,6 +1,5 @@
 "use strict";
 
-
 /**
  * @typedef {object} RouteMatch Object seperately keeps parsed and matched data of the request for every route
  * @property {boolean} isExact if Requested path is an exact match or not.
@@ -34,7 +33,7 @@
  * @property {!string} action Request action 'PUSH', 'POP' or 'REPLACE'
  * @property {!RouteMatch} match Request's match result
  * @property {!object} view Keeps requested route's view
- * @property {?object} [={}] routingState Keeps user data when route runs 
+ * @property {?object} [={}] routingState Keeps user data when route runs
  */
 
 const matchPath = require("../common/matchPath").matchPath;
@@ -120,7 +119,7 @@ class RoutePath {
 
 /**
  * Route implementation
- * 
+ *
  * @since 1.0.0
  * @class
  */
@@ -130,11 +129,11 @@ class Route {
    *
    * @since 1.0.0
    * @static
-   * @param {RouteParams} param
+   * @param {RouteParams} params
    * @return {Route}
    */
-  static of(props = {}) {
-    return new Route(props);
+  static of(params = {}) {
+    return new Route(params);
   }
   /**
    * @constructor
@@ -181,7 +180,7 @@ class Route {
    * Merges specified state to current route state
    *
    * @since 1.0.0
-   * @param {object}
+   * @param {object} state
    */
   setState(state) {
     this._state = Object.assign(this._state, state);
@@ -195,6 +194,17 @@ class Route {
    */
   getState() {
     return this._state;
+  }
+
+  toJSON() {
+    return {
+      type: "route",
+      exac: this._exact,
+      strict: this._strict,
+      sensitive: this._sensitive,
+      path: this._path,
+      state: { match: this._state.match }
+    };
   }
 
   /**
@@ -246,10 +256,8 @@ class Route {
    * There are some exceptions:
    * - going into a tab, which the tab is created before
    * - for iOS, goingBack via gesture or headerBar back
-   * 
+   *
    * @since 1.0.0
-   * @param {RouteMatch} match
-   * @param {RouteState} state
    * @param {Router} router - Not the root router, the router which the route belongs to.
    * @return {Page} view = null - If the route has been built once, the previous view (page) is given. Otherwise it is null. If view is not null, returning the view back makes it singleton.
    */
@@ -271,12 +279,12 @@ class Route {
    * })
    *
    * ...
-   * 
+   *
    * @protected
    * @since 1.0.0
    * @event
-   * @emits routeShouldMatch
-   * @param {RouteMatch} match
+   * @emits routeShouldMatch(router: Router, route: Route)
+   * @param {Router} router
    * @return {boolean}
    */
   routeShouldMatch(router) {

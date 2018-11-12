@@ -8,10 +8,10 @@
 
 /**
  * @typedef {object} HeaderBarParams For more info {@link NavigationController}
- * @property {{ transulent: boolean, 
- *              alpha: number, 
- *              backIndicatorImage: Image, 
- *              backIndicatorTransitionMaskImage: Image, 
+ * @property {{ transulent: boolean,
+ *              alpha: number,
+ *              backIndicatorImage: Image,
+ *              backIndicatorTransitionMaskImage: Image,
  *              prefersLargeTitles: boolean}} ios
  * @property {boolean} borderVisibility
  * @property {Color} titleColor
@@ -26,7 +26,6 @@
  * @property {Page} topage
  * @property {{operation: number}} operation
  */
-
 
 const NativeRouterBase = require("./NativeRouterBase");
 const Router = require("../router/Router");
@@ -106,11 +105,11 @@ class NativeStackRouter extends NativeRouterBase {
    * Builds OS specific NaitveRouter
    *
    * @static
-   * @param {NativeStackRouterParams} param
+   * @param {NativeStackRouterParams} params
    */
-  static of(props) {
-    props.renderer = createRenderer();
-    return new NativeStackRouter(props);
+  static of(params) {
+    params.renderer = createRenderer();
+    return new NativeStackRouter(params);
   }
 
   /**
@@ -186,10 +185,8 @@ class NativeStackRouter extends NativeRouterBase {
           // set Router to skip next history change
           // this._fromRouter = false;
           try {
-            console.log(JSON.stringify(this.getHistoryasArray()));
             this._historyController.preventDefault();
             this._historyController.goBack();
-            console.log(JSON.stringify(this.getHistoryasArray()));
             this._fromRouter = false;
             this.dispatch(
               this._historyController.history.location,
@@ -200,10 +197,7 @@ class NativeStackRouter extends NativeRouterBase {
           } catch (e) {
             throw e;
           } finally {
-            // this._fromRouter = true;
           }
-          // and history goes back.
-          // this.goBack();
         }
       }
     );
@@ -219,7 +213,6 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   push(path, routeData = {}) {
-    // console.log(`nav push ${path} ${this._currentUrl}`);
     if (path === this._currentUrl) {
       Object.assign(
         this._historyController.history.location.state.routeData,
@@ -238,7 +231,6 @@ class NativeStackRouter extends NativeRouterBase {
     switch (state.action) {
       case "REPLACE":
       case "PUSH":
-        console.log(`push ${this._currentUrl} - ${route.getUrlPath()}`);
         if (this._fromRouter && this._currentUrl !== route.getUrlPath())
           this._renderer.pushChild(state.view);
         break;
