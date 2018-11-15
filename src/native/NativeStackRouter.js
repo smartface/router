@@ -142,6 +142,7 @@ class NativeStackRouter extends NativeRouterBase {
       routerDidExit,
       routeShouldMatch
     });
+    
     this._fromRouter = true;
     this._renderer = renderer;
     this._renderer.setRootController(new NavigationController());

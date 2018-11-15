@@ -427,7 +427,7 @@ class Router extends Route {
           const view = this.renderRoute(route); // build route's view
           route.setState({ view }); // keep view in the route's state
           // this.routeWillEnter && this.routeWillEnter(route, this._prevRoute, action); // fires routeWillEnter
-          tasks.forEach((task) => task(match.url, action)); // trigger all routers' routeWillEnter in the tasks queue
+          tasks.reverse().forEach(task => task(match.url, action)); // trigger all routers' routeWillEnter in the tasks queue
           this.routerDidEnter && this.routerDidEnter(route); // fires routerDidEnter
           route.routeDidEnter(this); // fires routeDidEnter
           _lastRoute = route; // save matched route as last route
