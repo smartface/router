@@ -16,7 +16,7 @@ const dispatch = (location, action) => {
 };
 
 function handleRouteUrl(router, url, routeData, action) {
-  // console.log(` handleRouteUrl ${router} ${url} ${action}`);
+  console.log(` handleRouteUrl ${router} ${url} ${action}`);
   router._historyController.preventDefault();
   switch (action) {
     case "PUSH":
@@ -361,6 +361,7 @@ class Router extends Route {
   renderMatches(matches, location, action, target) {
     const routeData = location.state;
     matches.some(({ match, route }, index) => {
+      console.log(`${route}`);
       if (route !== this && route instanceof Router) {
         // if(index > 0 && this._isRoot)
         tasks.push((url) => {
@@ -383,7 +384,7 @@ class Router extends Route {
         ) {
           if (route.getRedirectto()) {
             tasks = []; // reset tasks
-            target.routeRollback(); // remove redirected path target Router
+            target.routeRollback(); // remove redirected path from target Router
             //  because real path can be owned by different router.
             // -----
             // And then trigger redirection path.

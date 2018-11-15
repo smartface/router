@@ -1,6 +1,7 @@
 "use strict";
 const createMemoryHistory = require("./history");
 const { matchUrl } = require("./matchPath");
+let rootHistory;
 
 /**
  * Creates a new HistoryController instance

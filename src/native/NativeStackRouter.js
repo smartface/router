@@ -230,7 +230,7 @@ class NativeStackRouter extends NativeRouterBase {
 
   routeWillEnter(route, url, action) {
     const state = route.getState();
-    // console.log(`routeWillEnter ${this} ${route} ${action} ${this._fromRouter}`);
+    console.log(`routeWillEnter ${this} ${route} ${action} ${this._fromRouter} ${this._presented}`);
     switch (action) {
       case "REPLACE":
       case "PUSH":
@@ -243,7 +243,7 @@ class NativeStackRouter extends NativeRouterBase {
         }
         break;
       case "POP":
-        if (this._fromRouter && this._currentUrl !== url){
+        if (this._fromRouter && this._currentUrl === url){
           if(this._presented){
             this._renderer.dismiss();
           } else {
@@ -267,7 +267,7 @@ class NativeStackRouter extends NativeRouterBase {
    */
   onRouterExit(action) {
     super.onRouterExit(action);
-    this._childRouter = null;
+    this._currentRoute = null;
     // if (action === "POP")
     // this._renderer.setRootController(new NavigationController());
   }
