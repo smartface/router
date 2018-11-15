@@ -192,15 +192,6 @@ class Router extends Route {
       routerDidExit
     };
     
-    routes
-      .forEach((route) => {
-        if(typeof route.preloadView === 'function'){
-          route.setState({
-            view: route.preloadView(this, route)
-          });
-        }
-      });
-
     if (isRoot) {
       /** @type {HistoryListener} */
       listeners.clear();

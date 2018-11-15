@@ -244,7 +244,7 @@ class NativeStackRouter extends NativeRouterBase {
         }
         break;
       case "POP":
-        if (this._fromRouter && this._currentUrl === url){
+        if (this._fromRouter && this._currentUrl !== url){
           if(this._presented){
             this._renderer.dismiss();
           } else {
