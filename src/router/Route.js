@@ -149,7 +149,7 @@ class Route {
     strict = true,
     modal= false,
     routeShouldMatch = null,
-    preload = null,
+    preloadView = null,
     routeDidEnter,
     routeDidExit
   }) {
@@ -159,7 +159,7 @@ class Route {
       sensitive,
       strict
     };
-    this.preload = preload;
+    this.preload = preloadView;
     this._exact = exact;
     this._strict = false;
     this._build = build;
