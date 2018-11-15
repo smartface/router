@@ -226,19 +226,25 @@ class NativeStackRouter extends NativeRouterBase {
     return super.push(path, routeData);
   }
 
-  routeWillEnter(route) {
+  routeWillEnter(route, url, action) {
     const state = route.getState();
-    switch (state.action) {
+    // console.log(`routeWillEnter ${this} ${route} ${action} ${this._fromRouter}`);
+    switch (action) {
       case "REPLACE":
       case "PUSH":
-        if (this._fromRouter && this._currentUrl !== route.getUrlPath())
-          this._renderer.pushChild(state.view);
+        if (this._fromRouter && this._currentRoute !== route && this._currentUrl !== url){
+          this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
+          // this._renderer.pushChild(state.view);
+        }
         break;
       case "POP":
-        if (this._fromRouter && Router.currentRouter === this)
+        if (this._fromRouter && this._currentUrl !== url)
           this._renderer.popChild();
         break;
     }
+    
+    this._currentRoute = route;
+    this._currentUrl = url;
   }
 
   /**
@@ -251,6 +257,7 @@ class NativeStackRouter extends NativeRouterBase {
    */
   onRouterExit(action) {
     super.onRouterExit(action);
+    this._childRouter = null;
     // if (action === "POP")
     // this._renderer.setRootController(new NavigationController());
   }

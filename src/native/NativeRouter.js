@@ -77,33 +77,23 @@ class NativeRouter extends NativeRouterBase {
     });
 
     this._renderer = renderer;
-    if (isRoot) {
-      this._renderer.setRootController(
-        new Page({ orientation: Page.Orientation.AUTO })
-      );
-      const Renderer = require("./Renderer");
-      Renderer.setasRoot(this._renderer._rootController);
-    }
-  }
-
-  /**
-   * @protected
-   * @param {NativeRouter[]|NativeStackRouter[]|BottomTabBarRouter[]} router
-   */
-  addChildRouter(router) {
-    const Renderer = require("./Renderer");
-    // this._renderer.show(router._renderer._rootController);
-    Renderer.setasRoot(router._renderer._rootController);
+    // if (isRoot) {
+    //   this._renderer.setRootController(
+    //     new Page({ orientation: Page.Orientation.AUTO })
+    //   );
+    //   const Renderer = require("./Renderer");
+    //   Renderer.setasRoot(this._renderer._rootController);
+    // }
   }
 
   /**
    * @override
    */
-  routeWillEnter(route) {
+  routeWillEnter(route, action) {
     const Renderer = require("./Renderer");
     // this._renderer.show(router._renderer._rootController);
     if(this._isRoot)
-      Renderer.setasRoot(route.getState().view);
+      Renderer.setasRoot(route._renderer && route._renderer._rootController || route.getState().view);
     else
       this._renderer.show(route.getState().view);
   }
