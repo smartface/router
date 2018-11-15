@@ -107,7 +107,7 @@ class NativeStackRouter extends NativeRouterBase {
    * @static
    * @param {NativeStackRouterParams} params
    */
-  static of(params) {
+  static of (params) {
     params.renderer = createRenderer();
     return new NativeStackRouter(params);
   }
@@ -142,7 +142,7 @@ class NativeStackRouter extends NativeRouterBase {
       routerDidExit,
       routeShouldMatch
     });
-    
+
     this._fromRouter = true;
     this._renderer = renderer;
     this._renderer.setRootController(new NavigationController());
@@ -197,10 +197,11 @@ class NativeStackRouter extends NativeRouterBase {
               this
             );
             this._fromRouter = true;
-          } catch (e) {
-            throw e;
-          } finally {
           }
+          catch (e) {
+            throw e;
+          }
+          finally {}
         }
       }
     );
@@ -229,31 +230,36 @@ class NativeStackRouter extends NativeRouterBase {
     return super.push(path, routeData);
   }
 
-  routeWillEnter(route, url, action) {
+  routeWillEnter(route, url, action, exact) {
     const state = route.getState();
-    console.log(`routeWillEnter ${this} ${route} ${action} ${this._fromRouter} ${this._presented}`);
+    console.log(`routeWillEnter ${this} ${route} ${action} ${this._fromRouter} ${this._presented} ${exact}`);
+
     switch (action) {
       case "REPLACE":
       case "PUSH":
-        if(route.isModal()){
-          this._renderer.present(route._renderer && route._renderer._rootController || state.view);
-          this._presented = true;
-        } else if (this._fromRouter && this._currentRoute !== route && this._currentUrl !== url){
-          this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
-          // this._renderer.pushChild(state.view);
+        if (this._fromRouter && this._currentUrl !== url) {
+          if (route.isModal() && !this._presented) {
+            this._renderer.present(route._renderer && route._renderer._rootController || state.view);
+            this._presented = true;
+          }
+          else if ((!route.isModal() && this._currentRoute !== route && exact) || !this._currentUrl) {
+            this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
+          }
         }
         break;
       case "POP":
-        if (this._fromRouter && this._currentUrl !== url){
-          if(this._presented){
+        if (this._fromRouter && this._currentUrl !== url && exact) {
+          if (route.isModal() && this._presented) {
             this._renderer.dismiss();
-          } else {
+            this._presented = false;
+          }
+          else if (!route.isModal() && exact) {
             this._renderer.popChild();
           }
         }
         break;
     }
-    
+
     this._currentRoute = route;
     this._currentUrl = url;
   }
@@ -269,6 +275,7 @@ class NativeStackRouter extends NativeRouterBase {
   onRouterExit(action) {
     super.onRouterExit(action);
     this._currentRoute = null;
+    this._currentUrl = null;
     // if (action === "POP")
     // this._renderer.setRootController(new NavigationController());
   }

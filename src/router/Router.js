@@ -365,7 +365,7 @@ class Router extends Route {
       if (route !== this && route instanceof Router) {
         // if(index > 0 && this._isRoot)
         tasks.push((url) => {
-          this.routeWillEnter && this.routeWillEnter(route, url, action);
+          this.routeWillEnter && this.routeWillEnter(route, url, action, false);
           handleRouteUrl(this, url, routeData, action);
         }); // add new router display logic from root to children
         // move routes to child router
@@ -410,7 +410,7 @@ class Router extends Route {
             handleRouteUrl(this, match.url, routeData, action);
           }
           
-          tasks.push((url, action) => this.routeWillEnter && this.routeWillEnter(route, url, action));
+          tasks.push((url, action) => this.routeWillEnter && this.routeWillEnter(route, url, action, true));
 
           // this.routeWillEnter(null);
           _lastRoute && _lastRoute.routeDidExit(this);
