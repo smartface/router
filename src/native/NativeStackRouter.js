@@ -124,6 +124,7 @@ class NativeStackRouter extends NativeRouterBase {
     renderer = null,
     to = null,
     isRoot = false,
+    modal = false,
     headerBarParams = () => {},
     routerDidEnter,
     routerDidExit,
@@ -134,6 +135,7 @@ class NativeStackRouter extends NativeRouterBase {
       build,
       routes,
       exact,
+      modal,
       to,
       isRoot,
       routerDidEnter,
@@ -232,14 +234,22 @@ class NativeStackRouter extends NativeRouterBase {
     switch (action) {
       case "REPLACE":
       case "PUSH":
-        if (this._fromRouter && this._currentRoute !== route && this._currentUrl !== url){
+        if(route.isModal()){
+          this._renderer.present(route._renderer && route._renderer._rootController || state.view);
+          this._presented = true;
+        } else if (this._fromRouter && this._currentRoute !== route && this._currentUrl !== url){
           this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
           // this._renderer.pushChild(state.view);
         }
         break;
       case "POP":
-        if (this._fromRouter && this._currentUrl !== url)
-          this._renderer.popChild();
+        if (this._fromRouter && this._currentUrl !== url){
+          if(this._presented){
+            this._renderer.dismiss();
+          } else {
+            this._renderer.popChild();
+          }
+        }
         break;
     }
     

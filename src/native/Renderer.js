@@ -58,6 +58,14 @@ class Renderer {
       .keyWindow;
     sfWindow.makeKeyAndVisible();
   }
+  
+  present(view, onComplete){
+    this._rootController.present(view, true, onComplete);
+  }
+  
+  dismiss(onComplete){
+    this._rootController.dismiss(onComplete);
+  }
 
   /**
    * Only use if rootpage is Page instancea

@@ -147,6 +147,7 @@ class Route {
     exact = false,
     sensitive = true,
     strict = true,
+    modal= false,
     routeShouldMatch = null,
     routeDidEnter,
     routeDidExit
@@ -167,6 +168,7 @@ class Route {
     this._routeShouldMatch = routeShouldMatch;
     this._routeDidEnter = routeDidEnter;
     this._routeDidExit = routeDidExit;
+    this._modal = modal;
     this._state = Object.seal({
       match: {},
       routeData: {},
@@ -174,6 +176,10 @@ class Route {
       routingState: {},
       action: null
     });
+  }
+  
+  isModal(){
+    return this._modal;
   }
 
   /**

@@ -16,7 +16,7 @@ const dispatch = (location, action) => {
 };
 
 function handleRouteUrl(router, url, routeData, action) {
-  console.log(` handleRouteUrl ${router} ${url} ${action}`);
+  // console.log(` handleRouteUrl ${router} ${url} ${action}`);
   router._historyController.preventDefault();
   switch (action) {
     case "PUSH":
@@ -179,11 +179,12 @@ class Router extends Route {
     strict = true,
     isRoot = false,
     to = null,
+    modal=false,
     routerDidEnter,
     routerDidExit,
     routeShouldMatch
   }) {
-    super({ path, build, routes, to, isRoot, routeShouldMatch });
+    super({ path, modal, build, routes, to, isRoot, routeShouldMatch });
 
     this._historyUnlisten = () => null;
     this._handlers = {
@@ -331,7 +332,6 @@ class Router extends Route {
    * @param {Router} target Target Router which pushed to its router.
    */
   onHistoryChange(location, action, target) {
-    console.log(`target : ${target} ${JSON.stringify(target.getHistoryasArray())}`);
     this._matches = matchRoutes([this].concat(this._routes), location.pathname);
     this.renderMatches(this._matches, location, action, target);
   }
@@ -507,6 +507,7 @@ class Router extends Route {
    * @param {string} action
    */
   routerDidExit(action) {
+    console.log(`routerDidExit ${this}`);
     this._handlers.routerDidExit && this._handlers.routerDidExit(this, action);
   }
 
