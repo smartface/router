@@ -149,6 +149,7 @@ class Route {
     strict = true,
     modal= false,
     routeShouldMatch = null,
+    preload = null,
     routeDidEnter,
     routeDidExit
   }) {
@@ -158,6 +159,7 @@ class Route {
       sensitive,
       strict
     };
+    this._preload = preload;
     this._exact = exact;
     this._strict = false;
     this._build = build;
@@ -180,6 +182,10 @@ class Route {
   
   isModal(){
     return this._modal;
+  }
+  
+  preload(router, route) {
+    return this._preload(router, route);
   }
 
   /**
