@@ -159,7 +159,7 @@ class Route {
       sensitive,
       strict
     };
-    this._preload = preload;
+    this.preload = preload;
     this._exact = exact;
     this._strict = false;
     this._build = build;
@@ -184,10 +184,6 @@ class Route {
     return this._modal;
   }
   
-  preload(router, route) {
-    return this._preload(router, route);
-  }
-
   /**
    * Merges specified state to current route state
    *
