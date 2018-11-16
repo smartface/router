@@ -5,7 +5,8 @@ const createRenderer = require("./createRenderer");
 const Page = require("sf-core/ui/page");
 
 /**
- * It creates root {@link Page} and adds and removes child pages.
+ * It creates a root fragment Rotuer adds and removes child routers and pages as application root.
+ * 
  * @class
  * @example
  * const {NativeRouter: Router, Route} = require('@smartface/router')
@@ -58,7 +59,6 @@ class NativeRouter extends NativeRouterBase {
     routes = [],
     exact = false,
     renderer = null,
-    isRoot = false,
     to = null,
     routerDidEnter,
     routerDidExit,
@@ -69,12 +69,16 @@ class NativeRouter extends NativeRouterBase {
       build,
       routes,
       exact,
-      isRoot,
+      isRoot: true,
       to,
       routerDidEnter,
       routerDidExit,
       routeShouldMatch
     });
+    
+    if(!this._isRoot){
+      throw new Error('[NativeRouter] Please only use as root');
+    }
 
     this._renderer = renderer;
     // if (isRoot) {
@@ -93,8 +97,7 @@ class NativeRouter extends NativeRouterBase {
     const Renderer = require("./Renderer");
     // this._renderer.show(router._renderer._rootController);
 
-    if (this._isRoot) Renderer.setasRoot(route.getState().view);
-    else this._renderer.show(route.getState().view);
+    if (this._isRoot) Renderer.setasRoot(route._renderer && route._renderer._rootController || route.getState().view);
   }
 }
 
