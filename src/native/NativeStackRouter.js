@@ -230,9 +230,9 @@ class NativeStackRouter extends NativeRouterBase {
     return super.push(path, routeData);
   }
 
-  routeWillEnter(route, url, action, exact) {
+  routeWillEnter(route, url, action, exact, target) {
     const state = route.getState();
-    console.log(`routeWillEnter ${this} ${route} ${action} ${this._fromRouter} ${this._presented} ${exact}`);
+    console.log(`routeWillEnter ${this} ${route} ${target} $ ${action} ${this._fromRouter} ${this._presented} ${exact}`);
 
     switch (action) {
       case "REPLACE": 
@@ -241,15 +241,14 @@ class NativeStackRouter extends NativeRouterBase {
           if (route.isModal()) {
             this._renderer.present(route._renderer && route._renderer._rootController || state.view);
             this._presented = true;
-          }
-          else if ((!route.isModal() && this._currentRoute !== route && exact) || !this._currentUrl) {
+          } else if ((!route.isModal() && this._currentRoute !== route && exact) || !this._currentUrl) {
             this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
           }
         }
         break;
       case "POP":
         if (this._fromRouter) {
-          if (route.isModal() && this._presented) {
+          if (this._presented) {
             this._renderer.dismiss();
             this._presented = false;
           }

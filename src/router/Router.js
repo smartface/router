@@ -365,7 +365,7 @@ class Router extends Route {
       if (route !== this && route instanceof Router) {
         // if(index > 0 && this._isRoot)
         tasks.push((url) => {
-          this.routeWillEnter && this.routeWillEnter(route, url, action, false);
+          this.routeWillEnter && this.routeWillEnter(route, url, action, false, target);
           // handleRouteUrl(this, url, routeData, action);
         }); // add new router display logic from root to children
         // move routes to child router
@@ -388,7 +388,7 @@ class Router extends Route {
             //  because real path can be owned by different router.
             // -----
             // And then trigger redirection path.
-            target.redirectRoute(route, routeData, action);
+            target.redirectRoute(route, routeData, action, target);
             return false;
           }
 
@@ -410,7 +410,7 @@ class Router extends Route {
             handleRouteUrl(this, match.url, routeData, action);
           }
           
-          tasks.push((url, action) => this.routeWillEnter && this.routeWillEnter(route, url, action, true));
+          tasks.push((url, action) => this.routeWillEnter && this.routeWillEnter(route, url, action, true, target));
 
           // this.routeWillEnter(null);
           _lastRoute && _lastRoute.routeDidExit(this);
