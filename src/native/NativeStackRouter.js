@@ -238,21 +238,21 @@ class NativeStackRouter extends NativeRouterBase {
       case "REPLACE": 
       case "PUSH":
         if (this._fromRouter) {
-          if (route.isModal()) {
+          if (route.isModal() && !this._presented) {
             this._renderer.present(route._renderer && route._renderer._rootController || state.view);
             this._presented = true;
-          } else if ((!route.isModal() && this._currentRoute !== route && exact) || !this._currentUrl) {
+          } else if (!route.isModal() && this._currentRoute !== route) {
             this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
           }
         }
         break;
       case "POP":
         if (this._fromRouter) {
-          if (this._presented) {
+          if (this._presented && target === this) {
             this._renderer.dismiss();
             this._presented = false;
           }
-          else if (!route.isModal() && this._currentUrl !== url) {
+          else if (!this._presented && !route.isModal() && this._currentUrl !== url) {
             this._renderer.popChild();
           }
         }
