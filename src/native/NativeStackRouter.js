@@ -262,6 +262,10 @@ class NativeStackRouter extends NativeRouterBase {
     this._currentRoute = route;
     this._currentUrl = url;
   }
+  
+  resetView(){
+    return  this._renderer.setRootController(new NavigationController());
+  }
 
   /**
    * Event handler when a router exits from active state
@@ -276,7 +280,6 @@ class NativeStackRouter extends NativeRouterBase {
     this._currentRoute = null;
     this._currentUrl = null;
     // if (action === "POP")
-    // this._renderer.setRootController(new NavigationController());
   }
 }
 
