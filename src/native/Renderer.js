@@ -59,12 +59,14 @@ class Renderer {
     sfWindow.makeKeyAndVisible();
   }
   
-  present(view, onComplete){
-    this._rootController.present(view, true, onComplete);
+  present(controller, animated, onComplete){
+    this._rootController.present({
+      controller, animated, onComplete
+    });
   }
   
   dismiss(onComplete){
-    this._rootController.dismiss(onComplete);
+    this._rootController.dismiss({onComplete});
   }
 
   /**

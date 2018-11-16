@@ -366,7 +366,7 @@ class Router extends Route {
         // if(index > 0 && this._isRoot)
         tasks.push((url) => {
           this.routeWillEnter && this.routeWillEnter(route, url, action, false);
-          handleRouteUrl(this, url, routeData, action);
+          // handleRouteUrl(this, url, routeData, action);
         }); // add new router display logic from root to children
         // move routes to child router
         route.renderMatches(

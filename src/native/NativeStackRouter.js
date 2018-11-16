@@ -235,10 +235,10 @@ class NativeStackRouter extends NativeRouterBase {
     console.log(`routeWillEnter ${this} ${route} ${action} ${this._fromRouter} ${this._presented} ${exact}`);
 
     switch (action) {
-      case "REPLACE":
+      case "REPLACE": 
       case "PUSH":
-        if (this._fromRouter && this._currentUrl !== url) {
-          if (route.isModal() && !this._presented) {
+        if (this._fromRouter) {
+          if (route.isModal()) {
             this._renderer.present(route._renderer && route._renderer._rootController || state.view);
             this._presented = true;
           }
@@ -248,12 +248,12 @@ class NativeStackRouter extends NativeRouterBase {
         }
         break;
       case "POP":
-        if (this._fromRouter && this._currentUrl !== url && exact) {
+        if (this._fromRouter) {
           if (route.isModal() && this._presented) {
             this._renderer.dismiss();
             this._presented = false;
           }
-          else if (!route.isModal() && exact) {
+          else if (!route.isModal() && this._currentUrl !== url) {
             this._renderer.popChild();
           }
         }
