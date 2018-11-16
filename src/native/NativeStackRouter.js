@@ -231,6 +231,10 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   routeWillEnter(route, url, action, exact, target) {
+    if(this._fromRouter === false)
+      return;
+    
+    const currentUrl = this._historyController.history.location.pathname;
     const state = route.getState();
     console.log(`routeWillEnter ${this} ${route} ${target} $ ${action} ${this._fromRouter} ${this._presented} ${exact}`);
 
@@ -277,8 +281,8 @@ class NativeStackRouter extends NativeRouterBase {
    */
   onRouterExit(action) {
     super.onRouterExit(action);
-    this._currentRoute = null;
-    this._currentUrl = null;
+    // this._currentRoute = null;
+    // this._currentUrl = null;
     // if (action === "POP")
   }
 }
