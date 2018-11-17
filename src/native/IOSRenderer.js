@@ -53,6 +53,7 @@ class IOSRenderer extends Renderer {
    * @override
    */
   pushChild(page, animated = true) {
+    console.log('pushChild '+page);
     this.makeRootVisible();
     this._rootController.push &&
       this._rootController.push({ controller: page, animated });

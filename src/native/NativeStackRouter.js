@@ -231,12 +231,8 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   routeWillEnter(route, url, action, exact, target) {
-    if(this._fromRouter === false)
-      return;
-    
     const currentUrl = this._historyController.history.location.pathname;
     const state = route.getState();
-    console.log(`routeWillEnter ${this} ${route} ${target} $ ${action} ${this._fromRouter} ${this._presented} ${exact}`);
 
     switch (action) {
       case "REPLACE": 
@@ -245,7 +241,7 @@ class NativeStackRouter extends NativeRouterBase {
           if (route.isModal() && !this._presented) {
             this._renderer.present(route._renderer && route._renderer._rootController || state.view);
             this._presented = true;
-          } else if (!route.isModal() && this._currentRoute !== route) {
+          } else if (!route.isModal() && this._currentRoute != route) {
             this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
           }
         }
@@ -256,7 +252,7 @@ class NativeStackRouter extends NativeRouterBase {
             this._renderer.dismiss();
             this._presented = false;
           }
-          else if (!this._presented && !route.isModal() && this._currentUrl !== url) {
+          else if (!this._presented && !route.isModal() && this._currentRoute != route) {
             this._renderer.popChild();
           }
         }
@@ -281,8 +277,8 @@ class NativeStackRouter extends NativeRouterBase {
    */
   onRouterExit(action) {
     super.onRouterExit(action);
-    // this._currentRoute = null;
-    // this._currentUrl = null;
+    this._currentRoute = null;
+    this._currentUrl = null;
     // if (action === "POP")
   }
 }

@@ -411,7 +411,7 @@ class Router extends Route {
             handleRouteUrl(this, match.url, routeData, action);
           }
           
-          this._fromRouter && tasks.push((url, action) => this.routeWillEnter && this.routeWillEnter(route, url, action, true, target));
+          tasks.push((url, action) => this.routeWillEnter && this.routeWillEnter(route, url, action, true, target));
 
           // this.routeWillEnter(null);
           _lastRoute && _lastRoute.routeDidExit(this);
@@ -421,14 +421,14 @@ class Router extends Route {
             route.setState({ view }); // keep view in the route's state
           }
           // this.routeWillEnter && this.routeWillEnter(route, this._prevRoute, action); // fires routeWillEnter
-          this._fromRouter && tasks.reverse().forEach(task => task(match.url, action)); // trigger all routers' routeWillEnter in the tasks queue
+          tasks.reverse().forEach(task => task(match.url, action)); // trigger all routers' routeWillEnter in the tasks queue
           this.routerDidEnter && this.routerDidEnter(route); // fires routerDidEnter
           route.routeDidEnter(this); // fires routeDidEnter
           _lastRoute = route; // save matched route as last route
           this._currentAction = action;
-          this._currentUrl = match.url;
+          // this._currentUrl = match.url;
           this._prevRoute = route;
-          this._fromRouter && dispatch(location, action);
+          dispatch(location, action);
         }
 
         tasks = []; // clear tasks
