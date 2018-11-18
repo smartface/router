@@ -29,7 +29,8 @@ const createLocation = (path, state, key, currentLocation) => {
     // Two-arg form: push(path, state)
     location = parsePath(path);
     location.state = state;
-  } else {
+  }
+  else {
     // One-arg form: push(location)
     location = Object.assign({}, path);
 
@@ -38,13 +39,15 @@ const createLocation = (path, state, key, currentLocation) => {
     if (location.search) {
       if (location.search.charAt(0) !== "?")
         location.search = "?" + location.search;
-    } else {
+    }
+    else {
       location.search = "";
     }
 
     if (location.hash) {
       if (location.hash.charAt(0) !== "#") location.hash = "#" + location.hash;
-    } else {
+    }
+    else {
       location.hash = "";
     }
 
@@ -54,15 +57,17 @@ const createLocation = (path, state, key, currentLocation) => {
 
   try {
     location.pathname = decodeURI(location.pathname);
-  } catch (e) {
+  }
+  catch (e) {
     if (e instanceof URIError) {
       throw new URIError(
         'Pathname "' +
-          location.pathname +
-          '" could not be decoded. ' +
-          "This is likely caused by an invalid percent-encoding."
+        location.pathname +
+        '" could not be decoded. ' +
+        "This is likely caused by an invalid percent-encoding."
       );
-    } else {
+    }
+    else {
       throw e;
     }
   }
@@ -73,13 +78,15 @@ const createLocation = (path, state, key, currentLocation) => {
     // Resolve incomplete/relative pathname relative to current location.
     if (!location.pathname) {
       location.pathname = currentLocation.pathname;
-    } else if (location.pathname.charAt(0) !== "/") {
+    }
+    else if (location.pathname.charAt(0) !== "/") {
       location.pathname = resolvePathname(
         location.pathname,
         currentLocation.pathname
       );
     }
-  } else {
+  }
+  else {
     // When there is no prior location and pathname is empty, set it to /
     if (!location.pathname) {
       location.pathname = "/";
@@ -114,15 +121,15 @@ const createMemoryHistory = (props = {}) => {
 
   const createKey = () =>
     Math.random()
-      .toString(36)
-      .substr(2, keyLength);
+    .toString(36)
+    .substr(2, keyLength);
 
   const index = clamp(initialIndex, 0, initialEntries.length - 1);
   const entries = initialEntries.map(
     entry =>
-      typeof entry === "string"
-        ? createLocation(entry, undefined, createKey())
-        : createLocation(entry, undefined, entry.key || createKey())
+    typeof entry === "string" ?
+    createLocation(entry, undefined, createKey()) :
+    createLocation(entry, undefined, entry.key || createKey())
   );
 
   // Public interface
@@ -150,16 +157,24 @@ const createMemoryHistory = (props = {}) => {
       ok => handler(location, ok)
     );
   };
-
+  let lastPath;
   const push = (path, state) => {
-    warning(
-      !(
+    if (lastPath === path) {
+      try {
+        throw new Error('Double push');
+      }
+      catch (e) {
+        console.log(e.stack);
+      }
+    }
+    lastPath = path;
+    warning(!(
         typeof path === "object" &&
         path.state !== undefined &&
         state !== undefined
       ),
       "You should avoid providing a 2nd state argument to push when the 1st " +
-        "argument is a location-like object that already has state; it is ignored"
+      "argument is a location-like object that already has state; it is ignored"
     );
 
     const action = "PUSH";
@@ -182,7 +197,8 @@ const createMemoryHistory = (props = {}) => {
             nextEntries.length - nextIndex,
             location
           );
-        } else {
+        }
+        else {
           nextEntries.push(location);
         }
 
@@ -194,17 +210,18 @@ const createMemoryHistory = (props = {}) => {
         });
       }
     );
+        // console.log('historyyyyy push : ' + JSON.stringify(history.entries.map(item => item.pathname)));
+
   };
 
   const replace = (path, state) => {
-    warning(
-      !(
+    warning(!(
         typeof path === "object" &&
         path.state !== undefined &&
         state !== undefined
       ),
       "You should avoid providing a 2nd state argument to replace when the 1st " +
-        "argument is a location-like object that already has state; it is ignored"
+      "argument is a location-like object that already has state; it is ignored"
     );
 
     const action = "REPLACE";
@@ -241,7 +258,8 @@ const createMemoryHistory = (props = {}) => {
             location,
             index: nextIndex
           });
-        } else {
+        }
+        else {
           // Mimic the behavior of DOM histories by
           // causing a render after a cancelled POP.
           setState();
@@ -259,6 +277,7 @@ const createMemoryHistory = (props = {}) => {
 
   const goForward = () => go(1);
   const clear = () => {
+    lastPath = null;
     history.index = 0;
     history.entries = [];
     history.length = 0;
@@ -310,6 +329,7 @@ const createMemoryHistory = (props = {}) => {
     canGo,
     block,
     listen,
+    dispatchLast: () => transitionManager.notifyListeners(history.location, history.action),
     confirmTransitionTo
   };
 

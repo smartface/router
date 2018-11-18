@@ -142,7 +142,8 @@ class NativeStackRouter extends NativeRouterBase {
       routerDidExit,
       routeShouldMatch
     });
-
+    
+    this._headerBarParams = headerBarParams;
     this._fromRouter = true;
     this._renderer = renderer;
     this._renderer.setRootController(new NavigationController());
@@ -194,7 +195,8 @@ class NativeStackRouter extends NativeRouterBase {
             this.dispatch(
               this._historyController.history.location,
               "POP",
-              this
+              this,
+              false
             );
             this._fromRouter = true;
           }
@@ -217,7 +219,9 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   push(path, routeData = {}) {
+    console.log(`push ${path} ${this._currentUrl} ${JSON.stringify(this._historyController.history.location)}`)
     if (path === this._currentUrl) {
+      console.log('entered same url');
       Object.assign(
         this._historyController.history.location.state.routeData,
         routeData
@@ -231,6 +235,7 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   routeWillEnter(route, url, action, exact, target) {
+    console.log(`routeWillEnter ${this} ${url} ${action}`);
     const currentUrl = this._historyController.history.location.pathname;
     const state = route.getState();
 
@@ -245,20 +250,21 @@ class NativeStackRouter extends NativeRouterBase {
             this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
           }
         }
+        
         break;
       case "POP":
         if (this._fromRouter) {
           if (this._presented && target === this) {
             this._renderer.dismiss();
             this._presented = false;
-          }
-          else if (!this._presented && !route.isModal() && this._currentRoute != route) {
+          } else if (!this._presented && !route.isModal() && this._currentRoute != route) {
             this._renderer.popChild();
           }
         }
+        
         break;
     }
-
+    
     this._currentRoute = route;
     this._currentUrl = url;
   }
@@ -266,20 +272,29 @@ class NativeStackRouter extends NativeRouterBase {
   resetView(){
     return  this._renderer.setRootController(new NavigationController());
   }
-
+  
   /**
    * Event handler when a router exits from active state
    *
    * @override
    * @protected
    * @event
+   * @emits routerWillReset
    * @param {string} action
    */
-  onRouterExit(action) {
-    super.onRouterExit(action);
+  routerDidExit(action) {
     this._currentRoute = null;
-    this._currentUrl = null;
-    // if (action === "POP")
+    if(action === 'POP' && this.isModal()){
+      // TODO: Destroy navigation controller's and childrens'
+      const nav = new NavigationController({headerBar: this._headerBarParams()});
+      this.routerWillReset && this.routerWillReset(NavigationController);
+      this._renderer.setRootController(nav);
+      this._historyController.clear();
+    }
+    
+    console.log(`history : ${JSON.stringify(this._historyController.getHistoryasArray())}`);
+    
+    super.routerDidExit(action);
   }
 }
 

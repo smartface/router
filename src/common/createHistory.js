@@ -92,6 +92,10 @@ function createHistory(
         _unblock();
       };
     }
+    
+    clear(){
+      _history.clear();
+    }
 
     getHistoryasArray() {
       return _history.entries.map(item => item.pathname);
@@ -106,10 +110,17 @@ function createHistory(
       _nodes.add(node);
       // bubbles history goback to root if go back could be possible.
       node.onGoBack = () => {
+        console.log('on go back '+JSON.stringify(this.getHistoryasArray()));
         if (_history.length > 0) {
           // _listeners.forEach(listener => listener(_history.location, 'POP'))
           _history.go(-1);
-        } else this.onGoBack && this.onGoBack();
+        } 
+        // else if (_history.length === 1) {
+          // _history.dispatchLast();
+        // } 
+        else {
+          this.onGoBack && this.onGoBack();
+        }
       };
       // bubbles history push to root if push could be possible.
       node.onPush = (path, data) => {
@@ -136,6 +147,10 @@ function createHistory(
      */
     get history() {
       return _history;
+    }
+    
+    pushLocation(location){
+      _history.push(location);
     }
 
     /**
@@ -194,7 +209,9 @@ function createHistory(
      * Calls History.goBack
      */
     goBack() {
-      this.canGoBack()
+              console.log(`--- go back ${JSON.stringify(this.getHistoryasArray())} ${_history.length} ${_history.index}`);
+
+      _history.length > 1
         ? _history.goBack()
         : !_preventDefault && this.onGoBack && this.onGoBack();
       _preventDefault && this.clearPreventDefault();

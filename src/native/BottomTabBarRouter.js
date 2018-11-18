@@ -195,7 +195,7 @@ class BottomTabBarRouter extends NativeRouterBase {
   /**
    * @override
    */
-  renderMatches(matches, state, action, target) {
+  renderMatches(matches, state, action, target, fromRouter) {
     this._fromRouter = true;
 
     if (matches.length > 0) {
@@ -213,7 +213,7 @@ class BottomTabBarRouter extends NativeRouterBase {
       if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
     }
 
-    super.renderMatches(matches, state, action, target);
+    super.renderMatches(matches, state, action, target, fromRouter);
 
     this._fromRouter = false;
   }
