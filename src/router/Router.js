@@ -18,9 +18,9 @@ const history = [];
 const dispatch = (location, action) => {
   history.push([location.pathnamme, action]);
   listeners.forEach(listener => listener(location, action));
-  // action === "PUSH"
-  //   ? historyController.pushLocation(location) // TODO: not share loaction instance
-  //   : historyController.goBack();
+  action === "PUSH"
+    ? historyController.pushLocation(location) // TODO: not share loaction instance
+    : historyController.goBack();
 };
 
 function handleRouteUrl(router, url, routeData, action) {
@@ -193,7 +193,6 @@ class Router extends Route {
     routeShouldMatch
   }) {
     super({ path, modal, build, routes, to, isRoot, routeShouldMatch });
-    this._fromRouter = true;
 
     this._historyUnlisten = () => null;
     this._handlers = {
@@ -214,8 +213,8 @@ class Router extends Route {
         }
       });
 
-      this.initialize(historyController, (location, action, target, fromRouter) =>
-        this.onHistoryChange(location, action, target, fromRouter)
+      this.initialize(historyController, (location, action, target) =>
+        this.onHistoryChange(location, action, target)
       );
     }
 
@@ -223,6 +222,7 @@ class Router extends Route {
     this._exact = exact;
     this._strict = strict;
     this._sensitive = sensitive;
+    this._fromRouter = true;
   }
 
   /**
@@ -243,16 +243,16 @@ class Router extends Route {
       })
     );
     
-    /*this._historyController.onGoBack = () => {
-      console.log('on go back '+this);
-      const _unlisten = historyController.listen((location, action) => {
-        _unlisten();
-        onHistoryChange(location, action, this, this._fromRouter); // fires root's onHistoryChange
-      });
-
-      historyController.goBack();
-    };*/
-    
+/*    this._historyController.onGoBack = () => {
+      // console.log('on go back '+this);
+      // const _unlisten = historyController.listen((location, action) => {
+      //   console.log('in global history listener '+this);
+      //   _unlisten();
+      //   onHistoryChange(location, action, this, true); // fires root's onHistoryChange
+      // });
+      this._historyController.goBack();
+    };
+*/    
     this._routes.forEach(route => {
       // if (route instanceof Router) {
       route.initialize &&
@@ -265,8 +265,7 @@ class Router extends Route {
     });
 
     // changes route without history
-    this.dispatch = (location, action, target, fromRouter) => {
-      console.log(' dispatch  --- fromRouter '+this._fromRouter);
+    this.dispatch = (location, action, target) => {
       onHistoryChange(location, action, target, this._fromRouter);
     };
   }
@@ -335,18 +334,10 @@ class Router extends Route {
    * @param {RouterBlockHandler} fn
    */
   addRouteBlocker(fn) {
-    Router.blocker = Router.createBlocker(() => { this.routerWillBlock(); fn();});
+    Router.blocker = Router.createBlocker(fn);
     this._unblock = () => (Router.blocker = null);
 
     return this._unblock;
-  }
-  
-  /**
-   * Router before block handler
-   * @event
-   * @protected
-   */
-  routerWillBlock(){
   }
 
   /**
@@ -386,16 +377,13 @@ class Router extends Route {
    * @param {string} action Current history action
    * @param {Router} target Target Router which pushed to its router.
    */
-  renderMatches(matches, location, action, target, fromRouter=true) {
+  renderMatches(matches, location, action, target, fromRouter) {
     const routeData = location.state;
-    console.log('fromRouter : '+fromRouter);
     matches.some(({ match, route }, index) => {
       if (route !== this && route instanceof Router) {
         // if(index > 0 && this._isRoot)
-        // makes this scope not from router
-        this._fromRouter = fromRouter;
         tasks.push((url) => {
-          this.routeWillEnter && this.routeWillEnter(route, url, action, false, target, fromRouter);
+          this.routeWillEnter && this.routeWillEnter(route, url, action, false, target);
           // handleRouteUrl(this, url, routeData, action);
         }); // add new router display logic from root to children
         // move routes to child router
@@ -407,16 +395,13 @@ class Router extends Route {
           fromRouter
         );
 
-        this._fromRouter = true;
         return true;
       }
       else if (match.isExact === true) {
-                console.log(`exact match ${this}`);
-
         if (
-          fromRouter || route.routeShouldMatch(route, { match, action, routeData }) === true
+          !this._fromRouter || route.routeShouldMatch(route, { match, action, routeData }) === true
         ) {
-          if (action === 'PUSH' && route.getRedirectto()) {
+          if (route.getRedirectto()) {
             tasks = []; // reset tasks
             target.routeRollback(); // remove redirected path from target Router
             //  because real path can be owned by different router.
@@ -425,8 +410,6 @@ class Router extends Route {
             target.redirectRoute(route, routeData, action, target);
             return false;
           }
-          // makes this scope not from router
-          this._fromRouter = fromRouter;
 
           const routingState =
             (route.getRoutingState &&
@@ -436,7 +419,7 @@ class Router extends Route {
                 routeData
               })) || {};
 
-          route.setState({ match, action, routeData, routingState });
+          route.setState({ match, action, routeData, routingState, fromRouter });
 
           // If route owned by current child router which is different from target router
           // then push or pop route to child router's history.
@@ -446,7 +429,7 @@ class Router extends Route {
             handleRouteUrl(this, match.url, routeData, action);
           }
           
-          tasks.push((url, action) => this.routeWillEnter && this.routeWillEnter(route, url, action, true, target, fromRouter));
+          tasks.push((url, action) => this.routeWillEnter && this.routeWillEnter(route, url, action, true, target));
 
           // this.routeWillEnter(null);
           _lastRoute && _lastRoute.routeDidExit(this);
@@ -464,7 +447,6 @@ class Router extends Route {
           // this._currentUrl = match.url;
           this._prevRoute = route;
           dispatch(location, action);
-          this._fromRouter = true;
         }
 
         tasks = []; // clear tasks

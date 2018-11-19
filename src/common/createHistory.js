@@ -110,15 +110,11 @@ function createHistory(
       _nodes.add(node);
       // bubbles history goback to root if go back could be possible.
       node.onGoBack = () => {
-        console.log('on go back '+JSON.stringify(this.getHistoryasArray()));
-        if (_history.length > 0) {
+        console.log(`on go back ${JSON.stringify(this.getHistoryasArray())} ${_history.index}`);
+        if (_history.canGo(-1)) {
           // _listeners.forEach(listener => listener(_history.location, 'POP'))
           _history.go(-1);
-        } 
-        // else if (_history.length === 1) {
-          // _history.dispatchLast();
-        // } 
-        else {
+        } else {
           this.onGoBack && this.onGoBack();
         }
       };
@@ -209,9 +205,9 @@ function createHistory(
      * Calls History.goBack
      */
     goBack() {
-              console.log(`--- go back ${JSON.stringify(this.getHistoryasArray())} ${_history.length} ${_history.index}`);
+      console.log(`--- go back ${JSON.stringify(this.getHistoryasArray())} ${_history.length} ${_history.index}`);
 
-      _history.length > 1
+      _history.canGo(-1)
         ? _history.goBack()
         : !_preventDefault && this.onGoBack && this.onGoBack();
       _preventDefault && this.clearPreventDefault();

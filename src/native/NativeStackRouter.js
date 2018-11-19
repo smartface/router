@@ -182,10 +182,12 @@ class NativeStackRouter extends NativeRouterBase {
    * Add new listener to listen NavigationController transitions.
    */
   addNavigatorChangeListener() {
+    console.log(`addNavigatorChangeListener ${this}`);
     this._unlistener = this._renderer.onNavigationControllerTransition(
       action => {
         // if user presses backbutton or uses gesture to back
         if (action.operation === NavigationController.OperationType.POP) {
+          console.log(`addNavigatorChangeListener ${this}`);
           // set Router to skip next history change
           // this._fromRouter = false;
           try {
@@ -233,30 +235,36 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   routeWillEnter(route, url, action, exact, target, fromRouter) {
-    console.log(`routeWillEnter ${this} ${url} ${action} ${fromRouter}`);
+    console.log(`routeWillEnter ${this} ${url} ${action} ${this._fromRouter}`);
     const currentUrl = this._historyController.history.location.pathname;
     const state = route.getState();
 
     switch (action) {
       case "REPLACE": 
       case "PUSH":
-        if (fromRouter) {
+        if (this._fromRouter) {
           if (route.isModal() && !this._presented) {
             this._renderer.present(route._renderer && route._renderer._rootController || state.view);
+            this._dismiss = (onComplete) => this._renderer.dismiss(() => {
+              console.log(`route dismiss ${route}`);
+              if(route instanceof Router){
+                route.resetView();
+              }
+            });
             this._presented = true;
           } else if (!route.isModal() && this._currentRoute != route) {
-            console.log(`routeWillEnter enter push ${this} ${url} ${action} ${fromRouter} ${route} ${this._currentRoute}`);
+            // console.log(`routeWillEnter enter push ${this} ${url} ${action}`);
             this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
           }
         }
         
         break;
       case "POP":
-        if (fromRouter) {
+        if (this._fromRouter) {
           if (this._presented && target === this) {
-            this._renderer.dismiss();
+            this._dismiss && this._dismiss();
             this._presented = false;
-          } else if (!this._presented && !route.isModal() && this._currentRoute != route) {
+          } else if (fromRouter && !this._presented && !route.isModal() && this._currentRoute != route) {
             this._renderer.popChild();
           }
         }
@@ -269,7 +277,10 @@ class NativeStackRouter extends NativeRouterBase {
   }
   
   resetView(){
-    return  this._renderer.setRootController(new NavigationController());
+      console.log('view reset '+this);
+      this._currentRoute = null;
+      this._renderer.setChildControllers([]);
+      this._historyController.clear();
   }
   
   /**
@@ -282,13 +293,8 @@ class NativeStackRouter extends NativeRouterBase {
    * @param {string} action
    */
   routerDidExit(action) {
-    // this._currentRoute = null;
     if(action === 'POP' && this.isModal()){
       // TODO: Destroy navigation controller's and childrens'
-      const nav = new NavigationController({headerBar: this._headerBarParams()});
-      this.routerWillReset && this.routerWillReset(NavigationController);
-      this._renderer.setRootController(nav);
-      this._historyController.clear();
     }
     
     console.log(`history : ${JSON.stringify(this._historyController.getHistoryasArray())}`);
