@@ -205,7 +205,7 @@ function createHistory(
      * Calls History.goBack
      */
     goBack() {
-      console.log(`--- go back ${JSON.stringify(this.getHistoryasArray())} ${_history.length} ${_history.index}`);
+      console.log(`--- go back ${JSON.stringify(this.getHistoryasArray())} ${_history.length} ${_history.index} ${_history.canGo(-1)}`);
 
       _history.canGo(-1)
         ? _history.goBack()

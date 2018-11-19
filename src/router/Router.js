@@ -419,7 +419,7 @@ class Router extends Route {
                 routeData
               })) || {};
 
-          route.setState({ match, action, routeData, routingState, fromRouter });
+          route.setState({ match, action, routeData, routingState });
 
           // If route owned by current child router which is different from target router
           // then push or pop route to child router's history.
@@ -646,6 +646,7 @@ class Router extends Route {
    * @param {string | RouteLocation}
    */
   goBack(url) {
+    console.log(`router goback ${this}`);
     const go = () => {
       url 
         ? this.dispatch(

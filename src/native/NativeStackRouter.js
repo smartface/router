@@ -276,11 +276,16 @@ class NativeStackRouter extends NativeRouterBase {
     this._currentUrl = url;
   }
   
+  dismiss(){
+    this._dismiss && this._dismiss();
+  }
+  
   resetView(){
       console.log('view reset '+this);
       this._currentRoute = null;
       this._renderer.setChildControllers([]);
       this._historyController.clear();
+      this._dismiss = null;
   }
   
   /**

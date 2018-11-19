@@ -104,7 +104,7 @@ const createLocation = (path, state, key, currentLocation) => {
 const createMemoryHistory = (props = {}) => {
   const {
     getUserConfirmation,
-    initialEntries = ["/"],
+    initialEntries = [],
     initialIndex = 0,
     keyLength = 6
   } = props;
@@ -268,7 +268,7 @@ const createMemoryHistory = (props = {}) => {
   const goForward = () => go(1);
   const clear = () => {
     lastPath = null;
-    history.index = 0;
+    history.index = -1;
     history.entries = [];
     history.length = 0;
   };
