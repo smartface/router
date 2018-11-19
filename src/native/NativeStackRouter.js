@@ -223,8 +223,7 @@ class NativeStackRouter extends NativeRouterBase {
   push(path, routeData = {}) {
     if (path === this._currentUrl) {
       Object.assign(
-        this._historyController.history.location.state.routeData,
-        routeData
+        this._historyController.history.location.state, { routeData },
       );
       this.dispatch(this._historyController.history.location, "PUSH", this);
 
@@ -246,11 +245,15 @@ class NativeStackRouter extends NativeRouterBase {
           if (route.isModal() && !this._presented) {
             this._renderer.present(route._renderer && route._renderer._rootController || state.view);
             route.dismiss = this._dismiss = (onComplete) => this._renderer.dismiss(() => {
-              console.log(`route dismiss ${route}`);
+              // console.log(`route dismiss ${route} ${this.getHistoryasArray()}`);
               if(route instanceof Router){
                 route.resetView();
               }
+              this._dismiss = null;
               route.dismiss = null;
+              this._presented = false;
+              this._currentUrl = null;
+              this._currentRoute = null;
             });
             this._presented = true;
           } else if (!route.isModal() && this._currentRoute != route) {
@@ -277,19 +280,11 @@ class NativeStackRouter extends NativeRouterBase {
     this._currentUrl = url;
   }
   
-  dismiss(){
-    const has = this._dismiss !== null;
-    this._dismiss && this._dismiss();
-    
-    return has;
-  }
-  
   resetView(){
-      console.log('view reset '+this);
       this._currentRoute = null;
       this._renderer.setChildControllers([]);
       this._historyController.clear();
-      this._dismiss = null;
+      this._currentUrl = null;
   }
   
   /**

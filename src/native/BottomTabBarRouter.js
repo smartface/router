@@ -135,7 +135,11 @@ class BottomTabBarRouter extends NativeRouterBase {
       return this.shouldSelectByIndex(index);
     };
 
-    this._renderer._rootController.didSelectByIndex = ({ index }) => {};
+    this._renderer._rootController.didSelectByIndex = ({ index }) => {
+      this._fromRouter = false;
+      this.pushRoute(this._routes[index]);
+      this._fromRouter = true;
+    };
 
     this._fromRouter = true;
 
@@ -164,13 +168,13 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @param {number} index
    */
   shouldSelectByIndex(index) {
-    this._fromRouter = false;
+    /*this._fromRouter = false;
     if (
       (this._tabStatus === userTabStatus.IDLE &&
         index !== this._currentIndex) ||
       this._tabStatus === userTabStatus.WAITING
     ) {
-      this._tabStatus = userTabStatus.WAITING;
+      this._tabStatus = userTabStatus.WAITING;*/
       /*(async function(scope) {
         console.log(`${scope} ${scope._routes[index]} ${index}`);
         scope.pushRoute(scope._routes[index]);
@@ -181,15 +185,16 @@ class BottomTabBarRouter extends NativeRouterBase {
         })
         .catch(e => alert(e.message + " " + e.stack, "Error"));*/
 
-      setTimeout(() => {
-        this.pushRoute(this._routes[index]);
-        this._fromRouter = true;
-      });
-    }
-
-    return (
+      // setTimeout(() => {
+      //   this.pushRoute(this._routes[index]);
+      //   this._fromRouter = true;
+      // });
+    // }
+    
+    return true;
+    /*return (
       this._currentIndex != index && this._tabStatus === userTabStatus.IDLE
-    );
+    );*/
   }
 
   /**
