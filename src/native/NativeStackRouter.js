@@ -211,14 +211,14 @@ class NativeStackRouter extends NativeRouterBase {
     );
   }
 
-  /**
-   * @override
-   *
-   */
-  dispose() {
-    super.dispose();
-    this._unlistener();
-  }
+  // /**
+  // * @override
+  // *
+  // */
+  // dispose() {
+  //   super.dispose();
+  //   this._unlistener();
+  // }
 
   push(path, routeData = {}) {
     if (path === this._currentUrl) {
@@ -245,11 +245,12 @@ class NativeStackRouter extends NativeRouterBase {
         if (this._fromRouter) {
           if (route.isModal() && !this._presented) {
             this._renderer.present(route._renderer && route._renderer._rootController || state.view);
-            this._dismiss = (onComplete) => this._renderer.dismiss(() => {
+            route.dismiss = this._dismiss = (onComplete) => this._renderer.dismiss(() => {
               console.log(`route dismiss ${route}`);
               if(route instanceof Router){
                 route.resetView();
               }
+              route.dismiss = null;
             });
             this._presented = true;
           } else if (!route.isModal() && this._currentRoute != route) {
@@ -277,7 +278,10 @@ class NativeStackRouter extends NativeRouterBase {
   }
   
   dismiss(){
+    const has = this._dismiss !== null;
     this._dismiss && this._dismiss();
+    
+    return has;
   }
   
   resetView(){
