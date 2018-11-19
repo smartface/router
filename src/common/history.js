@@ -159,14 +159,6 @@ const createMemoryHistory = (props = {}) => {
   };
   let lastPath;
   const push = (path, state) => {
-    if (lastPath === path) {
-      try {
-        throw new Error('Double push');
-      }
-      catch (e) {
-        console.log(e.stack);
-      }
-    }
     lastPath = path;
     warning(!(
         typeof path === "object" &&
@@ -210,8 +202,6 @@ const createMemoryHistory = (props = {}) => {
         });
       }
     );
-        // console.log('historyyyyy push : ' + JSON.stringify(history.entries.map(item => item.pathname)));
-
   };
 
   const replace = (path, state) => {

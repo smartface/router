@@ -149,7 +149,7 @@ function createHistory(
       return _history;
     }
     
-    pushLocation(location){
+    pushLocation(location) {
       _history.push(location);
     }
 

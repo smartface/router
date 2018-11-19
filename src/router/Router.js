@@ -265,7 +265,7 @@ class Router extends Route {
     });
 
     // changes route without history
-    this.dispatch = (location, action, target) => {
+    this.dispatch = (location, action, target, fromRouter) => {
       console.log(' dispatch  --- fromRouter '+this._fromRouter);
       onHistoryChange(location, action, target, this._fromRouter);
     };
@@ -335,10 +335,18 @@ class Router extends Route {
    * @param {RouterBlockHandler} fn
    */
   addRouteBlocker(fn) {
-    Router.blocker = Router.createBlocker(fn);
+    Router.blocker = Router.createBlocker(() => { this.routerWillBlock(); fn();});
     this._unblock = () => (Router.blocker = null);
 
     return this._unblock;
+  }
+  
+  /**
+   * Router before block handler
+   * @event
+   * @protected
+   */
+  routerWillBlock(){
   }
 
   /**
@@ -387,7 +395,7 @@ class Router extends Route {
         // makes this scope not from router
         this._fromRouter = fromRouter;
         tasks.push((url) => {
-          this.routeWillEnter && this.routeWillEnter(route, url, action, false, target);
+          this.routeWillEnter && this.routeWillEnter(route, url, action, false, target, fromRouter);
           // handleRouteUrl(this, url, routeData, action);
         }); // add new router display logic from root to children
         // move routes to child router
@@ -438,7 +446,7 @@ class Router extends Route {
             handleRouteUrl(this, match.url, routeData, action);
           }
           
-          tasks.push((url, action) => this.routeWillEnter && this.routeWillEnter(route, url, action, true, target));
+          tasks.push((url, action) => this.routeWillEnter && this.routeWillEnter(route, url, action, true, target, fromRouter));
 
           // this.routeWillEnter(null);
           _lastRoute && _lastRoute.routeDidExit(this);

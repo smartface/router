@@ -198,7 +198,7 @@ class NativeStackRouter extends NativeRouterBase {
               this,
               false
             );
-            this._fromRouter = true;
+            // this._fromRouter = true;
           }
           catch (e) {
             throw e;
@@ -219,9 +219,7 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   push(path, routeData = {}) {
-    console.log(`push ${path} ${this._currentUrl} ${JSON.stringify(this._historyController.history.location)}`)
     if (path === this._currentUrl) {
-      console.log('entered same url');
       Object.assign(
         this._historyController.history.location.state.routeData,
         routeData
@@ -234,26 +232,27 @@ class NativeStackRouter extends NativeRouterBase {
     return super.push(path, routeData);
   }
 
-  routeWillEnter(route, url, action, exact, target) {
-    console.log(`routeWillEnter ${this} ${url} ${action}`);
+  routeWillEnter(route, url, action, exact, target, fromRouter) {
+    console.log(`routeWillEnter ${this} ${url} ${action} ${fromRouter}`);
     const currentUrl = this._historyController.history.location.pathname;
     const state = route.getState();
 
     switch (action) {
       case "REPLACE": 
       case "PUSH":
-        if (this._fromRouter) {
+        if (fromRouter) {
           if (route.isModal() && !this._presented) {
             this._renderer.present(route._renderer && route._renderer._rootController || state.view);
             this._presented = true;
           } else if (!route.isModal() && this._currentRoute != route) {
+            console.log(`routeWillEnter enter push ${this} ${url} ${action} ${fromRouter} ${route} ${this._currentRoute}`);
             this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
           }
         }
         
         break;
       case "POP":
-        if (this._fromRouter) {
+        if (fromRouter) {
           if (this._presented && target === this) {
             this._renderer.dismiss();
             this._presented = false;
@@ -283,7 +282,7 @@ class NativeStackRouter extends NativeRouterBase {
    * @param {string} action
    */
   routerDidExit(action) {
-    this._currentRoute = null;
+    // this._currentRoute = null;
     if(action === 'POP' && this.isModal()){
       // TODO: Destroy navigation controller's and childrens'
       const nav = new NavigationController({headerBar: this._headerBarParams()});
