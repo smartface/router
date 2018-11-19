@@ -200,7 +200,7 @@ class NativeStackRouter extends NativeRouterBase {
               this,
               false
             );
-            // this._fromRouter = true;
+            this._fromRouter = true;
           }
           catch (e) {
             throw e;
@@ -234,10 +234,10 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   routeWillEnter(route, url, action, exact, target, fromRouter) {
-    console.log(`routeWillEnter ${this} ${url} ${action} ${this._fromRouter}`);
     const currentUrl = this._historyController.history.location.pathname;
     const state = route.getState();
-
+    console.log(`routeWillEnter this : ${route} ${this._currentRoute} exact : ${exact} _fromRouter : ${this._fromRouter}`);
+    
     switch (action) {
       case "REPLACE": 
       case "PUSH":
@@ -257,10 +257,11 @@ class NativeStackRouter extends NativeRouterBase {
             });
             this._presented = true;
           } else if (!route.isModal() && this._currentRoute != route) {
-            // console.log(`routeWillEnter enter push ${this} ${url} ${action}`);
+            console.log(`routeWillEnter enter push ${this} ${url}`);
             this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
           }
         }
+        this._currentRoute = route;
         
         break;
       case "POP":
@@ -268,16 +269,20 @@ class NativeStackRouter extends NativeRouterBase {
           if (this._presented && target === this) {
             this._dismiss && this._dismiss();
             this._presented = false;
-          } else if (fromRouter && !this._presented && !route.isModal() && this._currentRoute != route) {
+          } else if (fromRouter && !route.isModal() && this._currentRoute != route) {
             this._renderer.popChild();
           }
         }
         
+      if(exact) // just delete when exact true because parent routers' last router must be saved because if it repush then it crahes
+        this._currentRoute = null;
+
         break;
     }
     
-    this._currentRoute = route;
-    this._currentUrl = url;
+    console.log(`routeWillEnter this : ${route} ${this._currentRoute} exact : ${exact}`);
+
+    // this._currentUrl = url;
   }
   
   resetView(){
