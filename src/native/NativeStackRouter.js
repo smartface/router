@@ -221,7 +221,7 @@ class NativeStackRouter extends NativeRouterBase {
   push(path, routeData = {}) {
     if (path === this._currentUrl) {
       Object.assign(
-        this._historyController.history.location.state, { routeData },
+        this._historyController.history.location.state, { routeData }
       );
       this.dispatch(this._historyController.history.location, "PUSH", this);
 
