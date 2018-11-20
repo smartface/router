@@ -260,6 +260,8 @@ class Route {
   }
 
   setUrl(url) {
+    if(url === null)
+      throw new TypeError(`[${this}] Route url cannot be empty`);
     this.setState({ url, prevUrl: this._state.url });
     this._isDIrty = true;
   }
@@ -424,13 +426,12 @@ class Route {
    * @ignore
    * @returns {Route}
    */
-  clone(props) {
+  clone(state={}) {
     return Route.of({
       modal: this._modal,
       routeDidExit: this._routeDidExit,
       routeShouldMatch: this._routeShouldMatch,
       routeDidEnter: this._routeDidEnter,
-      to: this._to,
       exact: this._exact,
       strict: this._strict,
       path: this._path.clone(),
@@ -439,7 +440,7 @@ class Route {
       build: this._build,
       exact: this._exact,
       strict: this._strict
-    }, { active: this._state.active, url: this._state.url });
+    }, Object.assign({ active: this._state.active, url: this._state.url, view: this._state.view }, state));
   }
 }
 

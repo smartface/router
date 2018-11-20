@@ -26,14 +26,15 @@ const matchRoutes = (store, routes, pathname, /*not public API*/ branch = []) =>
 
     if (match) {
       // if (match && route.routeShouldMatch(match)) {
-      console.log('match : '+JSON.stringify(match));
+      // console.log('match : '+JSON.stringify(match));
       if(route.__is_router) {
-        route.setUrl(match.url)
+        route.setUrl(match.url);
         branch.push({
           route,
           match
         });
       } else {
+        // console.log(`store has ${match.url} : ${store.hasRoute(match.url) }`);
         !store.hasRoute(match.url) && store.saveRoute(match.url, route.clone({url: match.url}));
         branch.push({
           route: store.findRoute(match.url),

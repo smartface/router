@@ -16,6 +16,9 @@ module.exports = function createRouteStore(){
         },
         findRoute(url){
             return _routes.get(url);
+        },
+        toString(){
+            return `[${Array.from(_routes.keys())}]`;
         }
     }
 }
