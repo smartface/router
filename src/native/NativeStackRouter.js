@@ -182,12 +182,10 @@ class NativeStackRouter extends NativeRouterBase {
    * Add new listener to listen NavigationController transitions.
    */
   addNavigatorChangeListener() {
-    console.log(`addNavigatorChangeListener ${this}`);
     this._unlistener = this._renderer.onNavigationControllerTransition(
       action => {
         // if user presses backbutton or uses gesture to back
         if (action.operation === NavigationController.OperationType.POP) {
-          console.log(`addNavigatorChangeListener ${this}`);
           // set Router to skip next history change
           // this._fromRouter = false;
           try {
@@ -232,21 +230,24 @@ class NativeStackRouter extends NativeRouterBase {
 
     return super.push(path, routeData);
   }
+  
+  /**
+   * @override
+   */
+  routeWillEnter(route, u, act, ex, target, fromRouter) {
+    const {active, view, match: {isExact: exact, url}, action} = route.getState();
+    console.log(`routeWillEnter this : ${route} ${this._currentRoute} ${active} exact : ${exact} action : ${action} _fromRouter : ${this._fromRouter}`);
+    console.log('push enter : '+JSON.stringify(route.getState().active, ' ', '\t'));
 
-  routeWillEnter(route, url, action, exact, target, fromRouter) {
-    const currentUrl = this._historyController.history.location.pathname;
-    const state = route.getState();
-    console.log(`routeWillEnter this : ${route} ${this._currentRoute} exact : ${exact} _fromRouter : ${this._fromRouter}`);
-    
     switch (action) {
       case "REPLACE": 
       case "PUSH":
         if (this._fromRouter) {
-          if (route.isModal() && !this._presented) {
-            this._renderer.present(route._renderer && route._renderer._rootController || state.view);
-            route.dismiss = this._dismiss = (onComplete) => this._renderer.dismiss(() => {
+          if (route.isModal() && !this._presented && !active) {
+            this._renderer.present(route._renderer && route._renderer._rootController || view);
+            route.dismiss = this._dismiss = () => this._renderer.dismiss(() => {
               // console.log(`route dismiss ${route} ${this.getHistoryasArray()}`);
-              if(route instanceof Router){
+              if(route.__is_router){
                 route.resetView();
               }
               this._dismiss = null;
@@ -254,42 +255,48 @@ class NativeStackRouter extends NativeRouterBase {
               this._presented = false;
               this._currentUrl = null;
               this._currentRoute = null;
+              route.setState({active: false});
             });
             this._presented = true;
-          } else if (!route.isModal() && this._currentRoute !== route) {
-            console.log(`routeWillEnter enter push ${this} ${url}`);
-            this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
+            route.setState({active: true});
+          } else if (!route.isModal() && !active) {
+            console.log('push entered : '+this + ' - ' +(view));
+            this._renderer.pushChild(route._renderer && route._renderer._rootController || view);
+            route.__goBack = () => this._renderer.popChild();
+            route.setState({active: true});
           }
         }
-        this._currentRoute = route;
+        // this._currentRouteUrl = route.getUrl();
         
         break;
       case "POP":
         if (this._fromRouter) {
           if (this._presented && target === this) {
             this._dismiss && this._dismiss();
+            route.setState({active: false});
             this._presented = false;
-          } else if (fromRouter && !route.isModal() && this._currentRoute != route) {
-            this._renderer.popChild();
+          } else if (fromRouter && !route.isModal() && active) {
+            // this._renderer.popChild();
+            route.__goBack && route.__goBack()
+            route.__goBack = null;
+            route.setState({active: false});
           }
         }
         
-      if(exact) // just delete when exact true because parent routers' last router must be saved because if it repush then it crahes
-        this._currentRoute = null;
+      // if(exact) // just delete when exact true because parent routers' last router must be saved because if it repush then it crahes
+      //   this._currentRouteURL = null;
 
         break;
     }
-    
-    console.log(`routeWillEnter this : ${route} ${this._currentRoute} exact : ${exact}`);
-
     // this._currentUrl = url;
   }
-  
+
   resetView(){
       this._currentRoute = null;
       this._renderer.setChildControllers([]);
       this._historyController.clear();
-      this._currentUrl = null;
+      this._currentRouteUrl = null;
+      this.setState({active: false});
   }
   
   /**
@@ -303,6 +310,7 @@ class NativeStackRouter extends NativeRouterBase {
    */
   routerDidExit(action) {
     if(action === 'POP' && this.isModal()){
+      this.setState({active: false});
       // TODO: Destroy navigation controller's and childrens'
     }
     

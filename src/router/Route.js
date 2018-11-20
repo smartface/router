@@ -53,7 +53,7 @@ class RoutePath {
    * @param {string} path
    * @since 1.0.0
    */
-  static of(path) {
+  static of (path) {
     return new RoutePath(path);
   }
 
@@ -132,7 +132,7 @@ class Route {
    * @param {RouteParams} params
    * @return {Route}
    */
-  static of(params = {}) {
+  static of (params = {}) {
     return new Route(params);
   }
   /**
@@ -147,11 +147,19 @@ class Route {
     exact = false,
     sensitive = true,
     strict = true,
-    modal= false,
+    modal = false,
     routeShouldMatch = null,
     routeDidEnter,
     routeDidExit
-  }) {
+  }={}, {
+    match = {},
+    routeData = {},
+    view = null,
+    routingState = {},
+    action = null,
+    url = null,
+    active = false
+  } = {}) {
     this._options = {
       exact,
       path,
@@ -159,6 +167,7 @@ class Route {
       strict
     };
     this._exact = exact;
+    this._isDIrty = false;
     this._strict = false;
     this._build = build;
     this._path = path instanceof RoutePath ? path : new RoutePath(path);
@@ -170,19 +179,20 @@ class Route {
     this._routeDidExit = routeDidExit;
     this._modal = modal;
     this._state = Object.seal({
-      match: {},
-      routeData: {},
-      view: null,
-      routingState: {},
-      action: null,
-      url: null
+      match,
+      routeData,
+      view,
+      routingState,
+      action,
+      url,
+      active
     });
   }
-  
-  isModal(){
+
+  isModal() {
     return this._modal;
   }
-  
+
   /**
    * Merges specified state to current route state
    *
@@ -210,15 +220,31 @@ class Route {
    * @return {{path: string, routes: Array<object>}}
    */
   toJSON() {
+    const {
+      match,
+      routeData,
+      routingState,
+      action,
+      url,
+      view,
+      active
+    } = this._state;
     return {
       type: 'route',
       match: this._state.routeData,
       routeData: this._state.routeData,
       routingState: this._state.routingState,
-      action: this._state.action,
-      url: this._state.url,
       path: this._path.getPath(),
-      routes: this._routes.slice()
+      routes: this._routes.slice(),
+      state: {
+        match,
+        routeData,
+        routingState,
+        action,
+        url,
+        active,
+        view: view && view.constructor.name || undefined
+      }
     };
   }
 
@@ -231,12 +257,17 @@ class Route {
   toString() {
     return `[object ${this.constructor.name}, path: ${this.getUrlPath()}, url: ${this._state.url}]`;
   }
-  
-  setUrl(url){
-    this.setState({url});
+
+  setUrl(url) {
+    this.setState({ url, prevUrl: this._state.url });
+    this._isDIrty = true;
   }
-  
-  getUrl(){
+
+  clearDirty() {
+    this._isDIrty = false;
+  }
+
+  getUrl() {
     return this._state.url;
   }
 
@@ -392,15 +423,22 @@ class Route {
    * @ignore
    * @returns {Route}
    */
-  clone() {
+  clone(props) {
     return Route.of({
+      modal: this._modal,
+      routeDidExit: this._routeDidExit,
+      routeShouldMatch: this._routeShouldMatch,
+      routeDidEnter: this._routeDidEnter,
+      to: this._to,
+      exact: this._exact,
+      strict: this._strict,
+      path: this._path.clone(),
       path: this._path,
-      routes: this._routes.slice(),
       props: Object.assign({}, this._props),
       build: this._build,
       exact: this._exact,
       strict: this._strict
-    });
+    }, { active: this._state.active, url: this._state.url });
   }
 }
 

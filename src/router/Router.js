@@ -3,6 +3,7 @@
 const Route = require("./Route");
 const matchRoutes = require("../common/matchRoutes");
 const createHistory = require("../common/createHistory");
+const createStore = require("./routeStore");
 let tasks = [];
 
 let historyController;
@@ -10,6 +11,7 @@ let historyController;
 let _lastRoute;
 const listeners = new Set();
 const history = [];
+
 // const dispatch = (location, action) => {
 //   history.push([location.pathnamme, action]);
 //   listeners.forEach(listener => listener(location, action));
@@ -18,9 +20,10 @@ const history = [];
 const dispatch = (location, action) => {
   history.push([location.pathnamme, action]);
   listeners.forEach(listener => listener(location, action));
-  action === "PUSH"
-    ? historyController.pushLocation(location) // TODO: not share loaction instance
-    : historyController.goBack();
+  action === "PUSH" ?
+    historyController.pushLocation(location) // TODO: not share loaction instance
+    :
+    historyController.goBack();
 };
 
 function handleRouteUrl(router, url, routeData, action) {
@@ -187,7 +190,7 @@ class Router extends Route {
     strict = true,
     isRoot = false,
     to = null,
-    modal=false,
+    modal = false,
     routerDidEnter,
     routerDidExit,
     routeShouldMatch
@@ -199,8 +202,9 @@ class Router extends Route {
       routerDidEnter,
       routerDidExit
     };
-    
+
     if (isRoot) {
+      this._store = createStore();
       /** @type {HistoryListener} */
       listeners.clear();
       historyController = createHistory({
@@ -242,17 +246,17 @@ class Router extends Route {
         }
       })
     );
-    
-/*    this._historyController.onGoBack = () => {
-      // console.log('on go back '+this);
-      // const _unlisten = historyController.listen((location, action) => {
-      //   console.log('in global history listener '+this);
-      //   _unlisten();
-      //   onHistoryChange(location, action, this, true); // fires root's onHistoryChange
-      // });
-      this._historyController.goBack();
-    };
-*/    
+
+    /*    this._historyController.onGoBack = () => {
+          // console.log('on go back '+this);
+          // const _unlisten = historyController.listen((location, action) => {
+          //   console.log('in global history listener '+this);
+          //   _unlisten();
+          //   onHistoryChange(location, action, this, true); // fires root's onHistoryChange
+          // });
+          this._historyController.goBack();
+        };
+    */
     this._routes.forEach(route => {
       // if (route instanceof Router) {
       route.initialize &&
@@ -268,6 +272,10 @@ class Router extends Route {
     this.dispatch = (location, action, target) => {
       onHistoryChange(location, action, target, this._fromRouter);
     };
+  }
+
+  get __is_router() {
+    return true;
   }
 
   /**
@@ -340,6 +348,10 @@ class Router extends Route {
     return this._unblock;
   }
 
+  getStore() {
+    return this._store;
+  }
+
   /**
    * Handles history changes. Just Root router, because routing flow mmust be always root to children,
    * in order to change display logic all the time.
@@ -351,7 +363,7 @@ class Router extends Route {
    * @param {Router} target Target Router which pushed to its router.
    */
   onHistoryChange(location, action, target, fromRouter = true) {
-    this._matches = matchRoutes([this].concat(this._routes), location.pathname);
+    this._matches = matchRoutes(this.getStore(), [this].concat(this._routes), location.pathname);
     this.renderMatches(this._matches, location, action, target, fromRouter);
   }
 
@@ -380,8 +392,10 @@ class Router extends Route {
   renderMatches(matches, location, action, target, fromRouter) {
     const routeData = location.state;
     matches.some(({ match, route }, index) => {
-      route.setUrl(match.url);
-      if (route !== this && route instanceof Router) {
+      route.setState({
+        action
+      })
+      if (route !== this && route.__is_router) {
         // if(index > 0 && this._isRoot)
         tasks.push((url) => {
           this.routeWillEnter && this.routeWillEnter(route, url, action, false, target);
@@ -399,9 +413,7 @@ class Router extends Route {
         return true;
       }
       else if (match.isExact === true) {
-        if (
-          !this._fromRouter || route.routeShouldMatch(route, { match, action, routeData }) === true
-        ) {
+        if (!this._fromRouter || route.routeShouldMatch(route, { match, action, routeData }) === true) {
           if (route.getRedirectto()) {
             tasks = []; // reset tasks
             target.routeRollback(); // remove redirected path from target Router
@@ -429,13 +441,13 @@ class Router extends Route {
             // if (!this.isUrlCurrent(match.url, action)) {
             handleRouteUrl(this, match.url, routeData, action);
           }
-          
+
           tasks.push((url, action) => this.routeWillEnter && this.routeWillEnter(route, url, action, true, target));
 
           // this.routeWillEnter(null);
           _lastRoute && _lastRoute.routeDidExit(this);
           this.routeDidMatch(route); // fires routeDidMatch
-          if(this._fromRouter){
+          if (this._fromRouter) {
             const view = this.renderRoute(route); // build route's view
             route.setState({ view }); // keep view in the route's state
           }
@@ -622,9 +634,9 @@ class Router extends Route {
       return this;
     }
     // if(this._currentUrl !== path)
-      this._historyController.push(path, routeData);
+    this._historyController.push(path, routeData);
     // else
-      // dispatch(this._historyController.history.location, 'PUSH');
+    // dispatch(this._historyController.history.location, 'PUSH');
 
     return this;
   }
@@ -649,16 +661,16 @@ class Router extends Route {
   goBack(url) {
     console.log(`router goback ${this}`);
     const go = () => {
-      url 
-        ? this.dispatch(
-          typeof url === 'string' 
-            ? {pathname: url, hash: '', search: '', state: {}}
-            : url 
-          , 'POP', this)
-        : this._historyController.goBack();
+      url
+        ?
+        this.dispatch(
+          typeof url === 'string' ?
+          { pathname: url, hash: '', search: '', state: {} } :
+          url, 'POP', this) :
+        this._historyController.goBack();
     };
     if (Router.blocker) {
-      Router.blocker(this, null, null, "POP", () =>go());
+      Router.blocker(this, null, null, "POP", () => go());
 
       return this;
     }

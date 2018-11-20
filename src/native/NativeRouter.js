@@ -96,8 +96,10 @@ class NativeRouter extends NativeRouterBase {
   routeWillEnter(route, action) {
     const Renderer = require("./Renderer");
     // this._renderer.show(router._renderer._rootController);
-
-    if (this._isRoot) Renderer.setasRoot(route._renderer && route._renderer._rootController || route.getState().view);
+    if (this._isRoot && this._route !== route) {
+      Renderer.setasRoot(route._renderer && route._renderer._rootController || route.getState().view);
+      this._route = route;
+    }
   }
 }
 

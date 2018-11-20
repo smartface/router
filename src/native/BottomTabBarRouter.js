@@ -202,7 +202,6 @@ class BottomTabBarRouter extends NativeRouterBase {
    */
   renderMatches(matches, state, action, target, fromRouter) {
     this._fromRouter = true;
-
     if (matches.length > 0) {
       const { match: next } = matches[matches.length - 1];
       const { match } = matches[1] || matches[0];

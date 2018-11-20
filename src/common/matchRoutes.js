@@ -1,4 +1,5 @@
-// code from react-router
+// based from react-router
+"use strict";
 
 /**
  *
@@ -7,8 +8,9 @@
  * @param {Array<Route>} routes
  * @param {string} pathname
  * @param {Array} branch
+ * @param {object} store
  */
-const matchRoutes = (routes, pathname, /*not public API*/ branch = []) => {
+const matchRoutes = (store, routes, pathname, /*not public API*/ branch = []) => {
   routes.some(route => {
     const match = route.hasPath()
       ? route.matchPath(pathname)
@@ -24,15 +26,26 @@ const matchRoutes = (routes, pathname, /*not public API*/ branch = []) => {
 
     if (match) {
       // if (match && route.routeShouldMatch(match)) {
-      branch.push({
-        route: route,
-        match
-      });
+      console.log('match : '+JSON.stringify(match));
+      if(route.__is_router) {
+        route.setUrl(match.url)
+        branch.push({
+          route,
+          match
+        });
+      } else {
+        !store.hasRoute(match.url) && store.saveRoute(match.url, route.clone({url: match.url}));
+        branch.push({
+          route: store.findRoute(match.url),
+          match
+        });
+      }
+      
       const children = route.map(child => {
         return child;
       });
 
-      matchRoutes(children, pathname, branch);
+      matchRoutes(store, children, pathname, branch);
     }
 
     return match;
