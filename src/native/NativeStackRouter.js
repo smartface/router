@@ -209,15 +209,6 @@ class NativeStackRouter extends NativeRouterBase {
     );
   }
 
-  // /**
-  // * @override
-  // *
-  // */
-  // dispose() {
-  //   super.dispose();
-  //   this._unlistener();
-  // }
-
   push(path, routeData = {}) {
     if (path === this._currentUrl) {
       Object.assign(
@@ -237,7 +228,6 @@ class NativeStackRouter extends NativeRouterBase {
   routeWillEnter(route, u, act, ex, target, fromRouter) {
     const {active, view, match: {isExact: exact, url}, action} = route.getState();
     console.log(`routeWillEnter this : ${route} ${this._currentRoute} ${active} exact : ${exact} action : ${action} _fromRouter : ${this._fromRouter}`);
-    console.log('push enter : '+JSON.stringify(route.getState().active, ' ', '\t'));
 
     switch (action) {
       case "REPLACE": 
@@ -246,7 +236,6 @@ class NativeStackRouter extends NativeRouterBase {
           if (route.isModal() && !this._presented && !active) {
             this._renderer.present(route._renderer && route._renderer._rootController || view);
             route.dismiss = this._dismiss = () => this._renderer.dismiss(() => {
-              // console.log(`route dismiss ${route} ${this.getHistoryasArray()}`);
               if(route.__is_router){
                 route.resetView();
               }
@@ -260,9 +249,12 @@ class NativeStackRouter extends NativeRouterBase {
             this._presented = true;
             route.setState({active: true});
           } else if (!route.isModal() && !active) {
-            console.log('push entered : '+this + ' - ' +(view));
             this._renderer.pushChild(route._renderer && route._renderer._rootController || view);
             route.__goBack = () => this._renderer.popChild();
+            this.goBack = () => {
+              this._renderer.popChild();
+              this.goBack = () => null;
+            }
             route.setState({active: true});
           }
         }
@@ -277,7 +269,7 @@ class NativeStackRouter extends NativeRouterBase {
             this._presented = false;
           } else if (fromRouter && !route.isModal() && active) {
             // this._renderer.popChild();
-            route.__goBack && route.__goBack()
+            route.__goBack && route.__goBack();
             route.__goBack = null;
             route.setState({active: false});
           }

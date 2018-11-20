@@ -185,7 +185,8 @@ class Route {
       routingState,
       action,
       url,
-      active
+      active,
+      prevUrl: null
     });
   }
 
