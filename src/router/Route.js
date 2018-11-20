@@ -229,7 +229,7 @@ class Route {
    * @return {string}
    */
   toString() {
-    return `[object ${this.constructor.name}, path: ${this.getUrlPath()}, url: ${this.state.url}]`;
+    return `[object ${this.constructor.name}, path: ${this.getUrlPath()}, url: ${this._state.url}]`;
   }
   
   setUrl(url){
@@ -237,7 +237,7 @@ class Route {
   }
   
   getUrl(){
-    return this.state.url;
+    return this._state.url;
   }
 
   /**
