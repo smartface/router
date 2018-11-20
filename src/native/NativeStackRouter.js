@@ -256,7 +256,7 @@ class NativeStackRouter extends NativeRouterBase {
               this._currentRoute = null;
             });
             this._presented = true;
-          } else if (!route.isModal() && this._currentRoute != route) {
+          } else if (!route.isModal() && this._currentRoute !== route) {
             console.log(`routeWillEnter enter push ${this} ${url}`);
             this._renderer.pushChild(route._renderer && route._renderer._rootController || state.view);
           }

@@ -174,7 +174,8 @@ class Route {
       routeData: {},
       view: null,
       routingState: {},
-      action: null
+      action: null,
+      url: null
     });
   }
   
@@ -202,27 +203,22 @@ class Route {
     return this._state;
   }
 
-  toJSON() {
-    return {
-      type: "route",
-      exac: this._exact,
-      strict: this._strict,
-      sensitive: this._sensitive,
-      path: this._path,
-      state: { match: this._state.match }
-    };
-  }
-
   /**
    * Simple Object representation of the route
    *
    * @since 1.0.0
    * @return {{path: string, routes: Array<object>}}
    */
-  toObject() {
+  toJSON() {
     return {
+      type: 'route',
+      match: this._state.routeData,
+      routeData: this._state.routeData,
+      routingState: this._state.routingState,
+      action: this._state.action,
+      url: this._state.url,
       path: this._path.getPath(),
-      routes: this._routes.map(route => route.toObject())
+      routes: this._routes.slice()
     };
   }
 
@@ -233,7 +229,15 @@ class Route {
    * @return {string}
    */
   toString() {
-    return `[object ${this.constructor.name}, path: ${this.getUrlPath()}]`;
+    return `[object ${this.constructor.name}, path: ${this.getUrlPath()}, url: ${this.state.url}]`;
+  }
+  
+  setUrl(url){
+    this.setState({url});
+  }
+  
+  getUrl(){
+    return this.state.url;
   }
 
   /**

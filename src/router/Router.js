@@ -380,6 +380,7 @@ class Router extends Route {
   renderMatches(matches, location, action, target, fromRouter) {
     const routeData = location.state;
     matches.some(({ match, route }, index) => {
+      route.setUrl(match.url);
       if (route !== this && route instanceof Router) {
         // if(index > 0 && this._isRoot)
         tasks.push((url) => {
