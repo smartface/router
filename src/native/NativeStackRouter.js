@@ -144,7 +144,6 @@ class NativeStackRouter extends NativeRouterBase {
     });
 
     this._headerBarParams = headerBarParams;
-    this._fromRouter = true;
     this._renderer = renderer;
     this._renderer.setRootController(new NavigationController());
     this.addNavigatorChangeListener();
@@ -185,20 +184,19 @@ class NativeStackRouter extends NativeRouterBase {
     this._unlistener = this._renderer.onNavigationControllerTransition(
       action => {
         // if user presses backbutton or uses gesture to back
-        if (action.operation === NavigationController.OperationType.POP) {
+        if (action.operation === NavigationController.OperationType.POP && !this._fromRouter) {
           // set Router to skip next history change
           // this._fromRouter = false;
           try {
             this._historyController.preventDefault();
             this._historyController.goBack();
-            this._fromRouter = false;
             this.dispatch(
               this._historyController.history.location,
               "POP",
               this,
               false
             );
-            this._fromRouter = true;
+            // this._fromRouter = true;
           }
           catch (e) {
             throw e;
@@ -224,10 +222,13 @@ class NativeStackRouter extends NativeRouterBase {
 
   /**
    * @override
+   * 
+   * TODO: Nativeden gelen geri-don olaylarinda buraya girmiyor. Bu yuzdende router resetlenmiyor ve crash oluyor.
    */
-  routeWillEnter(route, u, act, ex, target, fromRouter) {
-    const { active, view, match: { isExact: exact, url }, action } = route.getState();
-    console.log(`routeWillEnter this : ${route} ${active} exact : ${exact} action : ${action} _fromRouter : ${this._fromRouter}`);
+  routeWillEnter(route, requestedUrl, act, ex, target, fromRouter) {
+    const { view, match: { isExact: exact }, url, action } = route.getState();
+    const active = url === this._currentRouteUrl;
+    console.log(`routeWillEnter route : ${route} url: ${url} ${this._currentRouteUrl} active: ${active} exact : ${exact} action : ${action} _fromRouter : ${this._fromRouter}`);
 
     switch (action) {
       case "REPLACE":
@@ -237,27 +238,26 @@ class NativeStackRouter extends NativeRouterBase {
             this._renderer.present(route._renderer && route._renderer._rootController || view);
             route.dismiss = this._dismiss = () => {
               this._renderer.dismiss(() => {
-                if (route.__is_router) {
-                  route.resetView();
-                }
+                route.resetView && route.resetView();
                 this._dismiss = null;
                 route.dismiss = null;
                 this._presented = false;
-                route.setState({ active: false });
+                this._currentRouteUrl = null;
               });
             };
+            
             this._presented = true;
             route.setState({ active: true });
           }
           else if (!route.isModal() && !active) {
-            this._currentRoute = route;
+            this._currentRouteUrl = url;
             this._renderer.pushChild(route._renderer && route._renderer._rootController || view);
-            route.__goBack = () => this._renderer.popChild();
-            this.goBack = () => {
-              this._renderer.popChild();
-              this.goBack = () => null;
-            };
-            route.setState({ active: true });
+            // route.__goBack = () => this._renderer.popChild();
+            // this.goBack = () => {
+            //   this._renderer.popChild();
+            //   this.goBack = () => null;
+            // };
+            // route.setState({ active: true });
           }
         }
         // this._currentRouteUrl = route.getUrl();
@@ -267,20 +267,22 @@ class NativeStackRouter extends NativeRouterBase {
         if (this._fromRouter) {
           if (this._presented && target === this) {
             this._dismiss && this._dismiss();
-            route.setState({ active: false });
+            this._currentRouteUrl = null;
+            // route.setState({ active: false });
             this._presented = false;
           }
           else if (fromRouter && !route.isModal() && active) {
             this._renderer.popChild();
             // route.__goBack && route.__goBack();
             // route.__goBack = null;
-            route.setState({ active: false });
+            // route.setState({ active: false });
+            // this._currentRouteUrl = null;
           }
         }
 
         if(exact){ // just delete when exact true because parent routers' last router must be saved because if it repush then it crahes
-          this._currentRoute.setState({active: false});
-          this._currentRoute = route;
+          // this._currentRoute.setState({active: false});
+          this._currentRouteUrl = url;
           // this._currentRouteURL.setState({active: false});
         }
 
@@ -290,12 +292,9 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   resetView() {
-    this._currentRoute.setState({active:false});
-    this._currentRoute = null;
+    this._currentRouteUrl = null;
     this._renderer.setChildControllers([]);
     this._historyController.clear();
-    this._currentRouteUrl = null;
-    this.setState({ active: false });
   }
 
   /**
@@ -308,12 +307,9 @@ class NativeStackRouter extends NativeRouterBase {
    * @param {string} action
    */
   routerDidExit(action) {
-    if (action === 'POP' && this.isModal()) {
-      this.setState({ active: false });
-      // TODO: Destroy navigation controller's and childrens'
+    if (action === 'POP') {
+      // this._currentRouteUrl = null;
     }
-
-    console.log(`history : ${JSON.stringify(this._historyController.getHistoryasArray())}`);
 
     super.routerDidExit(action);
   }

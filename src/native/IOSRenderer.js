@@ -53,10 +53,13 @@ class IOSRenderer extends Renderer {
    * @override
    */
   pushChild(page, animated = true) {
-    console.log('pushChild '+page);
+    if(this._rootController.childControllers.some(p => p === page))
+      throw new Error("You can't pass extisting view");
+      
     this.makeRootVisible();
     this._rootController.push &&
       this._rootController.push({ controller: page, animated });
+    this._activePage = page
   }
 
   /**

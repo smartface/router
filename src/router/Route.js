@@ -132,8 +132,8 @@ class Route {
    * @param {RouteParams} params
    * @return {Route}
    */
-  static of (params = {}) {
-    return new Route(params);
+  static of (params = {}, state={}) {
+    return new Route(params, state);
   }
   /**
    * @constructor
@@ -437,9 +437,7 @@ class Route {
       path: this._path.clone(),
       path: this._path,
       props: Object.assign({}, this._props),
-      build: this._build,
-      exact: this._exact,
-      strict: this._strict
+      build: this._build
     }, Object.assign({ active: this._state.active, url: this._state.url, view: this._state.view }, state));
   }
 }
