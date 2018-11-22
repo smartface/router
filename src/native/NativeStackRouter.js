@@ -269,15 +269,9 @@ class NativeStackRouter extends NativeRouterBase {
             this._dismiss && this._dismiss();
             this._presented = false;
           }
-          else if (fromRouter && !route.isModal() && active) {
+          else if (!route.isModal() && exact) {
             this._renderer.popChild();
           }
-        }
-
-        if(exact){ // just delete when exact true because parent routers' last router must be saved because if it repush then it crahes
-          // this._currentRoute.setState({active: false});
-          // this._currentRouteUrl = url;
-          // this._currentRouteURL.setState({active: false});
         }
 
         break;

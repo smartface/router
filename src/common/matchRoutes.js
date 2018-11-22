@@ -35,10 +35,10 @@ const matchRoutes = (store, routes, pathname, /*not public API*/ branch = []) =>
         });
       } else {
         // console.log(`store has ${match.url} : ${store.hasRoute(match.url) }`);
-        // !store.hasRoute(match.url) && store.saveRoute(match.url, route.clone({url: match.url}));
+        !store.hasRoute(match.url) && store.saveRoute(match.url, route.clone({url: match.url}));
         branch.push({
-          route: route.clone({url: match.url}),
-          // store.findRoute(match.url),
+          // route: route.clone({url: match.url}),
+          route: store.findRoute(match.url),
           match
         });
       }
