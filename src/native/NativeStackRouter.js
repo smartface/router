@@ -267,28 +267,22 @@ class NativeStackRouter extends NativeRouterBase {
         if (this._fromRouter) {
           if (this._presented && target === this) {
             this._dismiss && this._dismiss();
-            this._currentRouteUrl = null;
-            // route.setState({ active: false });
             this._presented = false;
           }
           else if (fromRouter && !route.isModal() && active) {
             this._renderer.popChild();
-            // route.__goBack && route.__goBack();
-            // route.__goBack = null;
-            // route.setState({ active: false });
-            // this._currentRouteUrl = null;
           }
         }
 
         if(exact){ // just delete when exact true because parent routers' last router must be saved because if it repush then it crahes
           // this._currentRoute.setState({active: false});
-          this._currentRouteUrl = url;
+          // this._currentRouteUrl = url;
           // this._currentRouteURL.setState({active: false});
         }
 
         break;
     }
-    // this._currentUrl = url;
+    this._currentRouteUrl = url;
   }
 
   resetView() {
