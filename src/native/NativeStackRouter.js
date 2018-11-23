@@ -235,9 +235,10 @@ class NativeStackRouter extends NativeRouterBase {
       case "PUSH":
         if (this._fromRouter) {
           if (route.isModal() && !this._presented && !active) {
+            console.log('present '+this);
             this._renderer.present(route._renderer && route._renderer._rootController || view);
             route.dismiss = this._dismiss = () => {
-              this._renderer.dismiss(() => {
+              route._renderer.dismiss(() => {
                 route.resetView && route.resetView();
                 this._dismiss = null;
                 route.dismiss = null;

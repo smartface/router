@@ -53,6 +53,7 @@ class Renderer {
     });
   }
 
+
   makeRootVisible() {
     var sfWindow = SF.requireClass("UIApplication").sharedApplication()
       .keyWindow;
