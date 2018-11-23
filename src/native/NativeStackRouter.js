@@ -273,11 +273,9 @@ class NativeStackRouter extends NativeRouterBase {
             this._dismiss && this._dismiss();
             this._presented = false;
           }
-          else if (!this._presented && !route.isModal() && exact) {
+          else if (!route.isModal() && exact) {
             console.log('pop '+this);
             this._renderer.popChild();
-          } else if(this._presented){
-            throw new Error("You must dismiss active page");
           }
         }
 

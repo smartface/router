@@ -28,6 +28,7 @@ class AndroidRenderer extends Renderer {
    * @override
    */
   pushChild(page, animated = true) {
+    console.log('pageID : '+page.pageID);
     if(this._rootController.childControllers.some(p => p === page)){
       console.log('Page exists')
       return;
