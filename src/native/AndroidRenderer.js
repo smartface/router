@@ -28,8 +28,10 @@ class AndroidRenderer extends Renderer {
    * @override
    */
   pushChild(page, animated = true) {
-    if(this._rootController.childControllers.some(p => p === page))
-      throw new Error("You can't pass extisting view");
+    if(this._rootController.childControllers.some(p => p === page)){
+      console.log('Page exists')
+      return;
+    }
     this._rootController.push &&
       this._rootController.push({ controller: page, animated: animated });
   }

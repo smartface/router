@@ -186,7 +186,9 @@ class NativeStackRouter extends NativeRouterBase {
         // if user presses backbutton or uses gesture to back
         if (action.operation === NavigationController.OperationType.POP && !this._fromRouter) {
           // set Router to skip next history change
-          // this._fromRouter = false;
+          this._fromRouter = false;
+          
+          console.log('-------- go back from device');
           try {
             this._historyController.preventDefault();
             this._historyController.goBack();
@@ -267,11 +269,15 @@ class NativeStackRouter extends NativeRouterBase {
       case "POP":
         if (this._fromRouter) {
           if (this._presented && target === this) {
+            console.log('dismiss '+this);
             this._dismiss && this._dismiss();
             this._presented = false;
           }
-          else if (!route.isModal() && exact) {
+          else if (!this._presented && !route.isModal() && exact) {
+            console.log('pop '+this);
             this._renderer.popChild();
+          } else if(this._presented){
+            throw new Error("You must dismiss active page");
           }
         }
 
