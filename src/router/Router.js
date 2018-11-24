@@ -699,6 +699,7 @@ class Router extends Route {
     }
     // if(this._currentUrl !== path)
     this._historyController.push(path, routeData);
+    console.log('last history '+this.getHistoryasArray());
     // else
     // dispatch(this._historyController.history.location, 'PUSH');
     this._fromRouter = false;

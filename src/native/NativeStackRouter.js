@@ -215,8 +215,8 @@ class NativeStackRouter extends NativeRouterBase {
    * @override
    */
   routeWillEnter(route, requestedUrl, act, ex, target, fromRouter) {
-    const { view, match: { isExact: exact }, url, action } = route.getState();
-    const active = url === this._currentRouteUrl;
+    const { active, view, match: { isExact: exact }, url, action } = route.getState();
+    // const active = url === this._currentRouteUrl;
     console.log(`routeWillEnter route : ${route} url: ${url} ${this._currentRouteUrl} active: ${active} exact : ${exact} action : ${action} _fromRouter : ${this._fromRouter}`);
 
     switch (action) {
@@ -236,6 +236,7 @@ class NativeStackRouter extends NativeRouterBase {
                 this._currentRouteUrl = null;
                 this._historyController.preventDefault();
                 this._historyController.goBack();
+                route.setState({ active: false });
               });
             };
             
@@ -248,6 +249,8 @@ class NativeStackRouter extends NativeRouterBase {
               this._renderer.pushChild(route._renderer && route._renderer._rootController || view);
             } catch(e) {
               console.log(`Error when ${route} is pushed ${this} ${e.messagr} ${e.stack}`);
+            } finally {
+              route.setState({ active: true });
             }
             // route.__goBack = () => this._renderer.popChild();
             // this.goBack = () => {
@@ -269,8 +272,9 @@ class NativeStackRouter extends NativeRouterBase {
           // }
           // else 
           if (!route.dismiss && exact) {
-            // console.log('pop '+this);
+            console.log('pop '+this);
             this._renderer.popChild();
+            route.setState({ active: false });
           }
         }
 
