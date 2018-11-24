@@ -199,9 +199,6 @@ describe("Router", () => {
         }),
         new Router({
           path: "/path2",
-          build: (router, route) => ({
-            type: "target1"
-          }),
           routes: [
             new Route({
               path: "/path2/to/:id",
@@ -230,6 +227,10 @@ describe("Router", () => {
     // });
     router.push("/");
     expect(lastUrl).toBe("/path/to/the/1");
+    expect(_router1.toString()).toBe(
+      "[object Router, path: /path/to, url: /path/to/the/1]"
+    );
+    console.log("_router1 : " + _router1);
     expect(_router1.getHistoryasArray()).toEqual(["/path/to/the/1"]);
 
     _router1.push("/path2/to/1");
@@ -300,20 +301,81 @@ describe("Router", () => {
       .push("/path/to/1")
       ._matches.map(({ match, route }) => ({
         match,
-        route: route.toObject(),
+        route: route.toJSON(),
         view: route.build()
       }));
 
-    expect(matches).toEqual([
-      {
+    expect(matches).toEqual[
+      ({
         match: { isExact: false, params: {}, path: "/", url: "/" },
         route: {
+          match: {},
           path: "/",
+          routeData: {},
           routes: [
-            { path: "/path/to/:name", routes: [] },
-            { path: "/path/to/:id", routes: [] },
-            { path: "*", routes: [] }
-          ]
+            {
+              match: {},
+              path: "/path/to/:name",
+              routeData: {},
+              routes: [],
+              routingState: {},
+              state: {
+                action: null,
+                active: false,
+                match: {},
+                routeData: {},
+                routingState: {},
+                url: null,
+                view: undefined
+              },
+              type: "route"
+            },
+            {
+              match: {},
+              path: "/path/to/:id",
+              routeData: {},
+              routes: [],
+              routingState: {},
+              state: {
+                action: null,
+                active: false,
+                match: {},
+                routeData: {},
+                routingState: {},
+                url: null,
+                view: undefined
+              },
+              type: "route"
+            },
+            {
+              match: {},
+              path: "*",
+              routeData: {},
+              routes: [],
+              routingState: {},
+              state: {
+                action: null,
+                active: false,
+                match: {},
+                routeData: {},
+                routingState: {},
+                url: null,
+                view: undefined
+              },
+              type: "route"
+            }
+          ],
+          routingState: {},
+          state: {
+            action: "PUSH",
+            active: false,
+            match: { isExact: false, params: {}, path: "/", url: "/" },
+            routeData: {},
+            routingState: {},
+            url: null,
+            view: undefined
+          },
+          type: "route"
         },
         view: null
       },
@@ -324,10 +386,31 @@ describe("Router", () => {
           path: "/path/to/:name",
           url: "/path/to/1"
         },
-        route: { path: "/path/to/:name", routes: [] },
+        route: {
+          match: {},
+          path: "/path/to/:name",
+          routeData: {},
+          routes: [],
+          routingState: {},
+          state: {
+            action: "PUSH",
+            active: false,
+            match: {
+              isExact: true,
+              params: { name: "1" },
+              path: "/path/to/:name",
+              url: "/path/to/1"
+            },
+            routeData: {},
+            routingState: {},
+            url: "/path/to/1",
+            view: "Object"
+          },
+          type: "route"
+        },
         view: { type: "target1" }
-      }
-    ]);
+      })
+    ];
   });
   it("return only root path if any route doesn't be matched", () => {
     const router = new Router({
@@ -387,7 +470,7 @@ describe("Router", () => {
     expect(data.match.params).toEqual({ name: "1" });
     expect(data.routeData).toEqual({ name: "name" });
   });
-  it("gets history back", () => {
+  it("can get back in its history", () => {
     let data;
     let callCount = 0;
     var component = {};
@@ -399,15 +482,20 @@ describe("Router", () => {
           path: "/path",
           routes: [
             new Route({
+              routeDidEnter: () => {
+                callCount++;
+              },
               path: "/path/to/:name",
               build: (router, route) => {
                 data = route.getState();
-                callCount++;
                 return { type: "target1" };
               }
             }),
             new Route({
               path: "/path/too/:name",
+              routeDidEnter: () => {
+                callCount++;
+              },
               build: (router, route) => {
                 component.router = router;
                 return component;
@@ -430,7 +518,7 @@ describe("Router", () => {
     expect(data.routeData).toEqual({ name: "name1" });
 
     expect(component.router === router).toBe(false);
-    expect(callCount).toBe(2);
+    expect(callCount).toBe(3);
   });
 
   it("calls back to parent if its history is empty", () => {
@@ -476,11 +564,16 @@ describe("Router", () => {
 
     router.push("/path2/to/1", { name: "name1" });
     expect(route.getState().routeData).toEqual({ name: "name1" });
+    expect(router.getHistoryasArray()).toEqual(["/path2/to/1"]);
+
     router.push("/path/to/dev", { name: "name2" });
+    expect(router.getHistoryasArray()).toEqual(["/path2/to/1", "/path/to/dev"]);
     expect(route.getState().routeData).toEqual({ name: "name2" });
+
     component.router.goBack();
-    expect(route.getState().routeData).toEqual({ name: "name1" });
-    expect(callCount).toBe(3);
+    expect(router._historyController.lastLocation.pathname).toEqual(
+      "/path2/to/1"
+    );
   });
   it("can call a relative path", () => {
     let data;

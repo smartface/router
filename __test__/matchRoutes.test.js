@@ -1,4 +1,6 @@
 const Route = require("../src/router/Route");
+const Router = require("../src/router/Router");
+const createStore = require("../src/router/routeStore");
 const matchRoutes = require("../src/common/matchRoutes");
 
 describe("Match Routes", () => {
@@ -10,8 +12,8 @@ describe("Match Routes", () => {
       })
     ];
 
-    const matches = matchRoutes(routes, "/new-path/cenkce").map(
-      ({ match, route }) => ({ match, route: route.toObject() })
+    const matches = matchRoutes(createStore(), routes, "/new-path/cenkce").map(
+      ({ match, route }) => ({ match, route: route.toString() })
     );
 
     expect(matches).toEqual([
@@ -22,10 +24,7 @@ describe("Match Routes", () => {
           path: "/new-path",
           url: "/new-path"
         },
-        route: {
-          path: "/new-path",
-          routes: [{ path: "/new-path/:name", routes: [] }]
-        }
+        route: "[object Route, path: /new-path, url: /new-path]"
       },
       {
         match: {
@@ -34,7 +33,7 @@ describe("Match Routes", () => {
           path: "/new-path/:name",
           url: "/new-path/cenkce"
         },
-        route: { path: "/new-path/:name", routes: [] }
+        route: "[object Route, path: /new-path/:name, url: /new-path/cenkce]"
       }
     ]);
   });
@@ -47,9 +46,11 @@ describe("Match Routes", () => {
     ];
 
     {
-      const matches = matchRoutes(routes, "/new-path/cenkce").map(
-        ({ match, route }) => ({ match, route: route.toObject() })
-      );
+      const matches = matchRoutes(
+        createStore(),
+        routes,
+        "/new-path/cenkce"
+      ).map(({ match, route }) => ({ match, route: route.toString() }));
 
       expect(matches).toEqual([
         {
@@ -59,16 +60,13 @@ describe("Match Routes", () => {
             path: "/new-path",
             url: "/new-path"
           },
-          route: {
-            path: "/new-path",
-            routes: [{ path: "/new-path/:id(\\d+)", routes: [] }]
-          }
+          route: "[object Route, path: /new-path, url: /new-path]"
         }
       ]);
     }
     {
-      const matches = matchRoutes(routes, "/new-path/123").map(
-        ({ match, route }) => ({ match, route: route.toObject() })
+      const matches = matchRoutes(createStore(), routes, "/new-path/123").map(
+        ({ match, route }) => ({ match, route: route.toString() })
       );
       expect(matches).toEqual([
         {
@@ -78,10 +76,7 @@ describe("Match Routes", () => {
             path: "/new-path",
             url: "/new-path"
           },
-          route: {
-            path: "/new-path",
-            routes: [{ path: "/new-path/:id(\\d+)", routes: [] }]
-          }
+          route: "[object Route, path: /new-path, url: /new-path]"
         },
         {
           match: {
@@ -90,43 +85,26 @@ describe("Match Routes", () => {
             path: "/new-path/:id(\\d+)",
             url: "/new-path/123"
           },
-          route: { path: "/new-path/:id(\\d+)", routes: [] }
+          route: "[object Route, path: /new-path/:id(\\d+), url: /new-path/123]"
         }
       ]);
     }
   });
   it("mathes routes if parameter is alphanumeric", () => {
     const routes = [
-      new Route({
+      new Router({
         path: "/new-path",
         routes: [new Route({ path: "/new-path/:name([A-Za-z0-9]*)" })]
       })
     ];
 
     {
-      const matches = matchRoutes(routes, "/new-path/cenkce").map(
-        ({ match, route }) => ({ match, route: route.toObject() })
-      );
+      const matches = matchRoutes(
+        createStore(),
+        routes,
+        "/new-path/cenkce"
+      ).map(({ match, route }) => ({ match, route: route.toString() }));
 
-      [
-        {
-          match: {
-            path: "/new-path",
-            url: "/new-path",
-            isExact: false,
-            params: {}
-          },
-          route: {
-            path: "/new-path",
-            routes: [
-              {
-                path: null,
-                routes: []
-              }
-            ]
-          }
-        }
-      ];
       expect(matches).toEqual([
         {
           match: {
@@ -135,10 +113,7 @@ describe("Match Routes", () => {
             path: "/new-path",
             url: "/new-path"
           },
-          route: {
-            path: "/new-path",
-            routes: [{ path: "/new-path/:name([A-Za-z0-9]*)", routes: [] }]
-          }
+          route: "[object Router, path: /new-path, url: null]"
         },
         {
           match: {
@@ -147,14 +122,17 @@ describe("Match Routes", () => {
             path: "/new-path/:name([A-Za-z0-9]*)",
             url: "/new-path/cenkce"
           },
-          route: { path: "/new-path/:name([A-Za-z0-9]*)", routes: [] }
+          route:
+            "[object Route, path: /new-path/:name([A-Za-z0-9]*), url: /new-path/cenkce]"
         }
       ]);
     }
     {
-      const matches = matchRoutes(routes, "/new-path/abc123").map(
-        ({ match, route }) => ({ match, route: route.toObject() })
-      );
+      const matches = matchRoutes(
+        createStore(),
+        routes,
+        "/new-path/abc123"
+      ).map(({ match, route }) => ({ match, route: route.toString() }));
       expect(matches).toEqual([
         {
           match: {
@@ -163,10 +141,7 @@ describe("Match Routes", () => {
             path: "/new-path",
             url: "/new-path"
           },
-          route: {
-            path: "/new-path",
-            routes: [{ path: "/new-path/:name([A-Za-z0-9]*)", routes: [] }]
-          }
+          route: "[object Router, path: /new-path, url: null]"
         },
         {
           match: {
@@ -175,7 +150,8 @@ describe("Match Routes", () => {
             path: "/new-path/:name([A-Za-z0-9]*)",
             url: "/new-path/abc123"
           },
-          route: { path: "/new-path/:name([A-Za-z0-9]*)", routes: [] }
+          route:
+            "[object Route, path: /new-path/:name([A-Za-z0-9]*), url: /new-path/abc123]"
         }
       ]);
     }

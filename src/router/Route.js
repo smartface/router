@@ -53,7 +53,7 @@ class RoutePath {
    * @param {string} path
    * @since 1.0.0
    */
-  static of (path) {
+  static of(path) {
     return new RoutePath(path);
   }
 
@@ -132,34 +132,37 @@ class Route {
    * @param {RouteParams} params
    * @return {Route}
    */
-  static of (params = {}, state={}) {
+  static of(params = {}, state = {}) {
     return new Route(params, state);
   }
   /**
    * @constructor
    * @param {RouteParams} param
    */
-  constructor({
-    path = null,
-    to = null,
-    routes = [],
-    build = null,
-    exact = false,
-    sensitive = true,
-    strict = true,
-    modal = false,
-    routeShouldMatch = null,
-    routeDidEnter,
-    routeDidExit
-  }={}, {
-    match = {},
-    routeData = {},
-    view = null,
-    routingState = {},
-    action = null,
-    url = null,
-    active = false
-  } = {}) {
+  constructor(
+    {
+      path = null,
+      to = null,
+      routes = [],
+      build = null,
+      exact = false,
+      sensitive = true,
+      strict = true,
+      modal = false,
+      routeShouldMatch = null,
+      routeDidEnter,
+      routeDidExit
+    } = {},
+    {
+      match = {},
+      routeData = {},
+      view = null,
+      routingState = {},
+      action = null,
+      url = null,
+      active = false
+    } = {}
+  ) {
     this._options = {
       exact,
       path,
@@ -228,10 +231,11 @@ class Route {
       action,
       url,
       view,
-      active
+      active,
+      prevUrl
     } = this._state;
     return {
-      type: 'route',
+      type: "route",
       match: this._state.routeData,
       routeData: this._state.routeData,
       routingState: this._state.routingState,
@@ -244,7 +248,8 @@ class Route {
         action,
         url,
         active,
-        view: view && view.constructor.name || undefined
+        view: (view && view.constructor.name) || undefined,
+        prevUrl
       }
     };
   }
@@ -256,11 +261,13 @@ class Route {
    * @return {string}
    */
   toString() {
-    return `[object ${this.constructor.name}, path: ${this.getUrlPath()}, url: ${this._state.url}]`;
+    return `[object ${
+      this.constructor.name
+    }, path: ${this.getUrlPath()}, url: ${this._state.url}]`;
   }
 
   setUrl(url) {
-    if(url === null)
+    if (url === null)
       throw new TypeError(`[${this}] Route url cannot be empty`);
     this.setState({ url, prevUrl: this._state.url });
     this._isDIrty = true;
@@ -426,19 +433,30 @@ class Route {
    * @ignore
    * @returns {Route}
    */
-  clone(state={}) {
-    return Route.of({
-      modal: this._modal,
-      routeDidExit: this._routeDidExit,
-      routeShouldMatch: this._routeShouldMatch,
-      routeDidEnter: this._routeDidEnter,
-      exact: this._exact,
-      strict: this._strict,
-      path: this._path.clone(),
-      path: this._path,
-      props: Object.assign({}, this._props),
-      build: this._build
-    }, Object.assign({ active: this._state.active, url: this._state.url, view: this._state.view }, state));
+  clone(state = {}) {
+    return Route.of(
+      {
+        to: this._to,
+        modal: this._modal,
+        routeDidExit: this._routeDidExit,
+        routeShouldMatch: this._routeShouldMatch,
+        routeDidEnter: this._routeDidEnter,
+        exact: this._exact,
+        strict: this._strict,
+        path: this._path.clone(),
+        path: this._path,
+        props: Object.assign({}, this._props),
+        build: this._build
+      },
+      Object.assign(
+        {
+          active: this._state.active,
+          url: this._state.url,
+          view: this._state.view
+        },
+        state
+      )
+    );
   }
 }
 

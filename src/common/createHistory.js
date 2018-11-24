@@ -5,22 +5,20 @@ let rootHistory;
 
 /**
  * Creates a new HistoryController instance
- * 
+ *
  * @param {{?initialEntries: Array, ?initialIndex: number, ?keyLength: number, ?getUserConfirmation: function, sensitive: boolean, strict: boolean}} param0
  * @return {HistoryController}
  */
-function createHistory(
-  {
-    initialEntries = null,
-    initialIndex = null,
-    keyLength = null,
-    getUserConfirmation = null,
-    exact = false,
-    sensitive = true,
-    strict = false,
-    path
-  } = {}
-) {
+function createHistory({
+  initialEntries = null,
+  initialIndex = null,
+  keyLength = null,
+  getUserConfirmation = null,
+  exact = false,
+  sensitive = true,
+  strict = false,
+  path
+} = {}) {
   let routeBlocker = (blockerFn, callback) => {
     // console.log(`--- routeBlocker ${blockerFn} ${_preventDefault}`);
     _preventDefault === false && getUserConfirmation
@@ -92,8 +90,8 @@ function createHistory(
         _unblock();
       };
     }
-    
-    clear(){
+
+    clear() {
       _history.clear();
     }
 
@@ -130,6 +128,10 @@ function createHistory(
       return node;
     }
 
+    get lastLocation() {
+      return _history.location;
+    }
+
     /**
      * Return all nodes
      * @return {Set<HistoryController>}
@@ -144,7 +146,7 @@ function createHistory(
     get history() {
       return _history;
     }
-    
+
     pushLocation(location) {
       _history.push(location);
     }
@@ -205,7 +207,11 @@ function createHistory(
      * Calls History.goBack
      */
     goBack() {
-      console.log(`--- go back ${JSON.stringify(this.getHistoryasArray())} ${_history.length} ${_history.index} ${_history.canGo(-1)}`);
+      console.log(
+        `--- go back ${JSON.stringify(this.getHistoryasArray())} ${
+          _history.length
+        } ${_history.index} ${_history.canGo(-1)}`
+      );
 
       _history.canGo(-1)
         ? _history.goBack()
@@ -224,7 +230,8 @@ function createHistory(
 
       _listeners.add(fn);
       const wrapper = (location, action) => {
-        !_preventDefault && fn(location, action, _history.entries[_history.index]);
+        !_preventDefault &&
+          fn(location, action, _history.entries[_history.index]);
       };
       unlisten.add(_history.listen(wrapper));
       unlisten.forEach(item => _unlistenAll.add(item));

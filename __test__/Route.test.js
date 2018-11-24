@@ -1,5 +1,6 @@
 const Route = require("../src/router/Route");
 const matchRoutes = require("../src/common/matchRoutes");
+const createStore = require("../src/router/routeStore");
 
 describe("Route", () => {
   it("has a path", () => {
@@ -24,7 +25,7 @@ describe("Route", () => {
         new Route({ path: "/path/to/cenk" })
       ]
     });
-    const matches = matchRoutes([route], "/path/to/1").map(
+    const matches = matchRoutes(createStore(), [route], "/path/to/1").map(
       ({ match, route }) => ({ match })
     );
 
