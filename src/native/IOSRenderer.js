@@ -53,6 +53,7 @@ class IOSRenderer extends Renderer {
    * @override
    */
   pushChild(page, animated = true) {
+    // prevents to push existing view
     if(this._rootController.childControllers.some(p => p === page)){
       console.log('Page exists');
       return;

@@ -186,9 +186,7 @@ class NativeStackRouter extends NativeRouterBase {
         // if user presses backbutton or uses gesture to back
         if (action.operation === NavigationController.OperationType.POP && !this._fromRouter) {
           // set Router to skip next history change
-          this._fromRouter = false;
-          
-          console.log('-------- go back from device');
+          console.log(`-------- go back from device ${this._fromRouter}`);
           try {
             this._historyController.preventDefault();
             this._historyController.goBack();
@@ -210,22 +208,11 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   push(path, routeData = {}) {
-    if (path === this._currentUrl) {
-      Object.assign(
-        this._historyController.history.location.state, { routeData }
-      );
-      this.dispatch(this._historyController.history.location, "PUSH", this);
-
-      return this;
-    }
-
     return super.push(path, routeData);
   }
 
   /**
    * @override
-   * 
-   * TODO: Nativeden gelen geri-don olaylarinda buraya girmiyor. Bu yuzdende router resetlenmiyor ve crash oluyor.
    */
   routeWillEnter(route, requestedUrl, act, ex, target, fromRouter) {
     const { view, match: { isExact: exact }, url, action } = route.getState();
@@ -241,11 +228,14 @@ class NativeStackRouter extends NativeRouterBase {
             this._renderer.present(route._renderer && route._renderer._rootController || view);
             route.dismiss = this._dismiss = () => {
               route._renderer.dismiss(() => {
+                console.log(`dismiss ${route}`);
                 route.resetView && route.resetView();
                 this._dismiss = null;
                 route.dismiss = null;
                 this._presented = false;
                 this._currentRouteUrl = null;
+                this._historyController.preventDefault();
+                this._historyController.goBack();
               });
             };
             
@@ -254,7 +244,11 @@ class NativeStackRouter extends NativeRouterBase {
           }
           else if (!route.isModal() && !active) {
             this._currentRouteUrl = url;
-            this._renderer.pushChild(route._renderer && route._renderer._rootController || view);
+            try {
+              this._renderer.pushChild(route._renderer && route._renderer._rootController || view);
+            } catch(e) {
+              console.log(`Error when ${route} is pushed ${this} ${e.messagr} ${e.stack}`);
+            }
             // route.__goBack = () => this._renderer.popChild();
             // this.goBack = () => {
             //   this._renderer.popChild();
@@ -268,13 +262,14 @@ class NativeStackRouter extends NativeRouterBase {
         break;
       case "POP":
         if (this._fromRouter) {
-          if (this._presented && target === this) {
-            console.log('dismiss '+this);
-            this._dismiss && this._dismiss();
-            this._presented = false;
-          }
-          else if (!route.isModal() && exact) {
-            console.log('pop '+this);
+          // if (this._presented && target === this) {
+          //   console.log('dismiss '+this);
+          //   this._dismiss && this._dismiss();
+          //   this._presented = false;
+          // }
+          // else 
+          if (!route.dismiss && exact) {
+            // console.log('pop '+this);
             this._renderer.popChild();
           }
         }

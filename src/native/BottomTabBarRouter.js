@@ -320,8 +320,9 @@ class BottomTabBarRouter extends NativeRouterBase {
   /**
    * @override
    */
-  renderMatches(matches, state, action, target, fromRouter) {
-    this._fromRouter = true;
+  renderMatches(matches, location, action, target, fromRouter) {
+    console.log(`bottomtabbar render ${location.pathname}`);
+    // this._fromRouter = true;
     if (matches.length > 0) {
       const { match: next } = matches[matches.length - 1];
       const { match } = matches[1] || matches[0];
@@ -332,14 +333,14 @@ class BottomTabBarRouter extends NativeRouterBase {
       this._renderer.setSelectedIndex(index);
       this._renderer._rootController.show();
       // this.isVisited(index) && this.activateIndex(index);
-      this.setVisited(index, next.url);
+      this.setVisited(index, location.pathname);
       this._currentIndex = index;
       if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
     }
 
-    super.renderMatches(matches, state, action, target, fromRouter);
+    super.renderMatches(matches, location, action, target, fromRouter);
 
-    this._fromRouter = false;
+    // this._fromRouter = false;
   }
 }
 
