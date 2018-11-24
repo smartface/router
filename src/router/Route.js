@@ -267,10 +267,14 @@ class Route {
   }
 
   setUrl(url) {
-    if (url === null)
+    if (!url)
       throw new TypeError(`[${this}] Route url cannot be empty`);
     this.setState({ url, prevUrl: this._state.url });
     this._isDIrty = true;
+  }
+  
+  clearUrl(){
+    this.setState({ url: '', prevUrl: this._state.url });
   }
 
   clearDirty() {

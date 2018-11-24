@@ -215,28 +215,37 @@ class NativeStackRouter extends NativeRouterBase {
    * @override
    */
   routeWillEnter(route, requestedUrl, act, ex, target, fromRouter) {
-    const { active, view, match: { isExact: exact }, url, action } = route.getState();
-    // const active = url === this._currentRouteUrl;
+    const { view, match: { isExact: exact }, url, action } = route.getState();
+    const active = url === this._currentRouteUrl;
     console.log(`routeWillEnter route : ${route} url: ${url} ${this._currentRouteUrl} active: ${active} exact : ${exact} action : ${action} _fromRouter : ${this._fromRouter}`);
-
+    if(this.isModal())
+      console.log(`routeWillEnter array : ${this.getHistoryasArray().length}`);
+      
     switch (action) {
       case "REPLACE":
       case "PUSH":
         if (this._fromRouter) {
           if (route.isModal() && !this._presented && !active) {
-            console.log('present '+this);
+            console.log('present '+this+" "+route);
             this._renderer.present(route._renderer && route._renderer._rootController || view);
             route.dismiss = this._dismiss = () => {
               route._renderer.dismiss(() => {
-                console.log(`dismiss ${route}`);
-                route.resetView && route.resetView();
-                this._dismiss = null;
+                // console.log(`dismiss ${route}`);
                 route.dismiss = null;
-                this._presented = false;
+                route._presented = false;
+                route._currentRouteUrl = null;
                 this._currentRouteUrl = null;
+                this._presented = false;
                 this._historyController.preventDefault();
                 this._historyController.goBack();
+                this.dispatch(
+                  this._historyController.history.location,
+                  "POP",
+                  this,
+                  false
+                );
                 route.setState({ active: false });
+                route.resetView();
               });
             };
             
@@ -274,16 +283,17 @@ class NativeStackRouter extends NativeRouterBase {
           if (!route.dismiss && exact) {
             console.log('pop '+this);
             this._renderer.popChild();
-            route.setState({ active: false });
           }
         }
 
+        route.setState({ active: false });
         break;
     }
     this._currentRouteUrl = url;
   }
 
   resetView() {
+    this.clearUrl();
     this._currentRouteUrl = null;
     this._renderer.setChildControllers([]);
     this._historyController.clear();
