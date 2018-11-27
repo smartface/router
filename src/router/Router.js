@@ -160,8 +160,15 @@ function handleRouteUrl(router, url, routeData, action) {
  * @extends {Route}
  */
 class Router extends Route {
+  static getGlobalRouter(){
+    return historyController;
+  }
   static getHistoryStack() {
     return history.slice();
+  }
+  
+  static getLastHistory(){
+    return history[history.length-1];
   }
 
   static getHistoryByIndex(index) {
@@ -481,8 +488,8 @@ class Router extends Route {
 
         tasks.push(
           (url, action) =>
-          this.routeWillEnter &&
-          this.routeWillEnter(route, url, action, true, target)
+            this.routeWillEnter &&
+            this.routeWillEnter(route, url, action, true, target)
         );
 
         // this.routeWillEnter(null);
@@ -706,6 +713,10 @@ class Router extends Route {
       path
     );
   }
+  
+  toString(){
+    return super.toString() +'\r\n'+this._historyController;
+  }
 
   /**
    * Replaces specified path's state
@@ -725,7 +736,7 @@ class Router extends Route {
    * @param {string | RouteLocation}
    */
   goBack(url) {
-    // console.log(`router goback ${this}`);
+    console.log(`router goback ${this}`);
     const go = () => {
       this._fromRouter = true;
 
