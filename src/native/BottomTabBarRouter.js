@@ -16,10 +16,7 @@ const NativeRouterBase = require("./NativeRouterBase");
 const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
 const createRenderer = require("./createRenderer");
 const TabBarItem = require("sf-core/ui/tabbaritem");
-
-function functionMaybe(val) {
-  return typeof val === "function" ? val() : val;
-}
+const functionMaybe = require("../utils/funcorVal");
 
 /**
  * @private

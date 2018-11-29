@@ -4,6 +4,7 @@ const Route = require("./Route");
 const matchRoutes = require("../common/matchRoutes");
 const createHistory = require("../common/createHistory");
 const createStore = require("./routeStore");
+const funcorVal = require("../utils/funcorVal");
 let tasks = [];
 
 let historyController;
@@ -424,6 +425,7 @@ class Router extends Route {
     this._fromRouter = fromRouter;
 
     const routeData = location.state;
+    
     matches.some(({ match, route }, index) => {
       route.setState({
         action,
@@ -454,7 +456,8 @@ class Router extends Route {
       }
       else if (match.isExact === true) {
         // if (!this._fromRouter || route.routeShouldMatch(route, { match, action, routeData }) === true) {
-        if (route.getRedirectto() && route.getRedirectto() !== match.url) {
+        const redirection = funcorVal(route.getRedirectto(), [this, route]);
+        if (redirection && redirection !== match.url) {
           tasks = []; // reset tasks
           target.routeRollback(); // remove redirected path from target Router
           //  because real path can be owned by different router.
@@ -605,7 +608,7 @@ class Router extends Route {
    */
   redirectRoute(route, routeData, action) {
     // redirection of a route
-    this.push(route.getRedirectto(), routeData); // and add new route
+    this.push(funcorVal(route.getRedirectto(), [this, route]), routeData); // and add new route
     // this._historyController.push(route.getRedirectto(), routeData);
   }
 
@@ -659,7 +662,7 @@ class Router extends Route {
   pushRoute(route) {
     if (!(route instanceof Route))
       throw new TypeError(`route must be instance of Route`);
-    this.push(route.getRedirectto() || route.getUrlPath());
+    this.push(funcorVal(route.getRedirectto(), [this, route]) || route.getUrlPath());
   }
 
   /**
@@ -714,10 +717,6 @@ class Router extends Route {
     );
   }
   
-  toString(){
-    return super.toString() +'\r\n'+this._historyController;
-  }
-
   /**
    * Replaces specified path's state
    *

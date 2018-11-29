@@ -223,6 +223,7 @@ class NativeStackRouter extends NativeRouterBase {
       
     switch (action) {
       case "REPLACE":
+        break;
       case "PUSH":
         if (this._fromRouter) {
           if (route.isModal() && !this._presented && !active) {
@@ -239,19 +240,12 @@ class NativeStackRouter extends NativeRouterBase {
                 this._currentRouteUrl = null;
                 
                 this._presented = false;
-                
+                let diff = Router.getGlobalRouter().history.index - lastLocationIndex;
                 // exits all locations in the modal router
-                // while(diff > 1){
-                //   diff--;
-                //   route._historyController.preventDefault();
-                //   route._historyController.goBack();
-                //   route.dispatch(
-                //     route._historyController.history.location,
-                //     "POP",
-                //     this,
-                //     false
-                //   );
-                // }
+                while(diff > 1){
+                  Router.getGlobalRouter().history.rollback();
+                  diff--;
+                }
                 console.log('nav dismiss 1 '+this._historyController);
                 this._historyController.preventDefault();
                 this._historyController.goBack();
