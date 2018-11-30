@@ -128,7 +128,8 @@ class NativeStackRouter extends NativeRouterBase {
     headerBarParams = () => {},
     routerDidEnter,
     routerDidExit,
-    routeShouldMatch
+    routeShouldMatch,
+    homeRoute = null
   }) {
     super({
       path,
@@ -140,9 +141,11 @@ class NativeStackRouter extends NativeRouterBase {
       isRoot,
       routerDidEnter,
       routerDidExit,
-      routeShouldMatch
+      routeShouldMatch,
+      homeRoute
     });
-
+    
+    this._homeRoute = homeRoute;
     this._headerBarParams = headerBarParams;
     this._renderer = renderer;
     this._renderer.setRootController(new NavigationController());

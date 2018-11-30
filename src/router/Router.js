@@ -12,6 +12,23 @@ let historyController;
 let _lastRoute;
 const listeners = new Set();
 const history = [];
+const store = createStore();
+
+function pushIndexes(path){
+  const matches = matchRoutes(
+    store, [this].concat(this._routes),
+    path
+  );
+  console.log(`pushIndexes ${path}`);
+  let len = 0;
+  while(++len < matches.length){
+    let route = matches[len].route;
+    if(route.__is_router && route.hasHome() ){
+      console.log(" has push index : "+route);
+      route.pushIndexOnce && route.pushIndexOnce(path);
+    }
+  }
+}
 
 // const dispatch = (location, action) => {
 //   history.push([location.pathnamme, action]);
@@ -206,10 +223,11 @@ class Router extends Route {
     modal = false,
     routerDidEnter,
     routerDidExit,
-    routeShouldMatch
+    routeShouldMatch,
+    homeRoute = null
   }) {
     super({ path, modal, build, routes, to, isRoot, routeShouldMatch });
-
+    this._homeRoute = homeRoute;
     this._historyUnlisten = () => null;
     this._handlers = {
       routerDidEnter,
@@ -217,7 +235,7 @@ class Router extends Route {
     };
 
     if (isRoot) {
-      this._store = createStore();
+      // this._store = createStore();
       /** @type {HistoryListener} */
       listeners.clear();
       historyController = createHistory({
@@ -233,7 +251,8 @@ class Router extends Route {
       this.initialize(
         historyController,
         (location, action, target, fromRouter = true) =>
-        this.onHistoryChange(location, action, target, fromRouter)
+        this.onHistoryChange(location, action, target, fromRouter),
+        pushIndexes.bind(this)
       );
     }
 
@@ -252,7 +271,8 @@ class Router extends Route {
    * @param {HistoryListener} parentHistory
    * @param {function} onHistoryChange Root onHistoryChange handler
    */
-  initialize(parentHistory, onHistoryChange) {
+  initialize(parentHistory, onHistoryChange, pushIndexes) {
+    this._pushIndexes = pushIndexes;
     /** @type {HistoryController} */
     this._historyController = parentHistory.createNode(
       Object.assign({}, this._options, {
@@ -275,7 +295,7 @@ class Router extends Route {
     this._routes.forEach(route => {
       // if (route instanceof Router) {
       route.initialize &&
-        route.initialize(this._historyController, onHistoryChange);
+        route.initialize(this._historyController, onHistoryChange, pushIndexes);
       // }
     });
 
@@ -288,6 +308,10 @@ class Router extends Route {
       // console.log(`dispatched ${location.pathname} ${fromRouter}`);
       onHistoryChange(location, action, target, fromRouter);
     };
+  }
+  
+  hasHome(){
+    return this._homeRoute !== null;
   }
 
   get __is_router() {
@@ -365,7 +389,7 @@ class Router extends Route {
   }
 
   getStore() {
-    return this._store;
+    return store;
   }
 
   /**
@@ -702,6 +726,8 @@ class Router extends Route {
 
       return this;
     }
+    
+    this._pushIndexes(path);
     // if(this._currentUrl !== path)
     this._historyController.push(path, routeData);
     console.log('last history ' + this.getHistoryasArray());
