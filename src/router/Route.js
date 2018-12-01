@@ -146,8 +146,8 @@ class Route {
       routes = [],
       build = null,
       exact = false,
-      sensitive = true,
-      strict = true,
+      sensitive = false,
+      strict = false,
       modal = false,
       routeShouldMatch = null,
       routeDidEnter,
@@ -403,13 +403,9 @@ class Route {
    * @returns {Match}
    */
   matchPath(url) {
-    this._match = matchPath(url, {
-      path: this._path.getPath(),
-      exact: this._exact,
-      strict: this._strict
-    });
+    return matchPath(url,this._options);
 
-    return this._match;
+    // return this._match;
   }
 
   /**

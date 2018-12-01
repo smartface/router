@@ -226,7 +226,8 @@ class NativeStackRouter extends NativeRouterBase {
       this._renderer._rootController.childControllers.length === 0
     ) {
       const indexRoute = this._routes[this._homeRoute];
-      console.log(`push home ${path} ${indexRoute}`);
+      console.log(`push home ${path} ${indexRoute.getUrlPath()}`);
+      
       if (path !== indexRoute.getUrlPath()) {
         this._historyController.push(indexRoute.getUrlPath());
       }
@@ -276,7 +277,7 @@ class NativeStackRouter extends NativeRouterBase {
             );
             route.dismiss = this._dismiss = () => {
               route._renderer.dismiss(() => {
-                console.log(`dismiss ${route}`);
+                // console.log(`dismiss ${route}`);
                 route.dismiss = null;
                 route._presented = false;
                 route._currentRouteUrl = null;
@@ -290,18 +291,18 @@ class NativeStackRouter extends NativeRouterBase {
                   Router.getGlobalRouter().history.rollback();
                   diff--;
                 }
-                console.log("nav dismiss 1 " + this._historyController);
+                // console.log("nav dismiss 1 " + this._historyController);
                 this._historyController.preventDefault();
                 this._historyController.goBack();
-                console.log("nav dismiss 1 " + this._historyController);
+                // console.log("nav dismiss 1 " + this._historyController);
                 this.dispatch(lastLocation, "POP", this, false);
 
-                console.log(
-                  `dismiss oncomplete 1.5 last : ${lastLocation.pathname} ${
-                    Router.getGlobalRouter().history.location.pathname
-                  }`
-                );
-                console.log(`dismiss oncomplete 2 ${this}`);
+                // console.log(
+                //   `dismiss oncomplete 1.5 last : ${lastLocation.pathname} ${
+                //     Router.getGlobalRouter().history.location.pathname
+                //   }`
+                // );
+                // console.log(`dismiss oncomplete 2 ${this}`);
                 route.setState({ active: false });
                 route.resetView();
               });
@@ -310,7 +311,7 @@ class NativeStackRouter extends NativeRouterBase {
             this._presented = true;
             route.setState({ active: true });
           } else if (!route.isModal() && !active) {
-            console.log('push '+this);
+            console.log('push '+route);
             this._currentRouteUrl = url;
             try {
               this._renderer.pushChild(

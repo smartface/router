@@ -508,7 +508,8 @@ class Router extends Route {
           handleRouteUrl(this, match.url, routeData, action);
         }
 
-        console.log(`match ${route.getState().query}`);
+        console.log(`route query ${route.getState().query} `);
+        console.log(`route query ${JSON.stringify(location)} `);
 
         tasks.push(
           (url, action) =>
