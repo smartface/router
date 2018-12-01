@@ -160,7 +160,8 @@ class Route {
       routingState = {},
       action = null,
       url = null,
-      active = false
+      active = false,
+      query = ""
     } = {}
   ) {
     this._options = {
@@ -183,6 +184,7 @@ class Route {
     this._modal = modal;
     this._state = Object.seal({
       match,
+      query,
       routeData,
       view,
       routingState,
@@ -267,14 +269,13 @@ class Route {
   }
 
   setUrl(url) {
-    if (!url)
-      throw new TypeError(`[${this}] Route url cannot be empty`);
+    if (!url) throw new TypeError(`[${this}] Route url cannot be empty`);
     this.setState({ url, prevUrl: this._state.url });
     this._isDIrty = true;
   }
-  
-  clearUrl(){
-    this.setState({ url: '', prevUrl: this._state.url });
+
+  clearUrl() {
+    this.setState({ url: "", prevUrl: this._state.url });
   }
 
   clearDirty() {
@@ -454,9 +455,11 @@ class Route {
       },
       Object.assign(
         {
+          action: this._state.action,
           active: this._state.active,
           url: this._state.url,
-          view: this._state.view
+          view: this._state.view,
+          query: this._state.query
         },
         state
       )

@@ -10,38 +10,44 @@
  * @param {Array} branch
  * @param {object} store
  */
-const matchRoutes = (store, routes, pathname, /*not public API*/ branch = []) => {
+const matchRoutes = (
+  store,
+  routes,
+  pathname,
+  /*not public API*/ branch = []
+) => {
   routes.some(route => {
     const match = route.hasPath()
       ? route.matchPath(pathname)
       : branch.length
-        ? branch[branch.length - 1].match
-        : {
-            // ensure we're using the exact code for default root match
-            path: "/",
-            url: "/",
-            params: {},
-            isExact: pathname === "/"
-          };
+      ? branch[branch.length - 1].match
+      : {
+          // ensure we're using the exact code for default root match
+          path: "/",
+          url: "/",
+          params: {},
+          isExact: pathname === "/"
+        };
 
     if (match) {
       // if (match && route.routeShouldMatch(match)) {
       // console.log('match : '+JSON.stringify(match));
-      if(route.__is_router) {
+      if (route.__is_router) {
         // route.setUrl(match.url);
         branch.push({
           route,
           match
         });
       } else {
-        console.log(`store has ${match.url} : ${store.hasRoute(match.url) }`);
-        !store.hasRoute(match.url) && store.saveRoute(match.url, route.clone({url: match.url}));
+        console.log(`store has ${match.url} : ${store.hasRoute(match.url)}`);
+        !store.hasRoute(match.url) &&
+          store.saveRoute(match.url, route.clone({ url: match.url }));
         branch.push({
           route: store.findRoute(match.url),
           match
         });
       }
-      
+
       const children = route.map(child => {
         return child;
       });

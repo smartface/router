@@ -53,21 +53,22 @@ class Renderer {
     });
   }
 
-
   makeRootVisible() {
     var sfWindow = SF.requireClass("UIApplication").sharedApplication()
       .keyWindow;
     sfWindow.makeKeyAndVisible();
   }
-  
-  present(controller, animated, onComplete){
+
+  present(controller, animated, onComplete) {
     this._rootController.present({
-      controller, animated, onComplete
+      controller,
+      animated,
+      onComplete
     });
   }
-  
-  dismiss(onComplete){
-    this._rootController.dismiss({onComplete});
+
+  dismiss(onComplete) {
+    this._rootController.dismiss({ onComplete });
   }
 
   /**

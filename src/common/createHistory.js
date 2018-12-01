@@ -202,14 +202,12 @@ function createHistory({
     canGoBack() {
       return _history.canGo(-1);
     }
-    
+
     /**
      * Calls History.goBack
      */
     goBack() {
-      console.log(
-        `--- go back `
-      );
+      console.log(`--- go back `);
 
       _history.canGo(-1)
         ? _history.goBack()
@@ -248,7 +246,9 @@ function createHistory({
      * @return {string}
      */
     toString() {
-      return `[Object HistoryController, stack: ${JSON.stringify(this.getHistoryasArray())},
+      return `[Object HistoryController, stack: ${JSON.stringify(
+        this.getHistoryasArray()
+      )},
         length ${_history.length}, 
         index : ${_history.index}]`;
     }

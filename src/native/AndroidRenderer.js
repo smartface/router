@@ -28,9 +28,9 @@ class AndroidRenderer extends Renderer {
    * @override
    */
   pushChild(page, animated = true) {
-    console.log('pageID : '+page.pageID);
+    console.log("pageID : " + page.pageID);
     // To avoid Android error
-    if(this._rootController.childControllers.some(p => p === page)){
+    if (this._rootController.childControllers.some(p => p === page)) {
       return;
     }
     this._rootController.push &&

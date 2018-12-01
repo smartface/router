@@ -107,7 +107,7 @@ class NativeStackRouter extends NativeRouterBase {
    * @static
    * @param {NativeStackRouterParams} params
    */
-  static of (params) {
+  static of(params) {
     params.renderer = createRenderer();
     return new NativeStackRouter(params);
   }
@@ -144,7 +144,7 @@ class NativeStackRouter extends NativeRouterBase {
       routeShouldMatch,
       homeRoute
     });
-    
+
     this._homeRoute = homeRoute;
     this._headerBarParams = headerBarParams;
     this._renderer = renderer;
@@ -187,7 +187,10 @@ class NativeStackRouter extends NativeRouterBase {
     this._unlistener = this._renderer.onNavigationControllerTransition(
       action => {
         // if user presses backbutton or uses gesture to back
-        if (action.operation === NavigationController.OperationType.POP && !this._fromRouter) {
+        if (
+          action.operation === NavigationController.OperationType.POP &&
+          !this._fromRouter
+        ) {
           // set Router to skip next history change
           console.log(`--- go back from device ${this._fromRouter}`);
           try {
@@ -200,14 +203,36 @@ class NativeStackRouter extends NativeRouterBase {
               false
             );
             // this._fromRouter = true;
-          }
-          catch (e) {
+          } catch (e) {
             throw e;
+          } finally {
           }
-          finally {}
         }
       }
     );
+  }
+
+  pushHomeBefore(path) {
+    console.log(
+      "push index " +
+        this +
+        " " +
+        this._homeRoute +
+        " len : " +
+        this._renderer._rootController.childControllers.length
+    );
+    if (
+      this.hasHome() &&
+      this._renderer._rootController.childControllers.length === 0
+    ) {
+      const indexRoute = this._routes[this._homeRoute];
+      console.log(`push home ${path} ${indexRoute}`);
+      if (path !== indexRoute.getUrlPath()) {
+        this._historyController.push(indexRoute.getUrlPath());
+      }
+    }
+
+    return true;
   }
 
   push(path, routeData = {}) {
@@ -218,22 +243,37 @@ class NativeStackRouter extends NativeRouterBase {
    * @override
    */
   routeWillEnter(route, requestedUrl, act, ex, target, fromRouter) {
-    const { view, match: { isExact: exact }, url, action } = route.getState();
+    const {
+      view,
+      match: { isExact: exact },
+      url,
+      action
+    } = route.getState();
     const active = url === this._currentRouteUrl;
-    console.log(`routeWillEnter route : ${route} url: ${url} ${this._currentRouteUrl} active: ${active} exact : ${exact} action : ${action} _fromRouter : ${this._fromRouter}`);
-    if(this.isModal())
+    console.log(
+      `routeWillEnter route : ${route} url: ${url} ${
+        this._currentRouteUrl
+      } active: ${active} exact : ${exact} action : ${action} _fromRouter : ${
+        this._fromRouter
+      }`
+    );
+    if (this.isModal())
       console.log(`routeWillEnter array : ${this.getHistoryasArray().length}`);
-      
+
     switch (action) {
       case "REPLACE":
         break;
       case "PUSH":
         if (this._fromRouter) {
           if (route.isModal() && !this._presented && !active) {
-            console.log('present '+this+" "+route);
-            const lastLocation = Router.getGlobalRouter().history.entries[Router.getGlobalRouter().history.index];
+            console.log("present " + this + " " + route);
+            const lastLocation = Router.getGlobalRouter().history.entries[
+              Router.getGlobalRouter().history.index
+            ];
             const lastLocationIndex = Router.getGlobalRouter().history.index;
-            this._renderer.present(route._renderer && route._renderer._rootController || view);
+            this._renderer.present(
+              (route._renderer && route._renderer._rootController) || view
+            );
             route.dismiss = this._dismiss = () => {
               route._renderer.dismiss(() => {
                 console.log(`dismiss ${route}`);
@@ -241,41 +281,43 @@ class NativeStackRouter extends NativeRouterBase {
                 route._presented = false;
                 route._currentRouteUrl = null;
                 this._currentRouteUrl = null;
-                
+
                 this._presented = false;
-                let diff = Router.getGlobalRouter().history.index - lastLocationIndex;
+                let diff =
+                  Router.getGlobalRouter().history.index - lastLocationIndex;
                 // exits all locations in the modal router
-                while(diff > 1){
+                while (diff > 1) {
                   Router.getGlobalRouter().history.rollback();
                   diff--;
                 }
-                console.log('nav dismiss 1 '+this._historyController);
+                console.log("nav dismiss 1 " + this._historyController);
                 this._historyController.preventDefault();
                 this._historyController.goBack();
-                console.log('nav dismiss 1 '+this._historyController);
-                this.dispatch(
-                  lastLocation,
-                  "POP",
-                  this,
-                  false
-                ); 
-                
-                console.log(`dismiss oncomplete 1.5 last : ${lastLocation.pathname} ${Router.getGlobalRouter().history.location.pathname}`);
+                console.log("nav dismiss 1 " + this._historyController);
+                this.dispatch(lastLocation, "POP", this, false);
+
+                console.log(
+                  `dismiss oncomplete 1.5 last : ${lastLocation.pathname} ${
+                    Router.getGlobalRouter().history.location.pathname
+                  }`
+                );
                 console.log(`dismiss oncomplete 2 ${this}`);
                 route.setState({ active: false });
                 route.resetView();
               });
             };
-            
+
             this._presented = true;
             route.setState({ active: true });
-          }
-          else if (!route.isModal() && !active) {
+          } else if (!route.isModal() && !active) {
+            console.log('push '+this);
             this._currentRouteUrl = url;
             try {
-              this._renderer.pushChild(route._renderer && route._renderer._rootController || view);
-            } catch(e) {
-              console.log(`Error when ${route} is pushed ${this} ${e.messagr} ${e.stack}`);
+              this._renderer.pushChild(
+                (route._renderer && route._renderer._rootController) || view
+              );
+            } catch (e) {
+                throw `Error when ${route} is pushed. ${e}`;
             } finally {
               route.setState({ active: true });
             }
@@ -287,8 +329,7 @@ class NativeStackRouter extends NativeRouterBase {
             // route.setState({ active: true });
           }
         }
-        
-        
+
         // this._currentRouteUrl = route.getUrl();
 
         break;
@@ -299,9 +340,9 @@ class NativeStackRouter extends NativeRouterBase {
           //   this._dismiss && this._dismiss();
           //   this._presented = false;
           // }
-          // else 
+          // else
           if (!route.dismiss && exact) {
-            console.log('navcontroller pop '+this);
+            console.log("navcontroller pop " + this);
             this._renderer.popChild();
           }
         }
@@ -329,7 +370,7 @@ class NativeStackRouter extends NativeRouterBase {
    * @param {string} action
    */
   routerDidExit(action) {
-    if (action === 'POP') {
+    if (action === "POP") {
       // this._currentRouteUrl = null;
     }
 

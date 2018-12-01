@@ -87,7 +87,7 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @static
    * @param {BottomTabBarRouterParams} params
    */
-  static of (params) {
+  static of(params) {
     params.renderer = createRenderer();
     return new BottomTabBarRouter(params);
   }
@@ -136,13 +136,12 @@ class BottomTabBarRouter extends NativeRouterBase {
       this._currentIndex = index;
     };
 
-
     // Initilaze BottomTabBarController's TabBarItems
     this._renderer._rootController.tabBar = tabbarParams();
   }
 
-  initialize(parentHistory, onHistoryChange) {
-    super.initialize(parentHistory, onHistoryChange);
+  initialize(parentHistory, onHistoryChange, pushHomes) {
+    super.initialize(parentHistory, onHistoryChange, pushHomes);
     // Initilaze BottomTabBarController's child controllers
     this._renderer.setChildControllers(
       this._routes.map(route => route.build(this, route))
@@ -269,16 +268,17 @@ class BottomTabBarRouter extends NativeRouterBase {
   }
 
   push(path, routeData = {}) {
-/*    try {
+    /*    try {
       throw new Error();
     }
     catch (e) {
       console.log('bottomtabbar push call ' + (e.stack));
     }
-*/    
+*/
+
     const index = this.resolveIndex(path);
     // console.log(`bottomtabbar push ${path} ${this._fromRouter} ${JSON.stringify(this._visitedIndexes[index])}`);
-    
+
     if (this._fromRouter === false) {
       if (this.isVisited(index)) {
         return super.push(this._visitedIndexes[index].path, routeData);
@@ -313,7 +313,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     // if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
     this._currentRouteUrl = url;
   }*/
-  
+
   /**
    * @override
    */
