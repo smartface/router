@@ -30,10 +30,7 @@ const matchRoutes = (
         };
 
     if (match) {
-      // if (match && route.routeShouldMatch(match)) {
-      // console.log('match : '+JSON.stringify(match));
       if (route.__is_router) {
-        // route.setUrl(match.url);
         branch.push({
           route,
           match

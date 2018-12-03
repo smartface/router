@@ -18,35 +18,6 @@ class Renderer {
    * @param {BottomTabBarController|Page|NavigationController} rootController
    */
   static setasRoot(rootController) {
-    /*if (Device.deviceOS === "iOS") {
-      var sfWindow = SF.requireClass("UIApplication").sharedApplication()
-        .keyWindow;
-      sfWindow.rootViewController = rootController.nativeObject;
-
-      rootController.nativeObject.view.addFrameObserver();
-      rootController.nativeObject.view.frameObserveHandler = e => {
-        for (var child in rootController.nativeObject.childViewControllers) {
-          rootController.nativeObject.childViewControllers[child].view.frame = {
-            x: 0,
-            y: 0,
-            width: e.frame.width,
-            height: e.frame.height
-          };
-
-          if (
-            rootController.nativeObject.childViewControllers[child].view.yoga
-              .isEnabled
-          ) {
-            rootController.nativeObject.childViewControllers[
-              child
-            ].view.yoga.applyLayoutPreservingOrigin(true);
-          }
-        }
-      };
-      // currentChild = controller;
-    } else {
-      Application.setRootController(rootController);
-    }*/
     Application.setRootController({
       controller: rootController,
       animated: true

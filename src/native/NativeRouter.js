@@ -81,13 +81,6 @@ class NativeRouter extends NativeRouterBase {
     }
 
     this._renderer = renderer;
-    // if (isRoot) {
-    //   this._renderer.setRootController(
-    //     new Page({ orientation: Page.Orientation.AUTO })
-    //   );
-    //   const Renderer = require("./Renderer");
-    //   Renderer.setasRoot(this._renderer._rootController);
-    // }
   }
 
   /**

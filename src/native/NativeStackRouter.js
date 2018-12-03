@@ -151,9 +151,7 @@ class NativeStackRouter extends NativeRouterBase {
     this._renderer.setRootController(new NavigationController());
     this.addNavigatorChangeListener();
     this.build = () => this._renderer._rootController;
-    // this._renderer._rootController.onLoad = () => {
     this._renderer._rootController.headerBar = headerBarParams();
-    // };
   }
 
   /**
@@ -181,7 +179,7 @@ class NativeStackRouter extends NativeRouterBase {
 
   /**
    * @private
-   * Add new listener to listen NavigationController transitions.
+   * to Listen page changes are handled by device.
    */
   addNavigatorChangeListener() {
     this._unlistener = this._renderer.onNavigationControllerTransition(
@@ -191,9 +189,8 @@ class NativeStackRouter extends NativeRouterBase {
           action.operation === NavigationController.OperationType.POP &&
           !this._fromRouter
         ) {
-          // set Router to skip next history change
-          console.log(`--- go back from device ${this._fromRouter}`);
           try {
+            // set Router to skip next history change
             this._historyController.preventDefault();
             this._historyController.goBack();
             this.dispatch(
@@ -202,7 +199,6 @@ class NativeStackRouter extends NativeRouterBase {
               this,
               false
             );
-            // this._fromRouter = true;
           } catch (e) {
             throw e;
           } finally {
@@ -213,21 +209,12 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   pushHomeBefore(path) {
-    console.log(
-      "push index " +
-        this +
-        " " +
-        this._homeRoute +
-        " len : " +
-        this._renderer._rootController.childControllers.length
-    );
     if (
       this.hasHome() &&
       this._renderer._rootController.childControllers.length === 0
     ) {
       const indexRoute = this._routes[this._homeRoute];
-      console.log(`push home ${path} ${indexRoute.getUrlPath()}`);
-      
+
       if (path !== indexRoute.getUrlPath()) {
         this._historyController.push(indexRoute.getUrlPath());
       }
@@ -258,9 +245,6 @@ class NativeStackRouter extends NativeRouterBase {
         this._fromRouter
       }`
     );
-    if (this.isModal())
-      console.log(`routeWillEnter array : ${this.getHistoryasArray().length}`);
-
     switch (action) {
       case "REPLACE":
         break;
@@ -277,7 +261,6 @@ class NativeStackRouter extends NativeRouterBase {
             );
             route.dismiss = this._dismiss = () => {
               route._renderer.dismiss(() => {
-                // console.log(`dismiss ${route}`);
                 route.dismiss = null;
                 route._presented = false;
                 route._currentRouteUrl = null;
@@ -291,18 +274,10 @@ class NativeStackRouter extends NativeRouterBase {
                   Router.getGlobalRouter().history.rollback();
                   diff--;
                 }
-                // console.log("nav dismiss 1 " + this._historyController);
                 this._historyController.preventDefault();
                 this._historyController.goBack();
-                // console.log("nav dismiss 1 " + this._historyController);
                 this.dispatch(lastLocation, "POP", this, false);
 
-                // console.log(
-                //   `dismiss oncomplete 1.5 last : ${lastLocation.pathname} ${
-                //     Router.getGlobalRouter().history.location.pathname
-                //   }`
-                // );
-                // console.log(`dismiss oncomplete 2 ${this}`);
                 route.setState({ active: false });
                 route.resetView();
               });
@@ -322,26 +297,13 @@ class NativeStackRouter extends NativeRouterBase {
             } finally {
               route.setState({ active: true });
             }
-            // route.__goBack = () => this._renderer.popChild();
-            // this.goBack = () => {
-            //   this._renderer.popChild();
-            //   this.goBack = () => null;
-            // };
-            // route.setState({ active: true });
           }
         }
 
-        // this._currentRouteUrl = route.getUrl();
-
         break;
       case "POP":
+        // TODO: Add dismiss logic
         if (this._fromRouter) {
-          // if (this._presented && target === this) {
-          //   console.log('dismiss '+this);
-          //   this._dismiss && this._dismiss();
-          //   this._presented = false;
-          // }
-          // else
           if (!route.dismiss && exact) {
             console.log("navcontroller pop " + this);
             this._renderer.popChild();
@@ -359,23 +321,6 @@ class NativeStackRouter extends NativeRouterBase {
     this._currentRouteUrl = null;
     this._renderer.setChildControllers([]);
     this._historyController.clear();
-  }
-
-  /**
-   * Event handler when a router exits from active state
-   *
-   * @override
-   * @protected
-   * @event
-   * @emits routerWillReset
-   * @param {string} action
-   */
-  routerDidExit(action) {
-    if (action === "POP") {
-      // this._currentRouteUrl = null;
-    }
-
-    super.routerDidExit(action);
   }
 }
 

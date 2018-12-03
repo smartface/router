@@ -398,14 +398,12 @@ class Route {
   }
 
   /**
-   * Queries if specified url match to the route path
+   * Checks if the specified url match to the route path
    * @param {string} url
    * @returns {Match}
    */
   matchPath(url) {
     return matchPath(url,this._options);
-
-    // return this._match;
   }
 
   /**

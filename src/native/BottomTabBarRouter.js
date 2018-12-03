@@ -195,19 +195,6 @@ class BottomTabBarRouter extends NativeRouterBase {
   }
 
   /**
-   * @override
-   */
-  /*  renderMatches(matches, state, action, target, fromRouter) {
-      this._fromRouter = true;
-      if (matches.length > 0) {
-      }
-
-      super.renderMatches(matches, state, action, target, fromRouter);
-
-      this._fromRouter = false;
-    }*/
-
-  /**
    * Sets TabBarItems visited by TabBarItem index
    *
    * @protected
@@ -268,16 +255,7 @@ class BottomTabBarRouter extends NativeRouterBase {
   }
 
   push(path, routeData = {}) {
-    /*    try {
-      throw new Error();
-    }
-    catch (e) {
-      console.log('bottomtabbar push call ' + (e.stack));
-    }
-*/
-
     const index = this.resolveIndex(path);
-    // console.log(`bottomtabbar push ${path} ${this._fromRouter} ${JSON.stringify(this._visitedIndexes[index])}`);
 
     if (this._fromRouter === false) {
       if (this.isVisited(index)) {
@@ -336,8 +314,6 @@ class BottomTabBarRouter extends NativeRouterBase {
     }
 
     super.renderMatches(matches, location, action, target, fromRouter);
-
-    // this._fromRouter = false;
   }
 }
 

@@ -26,13 +26,6 @@ class IOSRenderer extends Renderer {
     this._rootController.childControllers = controllers;
   }
 
-  setSelectedIndex(index) {
-    // if (this._rootController.shouldSelectByIndex({index})) {
-    super.setSelectedIndex(index);
-    // this._rootController.didSelectByIndex({index});
-    // }
-  }
-
   /**
    * @override
    */
@@ -54,9 +47,7 @@ class IOSRenderer extends Renderer {
    */
   pushChild(page, animated = true) {
     // prevents to push existing view
-    if (this._rootController.childControllers.some(p => p === page) || this._activePage === page) {
-      console.log("Page exists");
-      return;
+    if (this._rootController.childControllers.some(p => p === page) || this._activePage === page) {      return;
       // throw new Error("You can't pass extisting view");
     }
     

@@ -207,8 +207,6 @@ function createHistory({
      * Calls History.goBack
      */
     goBack() {
-      console.log(`--- go back `);
-
       _history.canGo(-1)
         ? _history.goBack()
         : !_preventDefault && this.onGoBack && this.onGoBack();
