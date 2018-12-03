@@ -2,8 +2,44 @@ const Route = require("../src/router/Route");
 const Router = require("../src/router/Router");
 const createStore = require("../src/router/routeStore");
 const matchRoutes = require("../src/common/matchRoutes");
+const { matchPath, matchUrl } = require("../src/common/matchPath");
+const parseUrl = require("../src/common/parseUrl");
 
 describe("Match Routes", () => {
+  it("should match same url with query", () => {
+    const path = "/path/to/:id";
+    {
+      const match = matchUrl("/path/to/1", path);
+      expect(match).toEqual({
+        isExact: true,
+        params: { id: "1" },
+        path: "/path/to/:id",
+        url: "/path/to/1"
+      });
+    }
+    {
+      const match = matchUrl("/path/to/1?type=any", path);
+      expect(match).toEqual({
+        isExact: true,
+        params: { id: "1" },
+        path: "/path/to/:id",
+        url: "/path/to/1"
+      });
+    }
+  });
+  it("should parse same url with query", () => {
+    const path = "/path/to/:id";
+    {
+      const res = parseUrl("/path/to/1?type=any&sort=ASC&parent=111");
+      expect(res).toEqual({
+        hash: "",
+        pathname: "/path/to/1",
+        query: { parent: "111", sort: "ASC", type: "any" },
+        rawQuery: "?type=any&sort=ASC&parent=111"
+      });
+      expect(res.query.type).toBe("any");
+    }
+  });
   it("can match with param", () => {
     const routes = [
       new Route({

@@ -2,7 +2,7 @@
 "use strict";
 
 const resolvePathname = require("resolve-pathname/umd/resolve-pathname");
-const parsePath = require("./parseUrl");
+const parseUrl = require("./parseUrl");
 
 const warning = require("./warning");
 const createPath = location => {
@@ -27,7 +27,7 @@ const createLocation = (path, state, key, currentLocation) => {
   let location;
   if (typeof path === "string") {
     // Two-arg form: push(path, state)
-    location = parsePath(path);
+    location = parseUrl(path);
     location.state = state;
   } else {
     // One-arg form: push(location)
@@ -35,11 +35,11 @@ const createLocation = (path, state, key, currentLocation) => {
 
     if (location.pathname === undefined) location.pathname = "";
 
-    if (location.search) {
-      if (location.search.charAt(0) !== "?")
-        location.search = "?" + location.search;
+    if (location.query) {
+      if (location.query.charAt(0) !== "?")
+        location.query = "?" + location.query;
     } else {
-      location.search = "";
+      location.query = "";
     }
 
     if (location.hash) {
@@ -118,10 +118,11 @@ const createMemoryHistory = (props = {}) => {
       .substr(2, keyLength);
 
   const index = clamp(initialIndex, 0, initialEntries.length - 1);
-  const entries = initialEntries.map(entry =>
-    typeof entry === "string"
-      ? createLocation(entry, undefined, createKey())
-      : createLocation(entry, undefined, entry.key || createKey())
+  const entries = initialEntries.map(
+    entry =>
+      typeof entry === "string"
+        ? createLocation(entry, undefined, createKey())
+        : createLocation(entry, undefined, entry.key || createKey())
   );
 
   // Public interface

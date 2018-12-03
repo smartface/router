@@ -36,7 +36,7 @@
  * @property {?object} [={}] routingState Keeps user data when route runs
  */
 
-const matchPath = require("../common/matchPath").matchPath;
+const matchUrl = require("../common/matchPath").matchUrl;
 const mapComposer = require("../utils/map");
 
 /**
@@ -161,7 +161,9 @@ class Route {
       action = null,
       url = null,
       active = false,
-      query = ""
+      query = "",
+      rawQuery = null,
+      hash = ""
     } = {}
   ) {
     this._options = {
@@ -185,6 +187,8 @@ class Route {
     this._state = Object.seal({
       match,
       query,
+      rawQuery,
+      hash,
       routeData,
       view,
       routingState,
@@ -226,16 +230,16 @@ class Route {
    * @return {{path: string, routes: Array<object>}}
    */
   toJSON() {
-    const {
-      match,
-      routeData,
-      routingState,
-      action,
-      url,
-      view,
-      active,
-      prevUrl
-    } = this._state;
+    // const {
+    //   match,
+    //   routeData,
+    //   routingState,
+    //   action,
+    //   url,
+    //   view,
+    //   active,
+    //   prevUrl
+    // } = this._state;
     return {
       type: "route",
       match: this._state.routeData,
@@ -243,16 +247,10 @@ class Route {
       routingState: this._state.routingState,
       path: this._path.getPath(),
       routes: this._routes.slice(),
-      state: {
-        match,
-        routeData,
-        routingState,
-        action,
-        url,
-        active,
-        view: (view && view.constructor.name) || undefined,
-        prevUrl
-      }
+      state: Object.assign({}, this._state, {
+        view:
+          (this._state.view && this._state.view.constructor.name) || undefined
+      })
     };
   }
 
@@ -403,7 +401,7 @@ class Route {
    * @returns {Match}
    */
   matchPath(url) {
-    return matchPath(url,this._options);
+    return matchUrl(url, { ...this._options });
   }
 
   /**
@@ -449,6 +447,9 @@ class Route {
       },
       Object.assign(
         {
+          hash: this._state.hash,
+          query: this._state.query,
+          rawQuery: this._state.rawQuery,
           action: this._state.action,
           active: this._state.active,
           url: this._state.url,

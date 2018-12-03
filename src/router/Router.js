@@ -28,10 +28,6 @@ const dispatch = (location, action) => {
 };
 
 function handleRouteUrl(router, url, routeData, action) {
-  // console.log(
-  //   ` handleRouteUrl ${router} ${router._state.url} ${url} ${action}`
-  // );
-  // console.log(`${url}, ${router._state.url}, ${router._state.prevUrl}`);
   if (url === router._state.prevUrl) return;
 
   router._historyController.preventDefault();
@@ -157,6 +153,9 @@ function handleRouteUrl(router, url, routeData, action) {
  *   ]
  * });
  *
+ * @example
+ *
+ *
  * @since 1.0.0
  * @extends {Route}
  */
@@ -238,7 +237,6 @@ class Router extends Route {
         while (++len < matches.length) {
           let route = matches[len].route;
           if (route.__is_router && route.hasHome()) {
-            // console.log(" has push index : " + route);
             route.pushHomeBefore && route.pushHomeBefore(path);
           }
         }
@@ -432,10 +430,12 @@ class Router extends Route {
 
     matches.some(({ match, route }, index) => {
       route.setState({
+        hash: location.hash,
+        query: location.query,
+        rawQuery: location.rawQuery,
         action,
         match
       });
-      // console.log(`match ${this._fromRouter } exact: ${match.isExact} ${match.url} ${location.pathname}`);
       if (match.isExact !== true && route !== this && route.__is_router) {
         // if(index > 0 && this._isRoot)
         tasks.push((url, action) => {
@@ -458,10 +458,8 @@ class Router extends Route {
 
         return true;
       } else if (match.isExact === true) {
-        // if (!this._fromRouter || route.routeShouldMatch(route, { match, action, routeData }) === true) {
         const redirection = funcorVal(route.getRedirectto(), [this, route]);
         if (redirection && redirection !== match.url) {
-          console.log("redicretion");
           tasks = []; // reset tasks
           target.routeRollback(); // remove redirected path from target Router
           //  because real path can be owned by different router.
@@ -479,7 +477,7 @@ class Router extends Route {
               routeData
             })) ||
           {};
-
+        // change route state to move data to callbacks
         route.setState({
           query: location.search,
           match,
@@ -493,14 +491,13 @@ class Router extends Route {
         // then push or pop route to child router's history.
         // Because current router isn't aware of the route.
         if (target != this) {
-          // console.log("new target");
-          // if (!this.isUrlCurrent(match.url, action)) {
           handleRouteUrl(this, match.url, routeData, action);
         }
 
-        console.log(`route query ${route.getState().query} `);
-        console.log(`route query ${JSON.stringify(location)} `);
-
+        // View operations must leave to end of rendering,
+        // because there must not render any view before route blocking.
+        // An another reason is we build views from child to parent but routing happens
+        // parent to child.
         tasks.push(
           (url, action) =>
             this.routeWillEnter &&
@@ -603,7 +600,6 @@ class Router extends Route {
    * @param {string} action
    */
   routerDidExit(action) {
-    // console.log(`routerDidExit ${this}`);
     this._handlers.routerDidExit && this._handlers.routerDidExit(this, action);
   }
 

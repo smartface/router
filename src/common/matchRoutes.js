@@ -20,14 +20,14 @@ const matchRoutes = (
     const match = route.hasPath()
       ? route.matchPath(pathname)
       : branch.length
-      ? branch[branch.length - 1].match
-      : {
-          // ensure we're using the exact code for default root match
-          path: "/",
-          url: "/",
-          params: {},
-          isExact: pathname === "/"
-        };
+        ? branch[branch.length - 1].match
+        : {
+            // ensure we're using the exact code for default root match
+            path: "/",
+            url: "/",
+            params: {},
+            isExact: pathname === "/"
+          };
 
     if (match) {
       if (route.__is_router) {
@@ -36,7 +36,6 @@ const matchRoutes = (
           match
         });
       } else {
-        console.log(`store has ${match.url} : ${store.hasRoute(match.url)}`);
         !store.hasRoute(match.url) &&
           store.saveRoute(match.url, route.clone({ url: match.url }));
         branch.push({

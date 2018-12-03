@@ -1,23 +1,33 @@
 const parseUrl = path => {
-  let pathname = path || "/";
-  let search = "";
+  let url = path || "/";
+  let query = "";
+  let rawQuery = "";
   let hash = "";
 
-  const hashIndex = pathname.indexOf("#");
+  const hashIndex = url.indexOf("#");
   if (hashIndex !== -1) {
-    hash = pathname.substr(hashIndex);
-    pathname = pathname.substr(0, hashIndex);
+    hash = url.substr(hashIndex);
+    url = url.substr(0, hashIndex);
   }
 
-  const searchIndex = pathname.indexOf("?");
-  if (searchIndex !== -1) {
-    search = pathname.substr(searchIndex);
-    pathname = pathname.substr(0, searchIndex);
+  const queryIndex = url.indexOf("?");
+  if (queryIndex !== -1) {
+    rawQuery = url.substr(queryIndex);
+    query =
+      "{" +
+      rawQuery
+        .replace("?", '"')
+        .replace(/\&/gi, '","')
+        .replace(/\=/gi, '":"') +
+      '"}';
+    query = JSON.parse(query);
+    url = url.substr(0, queryIndex);
   }
 
   return {
-    pathname,
-    search: search === "?" ? "" : search,
+    query,
+    pathname: url,
+    rawQuery: rawQuery === "?" ? "" : rawQuery,
     hash: hash === "#" ? "" : hash
   };
 };

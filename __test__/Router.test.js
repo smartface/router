@@ -230,11 +230,9 @@ describe("Router", () => {
     expect(_router1.toString()).toBe(
       "[object Router, path: /path/to, url: /path/to/the/1]"
     );
-    console.log("_router1 : " + _router1);
     expect(_router1.getHistoryasArray()).toEqual(["/path/to/the/1"]);
 
     _router1.push("/path2/to/1");
-    console.log(_router2.getHistoryasArray(), _router1.getHistoryasArray());
     expect(lastUrl).toBe("/path2/to/1");
     expect(_router2.getHistoryasArray()).toEqual(["/path2/to/1"]);
 
@@ -254,7 +252,6 @@ describe("Router", () => {
     ]);
 
     _router2.goBack();
-    console.log(router.getHistoryasArray(), _router2.getHistoryasArray());
 
     expect(lastUrl).toBe("/path2/to/1");
 

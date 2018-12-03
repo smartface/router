@@ -3,6 +3,19 @@ const matchRoutes = require("../src/common/matchRoutes");
 const createStore = require("../src/router/routeStore");
 
 describe("Route", () => {
+  it("can be matched any url", () => {
+    var route = new Route({
+      path: "/path/to/:id"
+    });
+
+    var res = route.matchPath("/path/to/1?type=any");
+    expect(res).toEqual({
+      isExact: true,
+      params: { id: "1" },
+      path: "/path/to/:id",
+      url: "/path/to/1"
+    });
+  });
   it("has a path", () => {
     const route = new Route({ path: "/path" });
 
