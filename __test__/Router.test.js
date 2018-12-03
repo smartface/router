@@ -770,10 +770,10 @@ describe("Router", () => {
 
   it("should be routed from child Routers", () => {
     let callCount = 0;
-    var component1 = {};
-    var component2 = {};
+    let component1 = {};
+    let component2 = {};
 
-    var router1 = Router.of({
+    let router1 = Router.of({
       path: "/stack1",
       to: "/stack1/to/1",
       routes: [
@@ -796,7 +796,7 @@ describe("Router", () => {
 
     router1.name = "router1";
 
-    var router2 = Router.of({
+    let router2 = Router.of({
       path: "/stack2",
       to: "/stack2/to/1",
       routes: [

@@ -12,7 +12,7 @@ let historyController;
 let _lastRoute;
 const listeners = new Set();
 const history = [];
-const store = createStore();
+let store;
 
 // const dispatch = (location, action) => {
 //   history.push([location.pathnamme, action]);
@@ -218,6 +218,7 @@ class Router extends Route {
     };
 
     if (isRoot) {
+      store = createStore();
       // this._store = createStore();
       /** @type {HistoryListener} */
       listeners.clear();
@@ -296,10 +297,10 @@ class Router extends Route {
   hasHome() {
     return this._homeRoute !== null;
   }
-  
+
   /**
    * Fast router's instance checking
-   * 
+   *
    * @since 1.0.0
    * @return {boolean}
    */
@@ -425,7 +426,7 @@ class Router extends Route {
    * @param {Router} target Target Router which pushed to its router.
    */
   renderMatches(matches, location, action, target, fromRouter, parent) {
-      this._fromRouter = fromRouter;
+    this._fromRouter = fromRouter;
 
     const routeData = location.state;
 
@@ -460,6 +461,7 @@ class Router extends Route {
         // if (!this._fromRouter || route.routeShouldMatch(route, { match, action, routeData }) === true) {
         const redirection = funcorVal(route.getRedirectto(), [this, route]);
         if (redirection && redirection !== match.url) {
+          console.log("redicretion");
           tasks = []; // reset tasks
           target.routeRollback(); // remove redirected path from target Router
           //  because real path can be owned by different router.
@@ -478,7 +480,13 @@ class Router extends Route {
             })) ||
           {};
 
-        route.setState({ query: location.search, match, action, routeData, routingState });
+        route.setState({
+          query: location.search,
+          match,
+          action,
+          routeData,
+          routingState
+        });
         route.setUrl(location.pathname);
 
         // If route owned by current child router which is different from target router
@@ -692,7 +700,7 @@ class Router extends Route {
     }
 
     this._fromRouter = true;
-    if (!this.isValidPath(path)) throw new TypeError(`[${path}] Path is invalid`);
+    // if (!this.isValidPath(path)) throw new TypeError(`[${path}] Pat h is invalid`);
     if (path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;
     }
