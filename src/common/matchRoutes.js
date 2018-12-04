@@ -4,18 +4,13 @@
 /**
  *
  * @ignore
- *
+ * @param {object} store
  * @param {Array<Route>} routes
  * @param {string} pathname
- * @param {Array} branch
- * @param {object} store
+ * @param {Array} [branch=[]] not public API
+ * @return {Array<{match: RouteMatch, route: Route}>}
  */
-const matchRoutes = (
-  store,
-  routes,
-  pathname,
-  /*not public API*/ branch = []
-) => {
+const matchRoutes = (store, routes, pathname, branch = []) => {
   routes.some(route => {
     const match = route.hasPath()
       ? route.matchPath(pathname)

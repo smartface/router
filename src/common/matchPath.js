@@ -45,7 +45,7 @@ const matchPath = (pathname, options = {}, parent) => {
   const { path, exact = false, strict = false, sensitive = false } = options;
 
   if (path == null) return parent;
-  
+
   // console.log(pathname+" :: "+ path + " " +JSON.stringify(options))
 
   const { re, keys } = compilePath(path, {
@@ -75,6 +75,12 @@ const matchPath = (pathname, options = {}, parent) => {
   };
 };
 
+/**
+ * @ignore
+ * @param {*} url
+ * @param {*} options
+ * @return {RouteMatch}
+ */
 const matchUrl = (url, options) => {
   const res = matchPath(parseUrl(url).pathname, options);
   return res;

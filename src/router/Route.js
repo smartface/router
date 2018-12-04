@@ -140,7 +140,8 @@ class Route {
    *
    * @since 1.0.0
    * @static
-   * @param {RouteParams} params
+   * @param {RouteParams} params Route properties
+   * @param {RouteState} state Initial state
    * @return {Route}
    */
   static of(params = {}, state = {}) {
@@ -148,8 +149,8 @@ class Route {
   }
   /**
    * @constructor
-   * @param {RouteParams} param0
-   * @param {RouteState} param1
+   * @param {RouteParams} param0 Route properties
+   * @param {RouteState} param1 Initial state
    */
   constructor(
     {
@@ -413,10 +414,10 @@ class Route {
   /**
    * Checks if the specified url match to the route path
    * @param {string} url
-   * @returns {Match}
+   * @return {RouteMatch}
    */
   matchPath(url) {
-    return matchUrl(url, { ...this._options });
+    return matchUrl(url, this._options);
   }
 
   /**

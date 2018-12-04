@@ -292,6 +292,7 @@ class Router extends Route {
    * @since 1.0.0
    * @param {HistoryListener} parentHistory
    * @param {function} onHistoryChange Root onHistoryChange handler
+   * @param {function} pushHomes It uses in order to push routers' home-route
    */
   initialize(parentHistory, onHistoryChange, pushHomes) {
     this._pushHomes = pushHomes;
@@ -408,14 +409,16 @@ class Router extends Route {
   }
 
   /**
-   * Handles history changes. Just Root router, because routing flow mmust be always root to children,
+   * Handles history changes. Just Root router,
+   * because routing flow mmust be always root to children,
    * in order to change display logic all the time.
    *
    * @since 1.0.0
    * @protected
    * @param {RouteLocation} location
-   * @param {Object} action
+   * @param {string} action
    * @param {Router} target Target Router which pushed to its router.
+   * @param {boolean} [fromRouter=true]
    */
   onHistoryChange(location, action, target, fromRouter = true) {
     if (this._isRoot) {
@@ -768,7 +771,8 @@ class Router extends Route {
    * Rewinds the history
    *
    * @since 1.0.0
-   * @param {string | RouteLocation}
+   * @param {string | RouteLocation} url This routes an experimental feature. If you use this feature you should use for same StackRouter stack.
+   * @return {Router}
    */
   goBack(url) {
     const go = () => {
