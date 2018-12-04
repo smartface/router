@@ -190,7 +190,7 @@ StackRouter has homeRoute attribute to push first when route is matched to an an
 ...
 ```
 
-### Send and recevice guery-string
+### Send and recevice query-string
 
 ```js
 const route = Router.of({
