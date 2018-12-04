@@ -216,15 +216,7 @@ describe("Router", () => {
         })
       ]
     });
-    // let matches = matchRoutes([router], "/path/to/1").map(
-    //   ({ match, route }) => ({ match, route: route.toObject(), view: route.build() })
-    // );
 
-    // router.listen((location, action) => {
-    //   console.log("---------------");
-    //   console.log(location.pathname, action);
-    //   console.log(router.getHistoryasArray());
-    // });
     router.push("/");
     expect(lastUrl).toBe("/path/to/the/1");
     expect(_router1.toString()).toBe(

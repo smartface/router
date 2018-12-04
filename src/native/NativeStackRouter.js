@@ -3,7 +3,8 @@
 /**
  * @typedef {RouterParams} NativeStackRouterParams
  * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
- * @property {function():HeaderBarParams} headerBarParams See {@link NavigationController}
+ * @property {function():HeaderBarParams} modal
+ * @property {function():HeaderBarParams} headerBarParams Properties of NavigationController's headerbar. See {@link NavigationController}.
  */
 
 /**
@@ -77,15 +78,15 @@ const createRenderer = require("./createRenderer");
  *
  * @example
  * const extend = require("js-base/core/extend");
- *  const System = require("sf-core/device/system");
- *  const Application = require("sf-core/application");
- *  const AlertView = require("sf-core/ui/alertview");
- *  const {NativeStackRouter} = require('@smartface/router');
+ * const System = require("sf-core/device/system");
+ * const Application = require("sf-core/application");
+ * const AlertView = require("sf-core/ui/alertview");
+ * const {NativeStackRouter} = require('@smartface/router');
  *
- *  // Get generated UI code
- *  const Page1Design = require("ui/ui_page1");
+ * // Get generated UI code
+ * const Page1Design = require("ui/ui_page1");
  *
- *  const Page1 = extend(Page1Design)(
+ * const Page1 = extend(Page1Design)(
  *   // Constructor
  *   function(_super, data, router) {
  *       // Initalizes super class for this page scope
@@ -172,14 +173,20 @@ class NativeStackRouter extends NativeRouterBase {
     return this._renderer._rootController.headerBar;
   }
 
+  /**
+   * @ignore
+   * @param {*} prevState
+   * @param {*} nextState
+   */
   routeShouldMatch(prevState, nextState) {
     if (this.isUrlCurrent(nextState.match.url, nextState.action)) return false;
     return super.routeShouldMatch(prevState, nextState);
   }
 
   /**
+   * To Listen page changes are handled by device.
+   *
    * @private
-   * to Listen page changes are handled by device.
    */
   addNavigatorChangeListener() {
     this._unlistener = this._renderer.onNavigationControllerTransition(
@@ -238,20 +245,12 @@ class NativeStackRouter extends NativeRouterBase {
       action
     } = route.getState();
     const active = url === this._currentRouteUrl;
-    console.log(
-      `routeWillEnter route : ${route} url: ${url} ${
-        this._currentRouteUrl
-      } active: ${active} exact : ${exact} action : ${action} _fromRouter : ${
-        this._fromRouter
-      }`
-    );
     switch (action) {
       case "REPLACE":
         break;
       case "PUSH":
         if (this._fromRouter) {
           if (route.isModal() && !this._presented && !active) {
-            console.log("present " + this + " " + route);
             const lastLocation = Router.getGlobalRouter().history.entries[
               Router.getGlobalRouter().history.index
             ];
@@ -286,14 +285,13 @@ class NativeStackRouter extends NativeRouterBase {
             this._presented = true;
             route.setState({ active: true });
           } else if (!route.isModal() && !active) {
-            console.log('push '+route);
             this._currentRouteUrl = url;
             try {
               this._renderer.pushChild(
                 (route._renderer && route._renderer._rootController) || view
               );
             } catch (e) {
-                throw `Error when ${route} is pushed. ${e}`;
+              throw `Error when ${route} is pushed. ${e}`;
             } finally {
               route.setState({ active: true });
             }
@@ -305,7 +303,6 @@ class NativeStackRouter extends NativeRouterBase {
         // TODO: Add dismiss logic
         if (this._fromRouter) {
           if (!route.dismiss && exact) {
-            console.log("navcontroller pop " + this);
             this._renderer.popChild();
           }
         }

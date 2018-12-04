@@ -14,11 +14,6 @@ const listeners = new Set();
 const history = [];
 let store;
 
-// const dispatch = (location, action) => {
-//   history.push([location.pathnamme, action]);
-//   listeners.forEach(listener => listener(location, action));
-// };
-
 const dispatch = (location, action) => {
   history.push([location.pathnamme, action]);
   listeners.forEach(listener => listener(location, action));
@@ -52,6 +47,7 @@ function handleRouteUrl(router, url, routeData, action) {
  * @property {?boolean} [sensitive=false] sensitive Path is case sensitive or not
  * @property {?function(router: Router, prevUrl: string, currentUrl: stirng, action: string)} routerDidEnter Handles the Router is actived.
  * @property {?function(router: Router, prevUrl: string, action: string)} routerDidExit Handles the Router is deactived.
+ * @property {number} homeRoute Home route index of the router's children. If it pushes first when routed to router's.
  */
 
 /**
@@ -62,6 +58,7 @@ function handleRouteUrl(router, url, routeData, action) {
  * to handle view changes and to create loosely coupled and resuable routing logic.
  *
  * @class
+ *
  * @example
  *  const router = Router.of({
  *   path: "/",
@@ -154,7 +151,37 @@ function handleRouteUrl(router, url, routeData, action) {
  * });
  *
  * @example
+ * // Homeroute setting
  *
+ * ...
+ *      StackRouter.of({
+ *           path: "/stack",
+ *           to: "/stack/path1",
+ *           homeRoute: 0, // it's first push if target is path diffrent.
+ *           headerBarParams: () => { ios: { translucent: true } },
+ *           routes: [
+ *               Route.of({
+ *                   path: "/stack/path1",
+ *                   build: (match, state, router) => new Page1(state.data, router)
+ *               }),
+ *               Route.of({
+ *                   path: "/stack/path2",
+ *                   routeShouldMatch: (route, nextState) => {
+ *                       console.log('routeShouldMatch');
+ *                       if (!nextState.routeData.applied) {
+ *                           // blocks route changing
+ *                           return false;
+ *                       }
+ *                       return false;
+ *                   },
+ *                   build: (router, route) => {
+ *                       const { routeData, view } = route.getState();
+ *                       return new Page2(routeData, router);
+ *                   }
+ *               })
+ *           ]
+ *       })
+ * ...
  *
  * @since 1.0.0
  * @extends {Route}
@@ -315,7 +342,7 @@ class Router extends Route {
   }
 
   /**
-   * Return current url
+   * Return current active url
    *
    * @since 1.0.0
    * @return {string}
@@ -422,8 +449,9 @@ class Router extends Route {
    * @param {RouteLocation} location Current location
    * @param {string} action Current history action
    * @param {Router} target Target Router which pushed to its router.
+   * @param {boolean} fromRouter If the specified request if from the router or an another source.
    */
-  renderMatches(matches, location, action, target, fromRouter, parent) {
+  renderMatches(matches, location, action, target, fromRouter) {
     this._fromRouter = fromRouter;
 
     const routeData = location.state;
@@ -604,7 +632,7 @@ class Router extends Route {
   }
 
   /**
-   * Redirects route and removes last route record from history
+   * Redirects route and removes last route record from history.
    *
    * @protected
    * @param {Route} route
@@ -628,7 +656,7 @@ class Router extends Route {
   }
 
   /**
-   * Route is matched handler
+   * Route is matched handler.
    *
    * @since 1.0.0
    * @protected
@@ -738,6 +766,7 @@ class Router extends Route {
 
   /**
    * Rewinds the history
+   *
    * @since 1.0.0
    * @param {string | RouteLocation}
    */

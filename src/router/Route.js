@@ -11,17 +11,22 @@
 /**
  * @typedef {object} RouteLocation History entry of a request
  * @property {!string} pathname Requested url
- * @property {?string} search Url's search data
+ * @property {?string} query Url's search data
  * @property {?string} hash Url's hash data
- * @property {?RouteState} state Route state
- * @property {!string} key Unique key
+ * @property {?RouteState} state Requested data to destination route
+ * @property {!string} key Auto generated unique key
  */
 
 /**
  * @typedef {object} RouteParams
  * @property {!string} path Route Path definition
- * @property {?Array<Route>} [=[]] routes Route children
- * @property {?boolean} [=false] exact Points that a route match must be exact or not
+ * @property {?string | ?function(router: Router, route: route)} [to=null] Redirection url
+ * @property {?Array<Route>} [routes=[]] Route children
+ * @property {?function(router: Router, route: Route)} [build=null] Route's view builder
+ * @property {?Array<Route>} [build=null] Route's view builder
+ * @property {?boolean} [exact=false]  Points that a route match must be exact or not. If a route is exact then it's chld routes cannot be received.
+ * @property {?boolean} [sensitive=false] If path matching is case-sensitive or not.
+ * @property {?modal} [modal=false] If route is displayed as modal or not.
  * @property {?function(route: Route, nextState: RouteState)} routeShouldMatch Handles if route is mathed as request url
  * @property {?function(Router: Router, route: Route)} routeDidEnter Handles if route is displayed
  * @property {?function(Router: Router, route: Route)} routeDidExit Handles if route is removed
@@ -29,11 +34,17 @@
 
 /**
  * @typedef {object} RouteState
- * @property {?object} [={}] routeData Requested data by user
+ * @property {?object} [routeData ={}] Requested data by user
  * @property {!string} action Request action 'PUSH', 'POP' or 'REPLACE'
+ * @property {object} query Request's query-string
+ * @property {string} rawQuery String version of the request's query-string
+ * @property {boolean} active If Route is currently displayed or not.
+ * @property {string} hash Request's url hash comes after '#' char. For example '/path/to#a-hash'
  * @property {!RouteMatch} match Request's match result
  * @property {!object} view Keeps requested route's view
- * @property {?object} [={}] routingState Keeps user data when route runs
+ * @property {!string} url Requested url
+ * @property {!string} prevUrl Previously requested url
+ * @property {?object} [routingState={}] Keeps user data when route runs
  */
 
 const matchUrl = require("../common/matchPath").matchUrl;
@@ -137,7 +148,8 @@ class Route {
   }
   /**
    * @constructor
-   * @param {RouteParams} param
+   * @param {RouteParams} param0
+   * @param {RouteState} param1
    */
   constructor(
     {
@@ -199,6 +211,9 @@ class Route {
     });
   }
 
+  /**
+   *
+   */
   isModal() {
     return this._modal;
   }
