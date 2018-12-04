@@ -165,12 +165,14 @@ router.push("/bottom");
 
 ### Setting home-route to StackRouter
 
+StackRouter has homeRoute attribute to push first when route is matched to an another path
+
 ```js
 ...
     StackRouter.of({
         path: "/bottom/stack2",
         to: "/bottom/stack2/path1",
-        homRoute: 0, // it means /bottom/stack2/path
+        homeRoute: 0, // it means /bottom/stack2/path
         headerBarParams: () => { ios: { translucent: false } },
         routes: [
             Route.of(routeBinder({
@@ -196,7 +198,7 @@ const route = Router.of({
     StackRouter.of({
         path: "/bottom/stack2",
         to: "/bottom/stack2/path1",
-        homRoute: 0, // it means /bottom/stack2/path
+        homeRoute: 0, // it means /bottom/stack2/path
         headerBarParams: () => { ios: { translucent: false } },
         routes: [
             Route.of(routeBinder({
