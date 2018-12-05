@@ -8,7 +8,7 @@ Router is a concept that separates routing/navigation and the pages/views.
 
 ## Types of Smartface Routers
 
-There are 5 types of routers
+There are 4 types of routers
 
 - [NativeRouter](https://smartface.github.io/router/class/src/native/NativeRouter.js~NativeRouter.html)
 - [NativeStackRouter](https://smartface.github.io/router/class/src/native/NativeStackRouter.js~NativeStackRouter.html)
@@ -22,6 +22,17 @@ There are 5 types of routers
 ```
 
 ## Usages
+
+### Table Of Contentes
+
+1. [Sending data between routes](#setting-home-route-to-stackrouter)
+2. [Working with pages](#working-with-pages)
+3. [Setting home-route to StackRouter](#setting-home-route-to-stackRouter)
+4. [Send and recevice query-string](#send-and-recevice-query-string)
+5. [Working with deeplinking](#working-with-deeplinking)
+6. [Working with life-cycle methods](#working-with-life-cycle-methods)
+7. [Blocking Routes](#blocking-routes)
+8. [Listening history changes](#listening-history-changes)
 
 ```javascript
 const {
@@ -195,7 +206,7 @@ const router = Router.of([
             }))
         ]
     }),
-
+Color.RED
 ...
 ]})
 
@@ -266,7 +277,7 @@ const Page1 = extend(Page1Design)(
 
 ### Setting home-route to StackRouter
 
-StackRouter has homeRoute attribute to push first when route is matched to an another path
+StackRouter has homeRoute attribute to push before when route is matched to an another path in the router.
 
 ```js
 ...
