@@ -23,7 +23,7 @@ There are 4 types of routers
 
 ## Usages
 
-### Table Of Contentes
+### Table Of Contents
 
 1. [Sending data between routes](#setting-home-route-to-stackrouter)
 2. [Working with pages](#working-with-pages)
