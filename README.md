@@ -84,8 +84,10 @@ const router = Router.of({
             to: "/bottom/stack2/path1",
             tabbarParams: () => ({
                 ios: { translucent: false },
-                itemColor: Color.RED,
-                unselectedItemColor: Color.YELLOW,
+                itemColor: {
+                    normal: Color.RED,
+                    selectd: Color.YELLOW
+                },
                 backgroundColor: Color.BLUE
             }),
             items: () => [{ title: "page1" }, { title: "page2" }, { title: "page3" }],
@@ -157,10 +159,109 @@ function routeBinder(params){
 }
 
 const unlisten = router.listen((location, action) => {
-    console.log(` ---- new route location: ${location.pathname} ${}`);
+    console.log(`New route location: ${location.pathname} ${}`);
 });
 
 router.push("/bottom");
+```
+
+### Sending data between routes
+
+```js
+const router = Router.of([
+    path: "/",
+    routes: [
+...
+
+    StackRouter.of({
+        path: "/bottom/stack2",
+        to: "/bottom/stack2/path1",
+        headerBarParams: () => { ios: { translucent: false } },
+        routes: [
+            Route.of(routeBinder({
+                path: "/bottom/stack2/path1",
+                build: (router, route) => {
+                    // get data from request
+                    const data = route.getState().routeData;
+                    // and then pass  to the page
+                    return new Page1(data, router)
+                }
+            })),
+            Route.of(routeBinder({
+                path: "/bottom/stack2/path2",
+                build: (router, route) => {
+                    return new Page2(route.getState().routeData, router);
+                }
+            }))
+        ]
+    }),
+
+...
+]})
+
+// push path with data
+router.push("/bottom/stack2/path1", {someElements: ['elemnent1', 'elemnent2', 'elemnent3']});
+```
+
+### Working with pages
+
+```js
+// router
+const router = Router.of([
+    path: "/",
+    routes: [
+...
+
+    StackRouter.of({
+        path: "/bottom/stack2",
+        to: "/bottom/stack2/path1",
+        headerBarParams: () => { ios: { translucent: false } },
+        routes: [
+            Route.of(routeBinder({
+                path: "/bottom/stack2/path1",
+                build: (router, route) => new Page1(route.getState().routeData, router)
+            })),
+            Route.of(routeBinder({
+                path: "/bottom/stack2/path2",
+                build: (router, route) => {
+                    return new Page2(route.getState().routeData, router);
+                }
+            }))
+        ]
+    }),
+
+...
+]})
+
+router.push("/bottom/stack2/path1", {sort: "ASC"});
+
+// page1.js
+
+const extend = require("js-base/core/extend");
+const System = require("sf-core/device/system");
+const Application = require("sf-core/application");
+const AlertView = require("sf-core/ui/alertview");
+
+// Get generated UI code
+const Page1Design = require("ui/ui_page1");
+
+const Page1 = extend(Page1Design)(
+    // Constructor
+    function(_super, routeData, router) {
+        // Initalizes super class for this page scope
+        _super(this);
+        this.onShow = onShow.bind(this, this.onShow.bind(this));
+        this.sort = routeData.sort;
+        this.router = router;
+    }
+...
+    // when user clicks a button in the Page1
+    function btnNext_onPress() {
+        const page = this;
+        this._router.push('/path/to/another', {
+            message: "Hello World!"
+        });
+    }
 ```
 
 ### Setting home-route to StackRouter
