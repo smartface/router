@@ -170,7 +170,7 @@ function routeBinder(params){
 }
 
 const unlisten = router.listen((location, action) => {
-    console.log(`New route location: ${location.pathname} ${}`);
+    console.log(`New route location: ${location.url} ${}`);
 });
 
 router.push("/bottom");
@@ -470,7 +470,7 @@ There are several actions that user can take, which cannot be blocked by the blo
 
 ```js
 const unlisten = router.getHistory().listen((location, action) => {
-  console.log(`new route action :  ${action} path : ${location.pathname}`);
+  console.log(`new route action :  ${action} path : ${location.url}`);
 });
 
 unlisten();
