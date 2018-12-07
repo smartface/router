@@ -421,7 +421,13 @@ class Router extends Route {
    * @param {boolean} [fromRouter=true]
    */
   onHistoryChange(location, action, target, fromRouter = true) {
-    console.log('onHistoryChange'+location);
+    try {
+      if(location.url === '/nav/tabs/discover/products/28186')
+        throw new Error();
+    }catch(e){
+      console.log(e.stack)
+    }
+    console.log('onHistoryChange'+location.p);
     if (this._isRoot) {
       this._matches = matchRoutes(
         this.getStore(),
