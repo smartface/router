@@ -4,7 +4,7 @@
 
 # What is a Router
 
-Router is a concept that separates routing/navigation and the pages/views.
+Router is a concept that decouples application's page-routing logic than view layer in order to make application more manageable, maintainable, easy understanding and useful.
 
 ## Types of Smartface Routers
 
@@ -23,16 +23,38 @@ There are 4 types of routers
 
 ## Usages
 
-### Table Of Contents
+## Table of Contents
 
-1. [Sending data between routes](#setting-home-route-to-stackrouter)
-2. [Working with pages](#working-with-pages)
-3. [Setting home-route to StackRouter](#setting-home-route-to-stackRouter)
-4. [Send and recevice query-string](#send-and-recevice-query-string)
-5. [Working with deeplinking](#working-with-deeplinking)
-6. [Working with life-cycle methods](#working-with-life-cycle-methods)
-7. [Blocking Routes](#blocking-routes)
-8. [Listening history changes](#listening-history-changes)
+- [Smartface Router](#smartface-router)
+- [What is a Router](#what-is-a-router)
+    - [Types of Smartface Routers](#types-of-smartface-routers)
+    - [Installation](#installation)
+    - [Usages](#usages)
+    - [Table of Contents](#table-of-contents)
+        - [Getting Started](#getting-started)
+            - [Basic Usage](#basic-usage)
+        - [Working with StackRouter](#working-with-stackrouter)
+        - [Working with BottomTabBarRouter](#working-with-bottomtabbarrouter)
+        - [Working with Pages](#working-with-pages)
+        - [Setting home-route to StackRouter](#setting-home-route-to-stackrouter)
+        - [Send and recevice query-string](#send-and-recevice-query-string)
+        - [Working with deeplinking](#working-with-deeplinking)
+        - [Working with life-cycle methods](#working-with-life-cycle-methods)
+            - [Usage :](#usage)
+        - [Blocking Routes](#blocking-routes)
+        - [Limitation](#limitation)
+    - [Listening history changes](#listening-history-changes)
+    - [Common features of Routers](#common-features-of-routers)
+- [Contribute to Repository](#contribute-to-repository)
+
+### Getting Started
+
+- `NativeRouter` is the root router
+- `StackRouter` is to create route stack
+- `Route` is a definition of a path
+- `BottomTabBarRouter` is to manage BottomTabBarController's
+
+#### Basic Usage
 
 ```javascript
 const {
@@ -47,52 +69,96 @@ const Image = require("sf-core/ui/image");
 
 const router = Router.of({
     path: "/",
-    to: "/pages/page2",
+    to: "/pages/page1",
     isRoot: true,
     routes: [
-        Route.of(routeBinder({
-            path: "/pages/page2",
+        Route.of({
+            path: "/pages/page1",
             build: (router, route) => {
                 let Page2 = require("pages/page2");
                 return new Page2();
             }
-        })),
-        Route.of(routeBinder({
-            path: "/pages/:name([0-9]*)",
+        }),
+        Route.of({
+            path: "/pages/page2",
             build: (router, route) => {
                 const { routeData, view } = route.getState();
                 let Page1 = require("pages/page1");
                 return new Page1(routeData, router);
             }
-        })),
+        })
+    ]})
+
+// push path with data
+router.push("/pages/page1");
+```
+
+### Working with StackRouter
+
+```js
+const {
+  NativeRouter: Router,
+  Router: RouterBase
+  NativeStackRouter: StackRouter,
+  BottomTabBarRouter,
+  Route
+} = require("@smartface/router");
+const Color = require("sf-core/ui/color");
+const Image = require("sf-core/ui/image");
+
+const router = Router.of({
+    path: "/",
+    to: "/pages/page1",
+    isRoot: true,
+    routes: [
         StackRouter.of({
-            path: "/stack",
-            to: "/stack/path1",
-            headerBarParams: () => { ios: { translucent: true } },
+            path: "/bottom/stack2",
+            to: "/bottom/stack2/path1",
+            headerBarParams: () => { ios: { translucent: false } },
             routes: [
-                Route.of(routeBinder({
-                    path: "/stack/path1",
-                    build: (router, route) => new Page1(state.data, router)
-                })),
-                Route.of(routeBinder({
-                    path: "/stack/path2",
-                    routeShouldMatch: (route, nextState) => {
-                        if (!nextState.routeData.applied) {
-                            // blocks route changing
-                            return false;
-                        }
-                        return false;
-                    },
+                Route.of({
+                    path: "/pages/page1",
+                    build: (router, route) => {
+                        let Page2 = require("pages/page2");
+                        return new Page2();
+                    }
+                }),
+                Route.of({
+                    path: "/pages/page2",
                     build: (router, route) => {
                         const { routeData, view } = route.getState();
-                        return new Page2(routeData, router);
+                        let Page1 = require("pages/page1");
+                        return new Page1(routeData, router);
                     }
-                }))
-            ]
-        }),
-        BottomTabBarRouter.of({
+                })
+            ]})
+    ]});
+
+// push path
+router.push("/pages/page1");
+```
+
+### Working with BottomTabBarRouter
+
+```js
+const {
+  NativeRouter: Router,
+  Router: RouterBase
+  NativeStackRouter: StackRouter,
+  BottomTabBarRouter,
+  Route
+} = require("@smartface/router");
+const Color = require("sf-core/ui/color");
+const Image = require("sf-core/ui/image");
+
+const router = Router.of({
+    path: "/",
+    to: "/pages/page1",
+    isRoot: true,
+    routes: [BottomTabBarRouter.of({
             path: "/bottom",
             to: "/bottom/stack2/path1",
+            // ui propperties of the BottomTabBarController
             tabbarParams: () => ({
                 ios: { translucent: false },
                 itemColor: {
@@ -101,8 +167,11 @@ const router = Router.of({
                 },
                 backgroundColor: Color.BLUE
             }),
+            // tabbar items of the BottomTabBarController
             items: () => [{ title: "page1" }, { title: "page2" }, { title: "page3" }],
+            // tab routes
             routes: [
+                // tab 1
                 StackRouter.of({
                     path: "/bottom/stack",
                     to: "/bottom/stack/path1",
@@ -122,6 +191,7 @@ const router = Router.of({
                         }))
                     ]
                 }),
+                // tab 2
                 StackRouter.of({
                     path: "/bottom/stack2",
                     to: "/bottom/stack2/path1",
@@ -139,6 +209,7 @@ const router = Router.of({
                         }))
                     ]
                 }),
+                // tab 3
                 Route.of(routeBinder({
                     path: "/bottom/page1",
                     build: (router, route) => {
@@ -148,73 +219,13 @@ const router = Router.of({
                 }))
             ]
         })
-    ]
-});
+    ]});
 
-function routeBinder(params){
-
-    return Object.assign({},
-        params,
-        {
-            routeDidEnter: (router, route) => {
-                const {view} = route.getState();
-                view.onRouteEnter && view.onRouteEnter(router, route);
-                params.routeDidEnter && params.routeDidEnter(router, route)
-            },
-            routeDidExit: (router, route) => {
-                const {view} = route.getState();
-                view.onRouteExit && view.onRouteExit(router, route);
-                params.routeDidExit && params.routeDidExit(router, route)
-            }
-        });
-}
-
-const unlisten = router.listen((location, action) => {
-    console.log(`New route location: ${location.url} ${}`);
-});
-
-router.push("/bottom");
+// push path
+router.push("/pages/page1");
 ```
 
-### Sending data between routes
-
-```js
-const router = Router.of([
-    path: "/",
-    routes: [
-...
-
-    StackRouter.of({
-        path: "/bottom/stack2",
-        to: "/bottom/stack2/path1",
-        headerBarParams: () => { ios: { translucent: false } },
-        routes: [
-            Route.of(routeBinder({
-                path: "/bottom/stack2/path1",
-                build: (router, route) => {
-                    // get data from request
-                    const data = route.getState().routeData;
-                    // and then pass  to the page
-                    return new Page1(data, router)
-                }
-            })),
-            Route.of(routeBinder({
-                path: "/bottom/stack2/path2",
-                build: (router, route) => {
-                    return new Page2(route.getState().routeData, router);
-                }
-            }))
-        ]
-    }),
-Color.RED
-...
-]})
-
-// push path with data
-router.push("/bottom/stack2/path1", {someElements: ['elemnent1', 'elemnent2', 'elemnent3']});
-```
-
-### Working with pages
+### Working with Pages
 
 ```js
 // router
@@ -228,16 +239,16 @@ const router = Router.of([
         to: "/bottom/stack2/path1",
         headerBarParams: () => { ios: { translucent: false } },
         routes: [
-            Route.of(routeBinder({
+            Route.of({
                 path: "/bottom/stack2/path1",
                 build: (router, route) => new Page1(route.getState().routeData, router)
-            })),
-            Route.of(routeBinder({
+            }),
+            Route.of({
                 path: "/bottom/stack2/path2",
                 build: (router, route) => {
                     return new Page2(route.getState().routeData, router);
                 }
-            }))
+            })
         ]
     }),
 
