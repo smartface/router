@@ -96,7 +96,7 @@ function createHistory({
     }
 
     getHistoryasArray() {
-      return _history.entries.map(item => item.pathname);
+      return _history.entries.map(item => item.url);
     }
 
     /**

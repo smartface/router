@@ -26,7 +26,7 @@ const parseUrl = path => {
 
   return {
     query,
-    pathname: url,
+    url,
     rawQuery: rawQuery === "?" ? "" : rawQuery,
     hash: hash === "#" ? "" : hash
   };

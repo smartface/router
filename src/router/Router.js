@@ -356,7 +356,7 @@ class Router extends Route {
    * Adds eventlisteners to listen history changes
    * @example
    * const unlisten = router.listen((location, action) => {
-   *     console.log(`new route location: ${location.pathname} action : ${action}`);
+   *     console.log(`new route location: ${location.url} action : ${action}`);
    * });
    *
    * @since 1.0.0
@@ -421,11 +421,12 @@ class Router extends Route {
    * @param {boolean} [fromRouter=true]
    */
   onHistoryChange(location, action, target, fromRouter = true) {
+    console.log('onHistoryChange'+location);
     if (this._isRoot) {
       this._matches = matchRoutes(
         this.getStore(),
         [this].concat(this._routes),
-        location.pathname
+        location.url
       );
       this.renderMatches(this._matches, location, action, target, fromRouter);
     }
@@ -475,7 +476,7 @@ class Router extends Route {
           // handleRouteUrl(this, url, routeData, action);
         }); // add new router display logic from root to children
 
-        route.setUrl(location.pathname);
+        route.setUrl(location.url);
 
         // move routes to child router
         route.renderMatches(
@@ -516,7 +517,7 @@ class Router extends Route {
           routeData,
           routingState
         });
-        route.setUrl(location.pathname);
+        route.setUrl(location.url);
 
         // If route owned by current child router which is different from target router
         // then push or pop route to child router's history.
@@ -541,7 +542,7 @@ class Router extends Route {
           const view = this.renderRoute(route); // build route's view
           route.setState({ view }); // keep view in the route's state
         }
-        tasks.reverse().forEach(task => task(location.pathname, action)); // trigger all routers' routeWillEnter in the tasks queue
+        tasks.reverse().forEach(task => task(location.url, action)); // trigger all routers' routeWillEnter in the tasks queue
         this.routerDidEnter && this.routerDidEnter(route); // fires routerDidEnter
         route.routeDidEnter(this); // fires routeDidEnter
         _lastRoute = route; // save exact matched route as last route
@@ -712,6 +713,7 @@ class Router extends Route {
    * @return {Router}
    */
   push(path, routeData = {}) {
+    console.log(`push ${path}`);
     if (path === this._state.url) {
       Object.assign(this._historyController.history.location.state, {
         routeData
@@ -781,7 +783,7 @@ class Router extends Route {
       url
         ? this.dispatch(
             typeof url === "string"
-              ? { pathname: url, hash: "", search: "", state: {} }
+              ? { url, hash: "", search: "", state: {} }
               : url,
             "POP",
             this,

@@ -6,9 +6,9 @@ const parseUrl = require("./parseUrl");
 
 const warning = require("./warning");
 const createPath = location => {
-  const { pathname, search, hash } = location;
+  const { url, search, hash } = location;
 
-  let path = pathname || "/";
+  let path = url || "/";
 
   if (search && search !== "?")
     path += search.charAt(0) === "?" ? search : `?${search}`;
@@ -33,7 +33,7 @@ const createLocation = (path, state, key, currentLocation) => {
     // One-arg form: push(location)
     location = Object.assign({}, path);
 
-    if (location.pathname === undefined) location.pathname = "";
+    if (location.url === undefined) location.url = "";
 
     if (location.query) {
       if (location.query.charAt(0) !== "?")
@@ -53,12 +53,12 @@ const createLocation = (path, state, key, currentLocation) => {
   }
 
   try {
-    location.pathname = decodeURI(location.pathname);
+    location.url = decodeURI(location.url);
   } catch (e) {
     if (e instanceof URIError) {
       throw new URIError(
         'Pathname "' +
-          location.pathname +
+          location.url +
           '" could not be decoded. ' +
           "This is likely caused by an invalid percent-encoding."
       );
@@ -71,18 +71,18 @@ const createLocation = (path, state, key, currentLocation) => {
 
   if (currentLocation) {
     // Resolve incomplete/relative pathname relative to current location.
-    if (!location.pathname) {
-      location.pathname = currentLocation.pathname;
-    } else if (location.pathname.charAt(0) !== "/") {
-      location.pathname = resolvePathname(
-        location.pathname,
-        currentLocation.pathname
+    if (!location.url) {
+      location.url = currentLocation.url;
+    } else if (location.url.charAt(0) !== "/") {
+      location.url = resolvePathname(
+        location.url,
+        currentLocation.url
       );
     }
   } else {
     // When there is no prior location and pathname is empty, set it to /
-    if (!location.pathname) {
-      location.pathname = "/";
+    if (!location.url) {
+      location.url = "/";
     }
   }
 

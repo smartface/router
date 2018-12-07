@@ -10,7 +10,7 @@
 
 /**
  * @typedef {object} RouteLocation History entry of a request
- * @property {!string} pathname Requested url
+ * @property {!string} url Requested url
  * @property {?string} query Url's search data
  * @property {?string} hash Url's hash data
  * @property {?RouteState} state Requested data to destination route
