@@ -258,7 +258,7 @@ class NativeStackRouter extends NativeRouterBase {
             this._renderer.present(
               (route._renderer && route._renderer._rootController) || view
             );
-            route.dismiss = this._dismiss = () => {
+            route.dismiss = this._dismiss = (cb=null) => {
                 let diff =
                   Router.getGlobalRouter().history.index - lastLocationIndex;
                 // exits all locations in the modal router
@@ -270,6 +270,7 @@ class NativeStackRouter extends NativeRouterBase {
               this._historyController.preventDefault();
               this._historyController.goBack();
               this.dispatch(lastLocation, "POP", this, false);
+              cb && cb();
               route._renderer.dismiss(() => {
                 route.dismiss = null;
                 route._presented = false;
