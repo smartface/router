@@ -29,9 +29,10 @@ class AndroidRenderer extends Renderer {
    */
   pushChild(page, animated = true) {
     // To avoid Android error
-    if (this._rootController.childControllers.some(p => p === page)) {
+    if (this._rootController.childControllers.length !== 0 && this._rootController.childControllers.some(p => p === page)) {
       return;
     }
+    animated = this._rootController.childControllers.length === 0 ? false : animated;
     this._rootController.push &&
       this._rootController.push({ controller: page, animated: animated });
   }
