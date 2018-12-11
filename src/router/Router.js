@@ -47,11 +47,12 @@ function handleRouteUrl(router, url, routeData, action) {
  * @property {?boolean} [sensitive=false] sensitive Path is case sensitive or not
  * @property {?function(router: Router, prevUrl: string, currentUrl: stirng, action: string)} routerDidEnter Handles the Router is actived.
  * @property {?function(router: Router, prevUrl: string, action: string)} routerDidExit Handles the Router is deactived.
+ * @property {?function(router: Router, route: Route | Router, viewController : NavigationController | BottomTabBarController | Page)} [routeWillEnter=null] A route or a router which is called by request in the router will be entered.
  * @property {number} homeRoute Home route index of the router's children. If it pushes first when routed to router's.
  */
 
 /**
- * Router Base
+ * Router Core Implemantation
  *
  * @description
  * Router implementation creates a thin layer between view and application layers
@@ -84,7 +85,6 @@ function handleRouteUrl(router, url, routeData, action) {
  *               Route.of({
  *                   path: "/stack/path2",
  *                   routeShouldMatch: (route, nextState) => {
- *                       console.log('routeShouldMatch');
  *                       if (!nextState.routeData.applied) {
  *                           // blocks route changing
  *                           return false;
@@ -167,7 +167,6 @@ function handleRouteUrl(router, url, routeData, action) {
  *               Route.of({
  *                   path: "/stack/path2",
  *                   routeShouldMatch: (route, nextState) => {
- *                       console.log('routeShouldMatch');
  *                       if (!nextState.routeData.applied) {
  *                           // blocks route changing
  *                           return false;
@@ -233,6 +232,7 @@ class Router extends Route {
     routerDidEnter,
     routerDidExit,
     routeShouldMatch,
+    routeWillEnter = null,
     homeRoute = null
   }) {
     super({ path, modal, build, routes, to, isRoot, routeShouldMatch });
@@ -240,7 +240,8 @@ class Router extends Route {
     this._historyUnlisten = () => null;
     this._handlers = {
       routerDidEnter,
-      routerDidExit
+      routerDidExit,
+      routeWillEnter
     };
 
     if (isRoot) {
@@ -421,13 +422,6 @@ class Router extends Route {
    * @param {boolean} [fromRouter=true]
    */
   onHistoryChange(location, action, target, fromRouter = true) {
-    try {
-      if(location.url === '/nav/tabs/discover/products/28186')
-        throw new Error();
-    }catch(e){
-      console.log(e.stack)
-    }
-    console.log('onHistoryChange'+location.p);
     if (this._isRoot) {
       this._matches = matchRoutes(
         this.getStore(),
@@ -574,7 +568,12 @@ class Router extends Route {
    * @protected
    * @param {Route} route
    */
-  routerWillEnter(route) {}
+  routeWillEnter(route, action) {
+    const viewConroller = (route._renderer && route._renderer._rootController) ||
+        // else just instance of Route
+          route.getState().view;
+    this._handlers.routeWillEnter && this._handlers.routeWillEnter(this, route, viewConroller);
+  }
 
   /**
    * @since 1.0.0
@@ -716,10 +715,10 @@ class Router extends Route {
    * @since 1.0.0
    * @param {object|string} path - Path or matches of the route
    * @param {!object} [routeData={}] routeData - Routing data
+   * @param {!boolean} [animated={}] routeData - Routing data
    * @return {Router}
    */
-  push(path, routeData = {}) {
-    console.log(`push ${path}`);
+  push(path, routeData = {}, animated=true) {
     if (path === this._state.url) {
       Object.assign(this._historyController.history.location.state, {
         routeData

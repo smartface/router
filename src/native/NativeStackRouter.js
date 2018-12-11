@@ -129,6 +129,7 @@ class NativeStackRouter extends NativeRouterBase {
     headerBarParams = () => {},
     routerDidEnter,
     routerDidExit,
+    routeWillEnter = null,
     routeShouldMatch,
     homeRoute = null
   }) {
@@ -143,7 +144,8 @@ class NativeStackRouter extends NativeRouterBase {
       routerDidEnter,
       routerDidExit,
       routeShouldMatch,
-      homeRoute
+      homeRoute,
+      routeWillEnter
     });
 
     this._homeRoute = homeRoute;
@@ -312,6 +314,7 @@ class NativeStackRouter extends NativeRouterBase {
         break;
     }
     this._currentRouteUrl = url;
+    super.routeWillEnter(route);
   }
 
   resetView() {

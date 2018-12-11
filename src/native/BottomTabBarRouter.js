@@ -107,7 +107,8 @@ class BottomTabBarRouter extends NativeRouterBase {
     isRoot = false,
     routerDidEnter,
     routerDidExit,
-    routeShouldMatch
+    routeShouldMatch,
+    routeWillEnter
   }) {
     super({
       path,
@@ -117,7 +118,8 @@ class BottomTabBarRouter extends NativeRouterBase {
       isRoot,
       routerDidEnter,
       routerDidExit,
-      routeShouldMatch
+      routeShouldMatch,
+      routeWillEnter
     });
 
     this._renderer = renderer;
@@ -296,7 +298,6 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @override
    */
   renderMatches(matches, location, action, target, fromRouter) {
-    console.log(`bottomtabbar render ${location.url}`);
     // this._fromRouter = true;
     if (matches.length > 0) {
       const { match: next } = matches[matches.length - 1];
@@ -310,7 +311,6 @@ class BottomTabBarRouter extends NativeRouterBase {
       // this.isVisited(index) && this.activateIndex(index);
       this.setVisited(index, location.url);
       this._currentIndex = index;
-      console.log(`bottomtabbar render ${location.url} ${index}`);
       if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
     }
 

@@ -62,7 +62,9 @@ class NativeRouter extends NativeRouterBase {
     to = null,
     routerDidEnter,
     routerDidExit,
-    routeShouldMatch
+    routeShouldMatch,
+    routeWillEnter,
+    rootWillChange = null,
   }) {
     super({
       path,
@@ -71,10 +73,13 @@ class NativeRouter extends NativeRouterBase {
       exact,
       isRoot: true,
       to,
+      routeWillEnter,
       routerDidEnter,
       routerDidExit,
       routeShouldMatch
     });
+    
+    this._rootWillChange = rootWillChange;
 
     if (!this._isRoot) {
       throw new Error("[NativeRouter] Please only use as root");
@@ -91,11 +96,15 @@ class NativeRouter extends NativeRouterBase {
     // this._renderer.show(router._renderer._rootController);
     if (this._isRoot && this._route !== route) {
       Renderer.setasRoot(
+        // If route is instance of Router
         (route._renderer && route._renderer._rootController) ||
+        // else just instance of Route
           route.getState().view
       );
       this._route = route;
     }
+    
+    super.routeWillEnter(route, action);
   }
 }
 

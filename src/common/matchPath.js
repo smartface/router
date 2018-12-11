@@ -46,8 +46,6 @@ const matchPath = (pathname, options = {}, parent) => {
 
   if (path == null) return parent;
 
-  console.log(pathname+" :: "+ path + " " +JSON.stringify(options))
-
   const { re, keys } = compilePath(path, {
     end: exact,
     strict,
