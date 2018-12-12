@@ -1,6 +1,6 @@
 {
   "name": "@smartface/router",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Smmartface Router",
   "main": "index.js",
   "scripts": {

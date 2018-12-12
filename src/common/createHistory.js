@@ -196,11 +196,20 @@ function createHistory({
 
     /**
      * If history can be gone back or not
+     * @param {number} n it's a negative number to go bac
      *
      * @return boolean
      */
-    canGoBack() {
-      return _history.canGo(-1);
+    canGoBack(n=-1) {
+      return _history.canGo(n);
+    }
+    
+    goBackto(n){
+      return _history.go(n)
+    }
+    
+    currentIndex(){
+      return _history.index;
     }
 
     /**
@@ -244,9 +253,8 @@ function createHistory({
      * @return {string}
      */
     toString() {
-      return `[Object HistoryController, stack: ${JSON.stringify(
-        this.getHistoryasArray()
-      )},
+      return `[Object HistoryController, 
+        stack: ${JSON.stringify(this.getHistoryasArray())}, 
         length ${_history.length}, 
         index : ${_history.index}]`;
     }

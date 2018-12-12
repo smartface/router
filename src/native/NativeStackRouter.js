@@ -316,6 +316,17 @@ class NativeStackRouter extends NativeRouterBase {
     this._currentRouteUrl = url;
     super.routeWillEnter(route);
   }
+  
+  /**
+   * @override
+   */
+  goBackto(n) {
+    if(this._historyController.canGoBack(n)) {
+      this._historyController.preventDefault();
+      this._historyController.goBackto(n);
+      this._renderer.popTo(this._historyController.currentIndex() + n);
+    }
+  }
 
   resetView() {
     this.clearUrl();

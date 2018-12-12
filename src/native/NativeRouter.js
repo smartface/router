@@ -87,6 +87,10 @@ class NativeRouter extends NativeRouterBase {
 
     this._renderer = renderer;
   }
+  
+  canGoBack(n){
+    return false;
+  }
 
   /**
    * @override

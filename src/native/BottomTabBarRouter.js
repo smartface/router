@@ -243,6 +243,10 @@ class BottomTabBarRouter extends NativeRouterBase {
   resolveRoute(index) {
     return this._routes.find((route, ind) => ind === index);
   }
+  
+  canGoBack(n){
+    return this._historyController.canGoBack(n);
+  }
 
   /**
    * @override

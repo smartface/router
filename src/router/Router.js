@@ -352,6 +352,25 @@ class Router extends Route {
   getCurrentUrl() {
     return this._currentUrl;
   }
+  
+  /**
+   * Go back to index
+   * @param {number} n Amount of back as negative value
+   * @throws {Error} if it's not implemented
+   */
+  goBackto(n){
+    throw new Error("This feature is not implemented at this kind of Router");
+  }
+  
+  /**
+   * it tests that Whether router can go back as n
+   * 
+   * @param {number} n Amount of back as negative value
+   * return {boolean}
+   */
+  canGoBack(n){
+    return this._historyController.canGoBack(n);
+  }
 
   /**
    * Adds eventlisteners to listen history changes
@@ -561,7 +580,7 @@ class Router extends Route {
   }
 
   /**
-   * Handles a new route activated in the router
+   * Handles a new route which is activated in the router
    *
    * @since 1.0.0
    * @event
@@ -587,7 +606,7 @@ class Router extends Route {
   }
 
   /**
-   * Life-cycle event handler handles when Router is activated
+   * Life-cycle handler emits when Router is activated
    * @example
    * ....
    * Router.of({
@@ -621,7 +640,7 @@ class Router extends Route {
   }
 
   /**
-   * Handles router is deactivated.
+   * Emits when the router is deactivated.
    *
    * @since 1.0.0
    * @example
@@ -641,7 +660,7 @@ class Router extends Route {
   }
 
   /**
-   * Redirects route and removes last route record from history.
+   * Redirects route and removes last route's record from the history.
    *
    * @protected
    * @param {Route} route
@@ -665,7 +684,7 @@ class Router extends Route {
   }
 
   /**
-   * Route is matched handler.
+   * Route matched to requested url
    *
    * @since 1.0.0
    * @protected
@@ -710,7 +729,7 @@ class Router extends Route {
   }
 
   /**
-   * Change history by specified path
+   * Pushes new history entry with specified path
    *
    * @since 1.0.0
    * @param {object|string} path - Path or matches of the route
@@ -778,7 +797,7 @@ class Router extends Route {
    * Rewinds the history
    *
    * @since 1.0.0
-   * @param {string | RouteLocation} url This routes an experimental feature. If you use this feature you should use for same StackRouter stack.
+   * @param {string | RouteLocation} url This is an experimental feature. If you use this feature you should use for same StackRouter stack.
    * @return {Router}
    */
   goBack(url) {
