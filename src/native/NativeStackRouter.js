@@ -348,6 +348,10 @@ class NativeStackRouter extends NativeRouterBase {
     this.goBackto(back);
   }
   
+  /**
+   * Go back to first page in the same stack
+   *
+   */
   goBackHome() {
     const lastIndex = this._historyController.getLength() - 1;
     const index = this._historyController.currentIndex();
