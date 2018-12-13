@@ -173,7 +173,7 @@ function btn_onPress() {
     // or specified step back
     this.router.goBackto(-3); // go back to first page
 
-    // and you can test your request abefore do request
+    // and you can test your request before do
     if(this.router.canGoBack(-2))
         // do something
     else if(this.router.canGoBacktoUrl('/some/path/to/back'))
