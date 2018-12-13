@@ -35,6 +35,7 @@ class AndroidRenderer extends Renderer {
     animated = this._rootController.childControllers.length === 0 ? false : animated;
     this._rootController.push &&
       this._rootController.push({ controller: page, animated: animated });
+    this._activePage = page;
   }
 
   /**
@@ -61,7 +62,10 @@ class AndroidRenderer extends Renderer {
    * @override
    */
   show(page) {
+    if(this._activePage == page)
+      return;
     Application.setRootController(page);
+    this._activePage = page;
   }
 }
 

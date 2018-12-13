@@ -152,7 +152,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     this._renderer.setTabBarItems(
       functionMaybe(this._items).map(createTabBarItem)
     );
-    this._renderer._rootController.show();
+    this._renderer.showTab();
     // Overrides build method
     this.build = () => this._renderer._rootController;
   }
@@ -289,7 +289,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     // selects target tabbaritem by index
     if (this._currentRouteUrl !== url) {
       this._renderer.setSelectedIndex(index);
-      this._renderer._rootController.show();
+      this._renderer.showTab();
       this.setVisited(index, backUrl || url);
     }
     // this.isVisited(index) && this.activateIndex(index);
@@ -311,7 +311,8 @@ class BottomTabBarRouter extends NativeRouterBase {
       // sets target tabbar item as visited.
       // selects target tabbaritem by index
       this._renderer.setSelectedIndex(index);
-      this._renderer._rootController.show();
+      if(this._currentIndex != index)
+        this._renderer.showTab();
       // this.isVisited(index) && this.activateIndex(index);
       this.setVisited(index, location.url);
       this._currentIndex = index;

@@ -29,6 +29,10 @@ class Renderer {
       .keyWindow;
     sfWindow.makeKeyAndVisible();
   }
+  
+  showTab(){
+    this._rootController.show();
+  }
 
   present(controller, animated, onComplete) {
     this._rootController.present({
@@ -89,8 +93,8 @@ class Renderer {
    * @param {nummer} index
    */
   setSelectedIndex(index) {
-    this._rootController.selectedIndex = index;
-    // this._rootController.hasOwnProperty('selectedIndex') ? (this._rootController.selectedIndex = index) : (this.setIndex(index));
+    if(this._rootController.selectedIndex != index)
+      this._rootController.selectedIndex = index;
   }
 
   /**
