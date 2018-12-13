@@ -476,7 +476,6 @@ class Router extends Route {
    */
   renderMatches(matches, location, action, target, fromRouter) {
     this._fromRouter = fromRouter;
-
     const routeData = location.state;
 
     matches.some(({ match, route }, index) => {
@@ -770,6 +769,7 @@ class Router extends Route {
     } catch (e) {
       throw e;
     }
+    
     this._historyController.push(path, routeData);
     this._fromRouter = false;
     return this;

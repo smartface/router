@@ -75,13 +75,6 @@ class IOSRenderer extends Renderer {
   }
 
   /**
-   */
-  popTo(index) {
-    this.setasRoot();
-    this._rootController.popTo(index);
-  }
-
-  /**
    * @override
    */
   removeChild(page) {

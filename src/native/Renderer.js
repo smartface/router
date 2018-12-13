@@ -143,6 +143,12 @@ class Renderer {
   popChild(animated = true) {
     throw new Error("popChild must be overridden");
   }
+  
+  /**
+   */
+  popTo(n) {
+    this._rootController.popTo({ controller: this._rootController.childControllers[n], animated: true });
+  }
 
   /**
    * Displays specified page

@@ -116,7 +116,7 @@ function createHistory({
           this.onGoBack && this.onGoBack();
         }
       };
-      // bubbles history push to root if push could be possible.
+      // bubbles the last push up to root until pushing can be possible.
       node.onPush = (path, data) => {
         if (this.canPush(path)) {
           this.push(path, data);
@@ -205,7 +205,8 @@ function createHistory({
     }
     
     goBackto(n){
-      return _history.go(n)
+      _history.go(n) 
+      _preventDefault && this.clearPreventDefault();
     }
     
     currentIndex(){
@@ -220,6 +221,10 @@ function createHistory({
         ? _history.goBack()
         : !_preventDefault && this.onGoBack && this.onGoBack();
       _preventDefault && this.clearPreventDefault();
+    }
+    
+    getLength(){
+      return _history.length
     }
 
     /**
@@ -245,6 +250,14 @@ function createHistory({
         });
         _listeners.delete(fn);
       };
+    }
+    
+    findIndex(fn){
+      return _history.entries.findIndex(fn);
+    }
+
+    find(fn){
+      return _history.entries.find(fn);
     }
 
     /**

@@ -233,6 +233,7 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   push(path, routeData = {}) {
+    console.log("push "+path);
     return super.push(path, routeData);
   }
 
@@ -321,12 +322,38 @@ class NativeStackRouter extends NativeRouterBase {
    * @override
    */
   goBackto(n) {
+    console.log(`goBackto : ${n} ${this._historyController}`);
     if(this._historyController.canGoBack(n)) {
+      const back = this._historyController.currentIndex() + n; 
+      const location = this._historyController.find((location, index) => index === back);
+      console.log("location : "+location.url);
       this._historyController.preventDefault();
       this._historyController.goBackto(n);
-      this._renderer.popTo(this._historyController.currentIndex() + n);
+      this._renderer.popTo(back);
+      this.dispatch(location, "POP", this, false);
+      console.log(`goBackto : ${n} ${this._historyController}`);
     }
   }
+  
+  /**
+   * Go back until the url
+   * 
+   * @param {string} url - An url will be matched in the same stack
+   */
+  goBacktoUrl(url) {
+    // console.log(`goBackto : ${n} ${this._historyController}`);
+    const lastIndex = this._historyController.getLength() - 1;
+    const index = this._historyController.findIndex(location => location.url === url);
+    const back = index - (lastIndex - index);
+    this.goBackto(back);
+  }
+  
+  goBackHome() {
+    const lastIndex = this._historyController.getLength() - 1;
+    const index = this._historyController.currentIndex();
+    const back = index - (lastIndex - index);
+    this.goBackto(back);
+  }  
 
   resetView() {
     this.clearUrl();
