@@ -350,29 +350,53 @@ class NativeStackRouter extends NativeRouterBase {
   /**
    * Go back until the url
    *
+   * @example
+   * ...
+   * router.goBacktoUrl('/back/to/url');
+   * ...
    * @since 1.1.0
    * @param {string} url - An url will be matched in the same stack
    */
   goBacktoUrl(url) {
-    // console.log(`goBackto : ${n} ${this._historyController}`);
-    const lastIndex = this._historyController.getLength() - 1;
-    const index = this._historyController.findIndex(
-      location => location.url === url
-    );
-    const back = index - (lastIndex - index);
-    this.goBackto(back);
+    this.goBackto(this.getStepLengthByCurrent(url));
   }
 
   /**
    * Go back to first page in the same stack
    *
+   * @example
+   * ...
+   * router.goBackHome();
+   * ...
    * @since 1.1.0
    */
   goBackHome() {
-    const lastIndex = this._historyController.getLength() - 1;
-    const index = this._historyController.currentIndex();
     const back = index - (lastIndex - index);
     this.goBackto(back);
+  }
+
+  /**
+   * Returns length of the history steps to be needed to receive from current to specified url
+   *
+   * @param {string} url
+   * @return {number}
+   */
+  getStepLengthByCurrent(url) {
+    const lastIndex = this._historyController.getLength() - 1;
+    const index = this._historyController.findIndex(
+      location => location.url === url
+    );
+    return index - (lastIndex - index);
+  }
+
+  /**
+   * Tests if desired url is available to go back or not
+   *
+   * @param {string} url Desired url to test availability to go back
+   * @return {boolean}
+   */
+  canGoBacktoUrl(url) {
+    return this.canGoBackto(this.getStepLengthByCurrent(url));
   }
 
   resetView() {

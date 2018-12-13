@@ -27,24 +27,25 @@ There are 4 types of routers
 
 - [Smartface Router](#smartface-router)
 - [What is a Router](#what-is-a-router)
-    - [Types of Smartface Routers](#types-of-smartface-routers)
-    - [Installation](#installation)
-    - [Usages](#usages)
-    - [Table of Contents](#table-of-contents)
-        - [Getting Started](#getting-started)
-            - [Basic Usage](#basic-usage)
-        - [Working with StackRouter](#working-with-stackrouter)
-        - [Working with BottomTabBarRouter](#working-with-bottomtabbarrouter)
-        - [Working with Pages](#working-with-pages)
-        - [Setting home-route to StackRouter](#setting-home-route-to-stackrouter)
-        - [Send and recevice query-string](#send-and-recevice-query-string)
-        - [Working with deeplinking](#working-with-deeplinking)
-        - [Working with life-cycle methods](#working-with-life-cycle-methods)
-            - [Usage :](#usage)
-        - [Blocking Routes](#blocking-routes)
-        - [Limitation](#limitation)
-    - [Listening history changes](#listening-history-changes)
-    - [Common features of Routers](#common-features-of-routers)
+  - [Types of Smartface Routers](#types-of-smartface-routers)
+  - [Installation](#installation)
+  - [Usages](#usages)
+  - [Table of Contents](#table-of-contents)
+    - [Getting Started](#getting-started)
+      - [Basic Usage and push to start](#basic-usage-and-push-to-start)
+    - [Go back to a desired page in same history stack](#go-back-to-a-desired-page-in-same-history-stack)
+    - [Working with StackRouter](#working-with-stackrouter)
+    - [Working with BottomTabBarRouter](#working-with-bottomtabbarrouter)
+    - [Working with Pages](#working-with-pages)
+    - [Setting home-route to StackRouter](#setting-home-route-to-stackrouter)
+    - [Send and recevice query-string](#send-and-recevice-query-string)
+    - [Working with deeplinking](#working-with-deeplinking)
+    - [Working with life-cycle methods](#working-with-life-cycle-methods)
+      - [Usage :](#usage)
+    - [Blocking Routes](#blocking-routes)
+    - [Limitation](#limitation)
+  - [Listening history changes](#listening-history-changes)
+  - [Common features of Routers](#common-features-of-routers)
 - [Contribute to Repository](#contribute-to-repository)
 
 ### Getting Started
@@ -54,7 +55,7 @@ There are 4 types of routers
 - `Route` is a definition of a path
 - `BottomTabBarRouter` is to manage BottomTabBarController's
 
-#### Basic Usage
+#### Basic Usage and push to start
 
 ```javascript
 const {
@@ -91,6 +92,99 @@ const router = Router.of({
 
 // push path with data
 router.push("/pages/page1");
+```
+
+### Go back to a desired page in same history stack
+
+This features are included in the only capabilities of the StackRouter. And it works just in the same stack.
+If your desired param is not included in the stack history then the router does nothing.
+
+```js
+// requires needed
+....
+
+const router = Router.of({
+  path: "/",
+  isRoot: true,
+  routes: [
+    StackRouter.of({
+      path: "/pages",
+      // modal: true,
+      // for testing gobackto
+      routes: [
+        Route.of(routeBinder({
+          path: "/pages/page1",
+          build: (router, route) => {
+            let Page = require("pages/page1");
+            return new Page({label:1}, router, "/pages2/page2");
+          }
+        })),
+        Route.of(routeBinder({
+          path: "/pages/page2",
+          build: (router, route) => {
+            let Page = require("pages/page1");
+            return new Page({label:2}, router, "/pages2/page3");
+          }
+        })),
+        Route.of(routeBinder({
+          path: "/pages/page3",
+          build: (router, route) => {
+            let Page = require("pages/page1");
+            return new Page({label:3}, router, "/pages2/page4");
+          }
+        })),
+        Route.of(routeBinder({
+          path: "/pages/page4",
+          build: (router, route) => {
+            let Page = require("pages/page2");
+            return new Page({}, router, -2);
+          }
+        }))
+      ]
+    }),
+...
+
+router.push('/pages/page1');
+router.push('/pages/page2');
+router.push('/pages/page3');
+router.push('/pages/page4');
+
+// page2.js
+...
+const Page2 = extend(Page2Design)(
+    // Constructor
+    function(_super, data, router, back=-1) {
+        // Initalizes super class for this page scope
+        _super(this);
+        this.back - back;
+        this.router = router;
+        // Overrides super.onShow method
+        this.onShow = onShow.bind(this, this.onShow.bind(this));
+        // Overrides super.onLoad method
+        this.onLoad = onLoad.bind(this, this.onLoad.bind(this));
+    });
+...
+// when button is tapped, It moves history to
+function btn_onPress() {
+    // "/pages2/page1" specified url
+    this.router.goBacktoUrl("/pages2/page1");
+    // or first page in the stack
+    this.router.goBacktoHome("/pages2/page1");
+    // or specified step back
+    this.router.goBackto(-3); // go back to first page
+
+    // and you can test your request abefore do request
+    if(this.router.canGoBack(-2))
+        // do something
+    else if(this.router.canGoBacktoUrl('/some/path/to/back'))
+        // do something else
+    else
+       // do something else
+}
+
+...
+
+///
 ```
 
 ### Working with StackRouter
