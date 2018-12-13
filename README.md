@@ -90,14 +90,14 @@ const router = Router.of({
         })
     ]})
 
-// push path with data
+// push path
 router.push("/pages/page1");
 ```
 
 ### Go back to a desired page in same history stack
 
-This features are included in the only capabilities of the StackRouter. And it works just in the same stack.
-If your desired param is not included in the stack history then the router does nothing.
+These features are included in the capabilities of the StackRouter. And it works just in the same stack.
+If your desired parameter(step back count or url) is not included in the stack history then the router does nothing.
 
 ```js
 // requires needed
