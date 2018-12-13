@@ -169,7 +169,7 @@ function btn_onPress() {
     // "/pages2/page1" specified url
     this.router.goBacktoUrl("/pages2/page1");
     // or first page in the stack
-    this.router.goBacktoHome("/pages2/page1");
+    this.router.goBacktoHome();
     // or specified step back
     this.router.goBackto(-3); // go back to first page
 
