@@ -352,23 +352,18 @@ class Router extends Route {
   getCurrentUrl() {
     return this._currentUrl;
   }
-  
-  /**
-   * Go back to index
-   * @param {number} n Amount of back as negative value
-   * @throws {Error} if it's not implemented
-   */
-  goBackto(n){
-    throw new Error("This feature is not implemented at this kind of Router");
-  }
-  
+
   /**
    * it tests that Whether router can go back as n
-   * 
+   * @example
+   * ...
+   * router.canGoBack(-3) ? router.goBackto(-3) : // if not, do anything else
+   *
+   * @since 1.1.0
    * @param {number} n Amount of back as negative value
    * return {boolean}
    */
-  canGoBack(n){
+  canGoBack(n) {
     return this._historyController.canGoBack(n);
   }
 
@@ -587,10 +582,12 @@ class Router extends Route {
    * @param {Route} route
    */
   routeWillEnter(route, action) {
-    const viewConroller = (route._renderer && route._renderer._rootController) ||
-        // else just instance of Route
-          route.getState().view;
-    this._handlers.routeWillEnter && this._handlers.routeWillEnter(this, route, viewConroller);
+    const viewConroller =
+      (route._renderer && route._renderer._rootController) ||
+      // else just instance of Route
+      route.getState().view;
+    this._handlers.routeWillEnter &&
+      this._handlers.routeWillEnter(this, route, viewConroller);
   }
 
   /**
@@ -736,7 +733,7 @@ class Router extends Route {
    * @param {!boolean} [animated={}] routeData - Routing data
    * @return {Router}
    */
-  push(path, routeData = {}, animated=true) {
+  push(path, routeData = {}, animated = true) {
     if (path === this._state.url) {
       Object.assign(this._historyController.history.location.state, {
         routeData
@@ -769,7 +766,7 @@ class Router extends Route {
     } catch (e) {
       throw e;
     }
-    
+
     this._historyController.push(path, routeData);
     this._fromRouter = false;
     return this;

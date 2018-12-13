@@ -217,6 +217,11 @@ class NativeStackRouter extends NativeRouterBase {
     );
   }
 
+  /**
+   * @protected
+   * @ignore
+   * @param {string} path
+   */
   pushHomeBefore(path) {
     if (
       this.hasHome() &&
@@ -232,8 +237,10 @@ class NativeStackRouter extends NativeRouterBase {
     return true;
   }
 
+  /**
+   * @override
+   */
   push(path, routeData = {}) {
-    console.log("push "+path);
     return super.push(path, routeData);
   }
 
@@ -261,14 +268,14 @@ class NativeStackRouter extends NativeRouterBase {
             this._renderer.present(
               (route._renderer && route._renderer._rootController) || view
             );
-            route.dismiss = this._dismiss = (cb=null) => {
-                let diff =
-                  Router.getGlobalRouter().history.index - lastLocationIndex;
-                // exits all locations in the modal router
-                while (diff > 1) {
-                  Router.getGlobalRouter().history.rollback();
-                  diff--;
-                }
+            route.dismiss = this._dismiss = (cb = null) => {
+              let diff =
+                Router.getGlobalRouter().history.index - lastLocationIndex;
+              // exits all locations in the modal router
+              while (diff > 1) {
+                Router.getGlobalRouter().history.rollback();
+                diff--;
+              }
 
               this._historyController.preventDefault();
               this._historyController.goBack();
@@ -317,47 +324,56 @@ class NativeStackRouter extends NativeRouterBase {
     this._currentRouteUrl = url;
     super.routeWillEnter(route);
   }
-  
+
   /**
-   * @override
+   * Go back to index
+   * @example
+   * ...
+   * router.goBackto(-2)
+   * ...
+   * @since 1.1.0
+   * @param {number} n Amount of back as negative value. If stack length shorter than specified number then the active router does nothing.
    */
   goBackto(n) {
-    console.log(`goBackto : ${n} ${this._historyController}`);
-    if(this._historyController.canGoBack(n)) {
-      const back = this._historyController.currentIndex() + n; 
-      const location = this._historyController.find((location, index) => index === back);
-      console.log("location : "+location.url);
+    if (this._historyController.canGoBack(n)) {
+      const back = this._historyController.currentIndex() + n;
+      const location = this._historyController.find(
+        (location, index) => index === back
+      );
       this._historyController.preventDefault();
       this._historyController.goBackto(n);
       this._renderer.popTo(back);
       this.dispatch(location, "POP", this, false);
-      console.log(`goBackto : ${n} ${this._historyController}`);
     }
   }
-  
+
   /**
    * Go back until the url
-   * 
+   *
+   * @since 1.1.0
    * @param {string} url - An url will be matched in the same stack
    */
   goBacktoUrl(url) {
     // console.log(`goBackto : ${n} ${this._historyController}`);
     const lastIndex = this._historyController.getLength() - 1;
-    const index = this._historyController.findIndex(location => location.url === url);
+    const index = this._historyController.findIndex(
+      location => location.url === url
+    );
     const back = index - (lastIndex - index);
     this.goBackto(back);
   }
-  
+
   /**
    * Go back to first page in the same stack
    *
+   * @since 1.1.0
    */
   goBackHome() {
     const lastIndex = this._historyController.getLength() - 1;
     const index = this._historyController.currentIndex();
     const back = index - (lastIndex - index);
     this.goBackto(back);
-  }  
+  }
 
   resetView() {
     this.clearUrl();

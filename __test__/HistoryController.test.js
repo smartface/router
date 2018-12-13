@@ -40,7 +40,7 @@ describe("HistoryController", () => {
 
     history.push("/path");
 
-    expect(_location.pathname).toBe("/path");
+    expect(_location.url).toBe("/path");
   });
 
   it("cannot be affected when children's state is chenged", () => {
@@ -51,12 +51,12 @@ describe("HistoryController", () => {
     [node, node2, node3].forEach(listen);
     var res = [];
     var rootUnlisten = history.listen((location, action) => {
-      res.push(location.pathname);
+      res.push(location.url);
     });
 
     function listen(node) {
       node.listen((location, action) => {
-        res.push(location.pathname);
+        res.push(location.url);
       });
     }
 
@@ -78,7 +78,7 @@ describe("HistoryController", () => {
 
   //   function listen(node) {
   //     node.listen((location, action) => {
-  //       res.push(location.pathname);
+  //       res.push(location.url);
   //     });
   //   }
 
@@ -127,12 +127,12 @@ describe("HistoryController", () => {
 
   //   grandNode.push("/path");
   //   grandNode.push("/path2");
-  //   expect(_nodeLocation.pathname).toBe("/path2");
-  //   expect(_location.pathname).toBe("/path2");
+  //   expect(_nodeLocation.url).toBe("/path2");
+  //   expect(_location.url).toBe("/path2");
   //   nodeUnlisten();
   //   grandNode.goBack();
-  //   expect(_nodeLocation.pathname).toBe("/path2");
-  //   expect(_location.pathname).toBe("/path");
+  //   expect(_nodeLocation.url).toBe("/path2");
+  //   expect(_location.url).toBe("/path");
   // });
 
   it("can go back", () => {
@@ -150,9 +150,9 @@ describe("HistoryController", () => {
 
     node.push("/path");
     node.push("/path2");
-    expect(_nodeLocation.pathname).toBe("/path2");
+    expect(_nodeLocation.url).toBe("/path2");
     node.goBack();
-    expect(_nodeLocation.pathname).toBe("/path");
+    expect(_nodeLocation.url).toBe("/path");
   });
 
   it("can't go back if history is empty", () => {
@@ -195,11 +195,11 @@ describe("HistoryController", () => {
     history.push("/path/to");
     history.push("/path/to/2");
     node.push("/path/too");
-    expect(_nodeLocation.pathname).toBe("/path/too");
-    expect(_location.pathname).toBe("/path/to/2");
+    expect(_nodeLocation.url).toBe("/path/too");
+    expect(_location.url).toBe("/path/to/2");
     node.goBack();
-    expect(_location.pathname).toBe("/path/to");
-    expect(_nodeLocation.pathname).toBe("/path/too");
+    expect(_location.url).toBe("/path/to");
+    expect(_nodeLocation.url).toBe("/path/too");
   });
   it("can dispose", () => {
     var history = createHistory();

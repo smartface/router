@@ -33,7 +33,7 @@ describe("Match Routes", () => {
       const res = parseUrl("/path/to/1?type=any&sort=ASC&parent=111");
       expect(res).toEqual({
         hash: "",
-        pathname: "/path/to/1",
+        url: "/path/to/1",
         query: { parent: "111", sort: "ASC", type: "any" },
         rawQuery: "?type=any&sort=ASC&parent=111"
       });

@@ -560,9 +560,7 @@ describe("Router", () => {
     expect(route.getState().routeData).toEqual({ name: "name2" });
 
     component.router.goBack();
-    expect(router._historyController.lastLocation.pathname).toEqual(
-      "/path2/to/1"
-    );
+    expect(router._historyController.lastLocation.url).toEqual("/path2/to/1");
   });
   it("can call a relative path", () => {
     let data;
@@ -618,7 +616,7 @@ describe("Router", () => {
     // expect(component1.router === router).toBe(false);
     // expect(component1.params.name).toBe("cenk");
     expect(component2.params.id).toBe("1123");
-    expect(router.getHistory().entries.map(entry => entry.pathname)).toEqual([
+    expect(router.getHistory().entries.map(entry => entry.url)).toEqual([
       "/path/to/cenk"
     ]);
   });
@@ -661,7 +659,7 @@ describe("Router", () => {
       callback(true);
     });
 
-    expect(router.getHistory().entries[0].pathname).toBe("/path/to/cenk");
+    expect(router.getHistory().entries[0].url).toBe("/path/to/cenk");
   });
 
   it("can redirect to specified route with route-data when route has 'to' attribute", () => {
@@ -693,7 +691,7 @@ describe("Router", () => {
     });
 
     router.push("/path", { name: "name" });
-    expect(router.getHistory().entries[0].pathname).toBe("/path2/to/1");
+    expect(router.getHistory().entries[0].url).toBe("/path2/to/1");
     expect(activeRoute.getState().routeData).toEqual({ name: "name" });
   });
   it("can call child Routers", () => {
