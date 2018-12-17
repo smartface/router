@@ -1,6 +1,6 @@
 {
   "name": "@smartface/router",
-  "version": "1.1.0-rc.5",
+  "version": "1.1.0",
   "description": "Smmartface Router",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cenkce/router.git"
+    "url": "git+https://github.com/smartface/router.git"
   },
   "jest": {
     "testEnvironment": "node"
