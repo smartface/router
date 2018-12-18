@@ -551,7 +551,7 @@ class Router extends Route {
 
         _lastRoute && _lastRoute.routeDidExit(this);
         this.routeDidMatch(route); // fires routeDidMatch
-        if (this._fromRouter && action === 'PUSH') {
+        if (this._fromRouter && action !== 'POP') {
           const view = this.renderRoute(route); // build route's view
           route.setState({ view }); // keep view in the route's state
         }
@@ -781,6 +781,7 @@ class Router extends Route {
   /**
    * Replaces specified path's state
    *
+   * @experimental
    * @since 1.0.0
    * @ignore
    * @param {string} path

@@ -257,6 +257,11 @@ class NativeStackRouter extends NativeRouterBase {
     const active = url === this._currentRouteUrl;
     switch (action) {
       case "REPLACE":
+        if (this._fromRouter) {
+          this._renderer.replaceChild(
+                  (route._renderer && route._renderer._rootController) || view
+                );
+        }
         break;
       case "PUSH":
         if (this._fromRouter) {
@@ -265,9 +270,10 @@ class NativeStackRouter extends NativeRouterBase {
               Router.getGlobalRouter().history.index
             ];
             const lastLocationIndex = Router.getGlobalRouter().history.index;
-            this._renderer.present(
-              (route._renderer && route._renderer._rootController) || view
-            );
+            let _view;
+            if(!(_view = (route._renderer && route._renderer._rootController) || view))
+              throw new TypeError(route + ' view cannot be empty');
+            console.log('view : '+_view.constructor.name);
             route.dismiss = this._dismiss = (cb = null) => {
               let diff =
                 Router.getGlobalRouter().history.index - lastLocationIndex;

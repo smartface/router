@@ -45,6 +45,17 @@ class Renderer {
   dismiss(onComplete) {
     this._rootController.dismiss({ onComplete });
   }
+  
+  replaceChild(view, index=null){
+    if(!this._rootController.childControllers || !this._rootController.childControllers.length)
+      return;
+    
+    index = index || this._rootController.childControllers.length - 1;
+    const controllers = this._rootController.childControllers;
+    controllers[index] = view;
+    console.log('replaceChild '+ view.constructor.name+" : "+index);
+    this._rootController.childControllers = controllers;
+  }
 
   /**
    * Only use if rootpage is Page instancea
