@@ -112,34 +112,34 @@ const router = Router.of({
       // modal: true,
       // for testing gobackto
       routes: [
-        Route.of(routeBinder({
+        Route.of({
           path: "/pages/page1",
           build: (router, route) => {
             let Page = require("pages/page1");
             return new Page({label:1}, router, "/pages2/page2");
           }
-        })),
-        Route.of(routeBinder({
+        }),
+        Route.of({
           path: "/pages/page2",
           build: (router, route) => {
             let Page = require("pages/page1");
             return new Page({label:2}, router, "/pages2/page3");
           }
-        })),
-        Route.of(routeBinder({
+        }),
+        Route.of({
           path: "/pages/page3",
           build: (router, route) => {
             let Page = require("pages/page1");
             return new Page({label:3}, router, "/pages2/page4");
           }
-        })),
-        Route.of(routeBinder({
+        }),
+        Route.of({
           path: "/pages/page4",
           build: (router, route) => {
             let Page = require("pages/page2");
             return new Page({}, router, -2);
           }
-        }))
+        })
       ]
     }),
 ...
@@ -271,18 +271,18 @@ const router = Router.of({
                     to: "/bottom/stack/path1",
                     headerBarParams: () => { ios: { translucent: false } },
                     routes: [
-                        Route.of(routeBinder({
+                        Route.of({
                             path: "/bottom/stack/path1",
                             build: (router, route) => new Page1(route.getState().routeData, router, "/stack/path2")
-                        })),
-                        Route.of(routeBinder({
+                        }),
+                        Route.of({
                             path: "/bottom/stack/path2",
                             build: (router, route) => {
                                 const { routeData, view } = route.getState();
 
                                 return new Page2(routeData, router, "/bottom/stack2/path1");
                             }
-                        }))
+                        })
                     ]
                 }),
                 // tab 2
@@ -291,26 +291,26 @@ const router = Router.of({
                     to: "/bottom/stack2/path1",
                     headerBarParams: () => { ios: { translucent: false } },
                     routes: [
-                        Route.of(routeBinder({
+                        Route.of({
                             path: "/bottom/stack2/path1",
                             build: (router, route) => new Page1(route.getState().routeData, router, "/bottom/stack/path2")
-                        })),
-                        Route.of(routeBinder({
+                        }),
+                        Route.of({
                             path: "/bottom/stack2/path2",
                             build: (router, route) => {
                                 return new Page2(route.getState().routeData, router);
                             }
-                        }))
+                        })
                     ]
                 }),
                 // tab 3
-                Route.of(routeBinder({
+                Route.of({
                     path: "/bottom/page1",
                     build: (router, route) => {
                         console.log(`route ${route}`);
                         return new Page1(route.getState().routeData, router, "/bottom/stack/path1");
                     }
-                }))
+                })
             ]
         })
     ]});
@@ -392,16 +392,16 @@ StackRouter has homeRoute attribute to push before when route is matched to an a
         homeRoute: 0, // it means /bottom/stack2/path
         headerBarParams: () => { ios: { translucent: false } },
         routes: [
-            Route.of(routeBinder({
+            Route.of({
                 path: "/bottom/stack2/path1",
                 build: (router, route) => new Page1(route.getState().routeData, router, "/bottom/stack/path2")
-            })),
-            Route.of(routeBinder({
+            }),
+            Route.of({
                 path: "/bottom/stack2/path2",
                 build: (router, route) => {
                     return new Page2(route.getState().routeData, router);
                 }
-            }))
+            })
         ]
     })
 ...
@@ -418,19 +418,19 @@ const route = Router.of({
         homeRoute: 0, // it means /bottom/stack2/path
         headerBarParams: () => { ios: { translucent: false } },
         routes: [
-            Route.of(routeBinder({
+            Route.of({
                 path: "/bottom/stack2/path1",
                 build: (router, route) => {
                     var sort = route.getState().query.sort;
                     return new Page1(route.getState().routeData, router, sort, "/bottom/stack/path2")
                 }
-            })),
-            Route.of(routeBinder({
+            }),
+            Route.of({
                 path: "/bottom/stack2/path2",
                 build: (router, route) => {
                     return new Page2(route.getState().routeData, router);
                 }
-            }))
+            })
         ]
     })
 ]})
