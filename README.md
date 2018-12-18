@@ -1,6 +1,7 @@
 # Smartface Router
 
-[Read Documentation](https://smartface.github.io/router/)
+[Read API Documentation](https://smartface.github.io/router/)
+[Router Playground](https://github.com/smartface/router-test)
 
 # What is a Router
 
