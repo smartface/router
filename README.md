@@ -257,7 +257,7 @@ const router = Router.of({
                 ios: { translucent: false },
                 itemColor: {
                     normal: Color.RED,
-                    selectd: Color.YELLOW
+                    selected: Color.YELLOW
                 },
                 backgroundColor: Color.BLUE
             }),
