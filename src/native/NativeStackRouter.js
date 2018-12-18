@@ -374,7 +374,7 @@ class NativeStackRouter extends NativeRouterBase {
     const lastIndex = this._historyController.getLength() - 1;
     const index = this._historyController.currentIndex();
     const back = index - (lastIndex - index);
-    this.goBackto(back);
+    this.goBackto(-back);
   }
 
   /**
@@ -388,7 +388,8 @@ class NativeStackRouter extends NativeRouterBase {
     const index = this._historyController.findIndex(
       location => location.url === url
     );
-    return index - (lastIndex - index);
+    
+    return index - lastIndex;
   }
 
   /**
