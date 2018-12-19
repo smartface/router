@@ -53,7 +53,6 @@ class Renderer {
     index = index || this._rootController.childControllers.length - 1;
     const controllers = this._rootController.childControllers;
     controllers[index] = view;
-    console.log('replaceChild '+ view.constructor.name+" : "+index);
     this._rootController.childControllers = controllers;
   }
 
