@@ -33,9 +33,11 @@ There are 4 types of routers
   - [Usages](#usages)
   - [Table of Contents](#table-of-contents)
     - [Getting Started](#getting-started)
-      - [Basic Usage and push to start](#basic-usage-and-push-to-start)
-    - [Go back to a desired page in same history stack](#go-back-to-a-desired-page-in-same-history-stack)
+      - [Basic Usage of Push and Goback](#basic-usage-of-push-and-goback)
+        - [Push a new page](#push-a-new-page)
+        - [Go back to a desired page in same history stack](#go-back-to-a-desired-page-in-same-history-stack)
     - [Working with StackRouter](#working-with-stackrouter)
+      - [To open(present) and dismissing StackRouter's view as modal](#to-openpresent-and-dismissing-stackrouters-view-as-modal)
     - [Working with BottomTabBarRouter](#working-with-bottomtabbarrouter)
     - [Working with Pages](#working-with-pages)
     - [Setting home-route to StackRouter](#setting-home-route-to-stackrouter)
@@ -56,7 +58,9 @@ There are 4 types of routers
 - `Route` is a definition of a path
 - `BottomTabBarRouter` is to manage BottomTabBarController's
 
-#### Basic Usage and push to start
+#### Basic Usage of Push and Goback
+
+##### Push a new page
 
 ```javascript
 const {
@@ -95,7 +99,7 @@ const router = Router.of({
 router.push("/pages/page1");
 ```
 
-### Go back to a desired page in same history stack
+##### Go back to a desired page in same history stack
 
 These features are included in the capabilities of the StackRouter. And it works just in the same stack.
 If your desired parameter(step back count or url) is not included in the stack history then the router does nothing.
@@ -231,6 +235,46 @@ const router = Router.of({
 
 // push path
 router.push("/pages/page1");
+```
+
+#### To open(present) and dismissing StackRouter's view as modal
+
+```js
+module.exports = StackRouter.of({
+  path: "/example/modal",
+  to: "/example/modal/page1",
+  routes: [
+    StackRouter.of({
+      path: "/example/modal/modalpages",
+      modal: true,
+      routes: [
+        Route.of({
+          path: "/example/modal/modalpages/page1",
+          build: (router, route) => {
+            let Page = require("pages/page1");
+            return new Page({ label: 1 }, router);
+          }
+        }),
+        Route.of({
+          path: "/example/modal/modalpages/page2",
+          build: (router, route) => {
+            let Page = require("pages/page2");
+            return new Page({ label: 2 }, router);
+          }
+        })
+      ]
+    })
+  ]
+});
+
+// And in order to close a modal StackRouter, you must use router's dismiss method.
+// The router is opened router as modal.
+router.dismiss();
+
+// If you want to push a new page while router does dismissing.
+// You can use a callback by passing to dismiss method
+// to propagate in series.
+router.dismiss(() => router.push('/to/another/page"));
 ```
 
 ### Working with BottomTabBarRouter
