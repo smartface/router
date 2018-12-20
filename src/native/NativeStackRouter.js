@@ -300,7 +300,7 @@ class NativeStackRouter extends NativeRouterBase {
               this.dispatch(lastLocation, "POP", this, false);
               cb && cb();
               route._renderer.dismiss(() => {
-                route.dismiss = null;
+                route._dismiss = null;
                 route._presented = false;
                 route._currentRouteUrl = null;
                 this._currentRouteUrl = null;
@@ -331,7 +331,7 @@ class NativeStackRouter extends NativeRouterBase {
       case "POP":
         // TODO: Add dismiss logic
         if (this._fromRouter) {
-          if (!route.dismiss && exact) {
+          if (!route._dismiss && exact) {
             this._renderer.popChild();
           }
         }
