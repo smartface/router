@@ -186,6 +186,15 @@ class NativeStackRouter extends NativeRouterBase {
   }
 
   /**
+   * Closes StackRouter's View if it is opened as modal.
+   *
+   * @param {function} fn - Callback is called before dismissing to trigger another action like routing to an another page.
+   */
+  dismiss(fn) {
+    this._dismiss && this._dismiss(fn);
+  }
+
+  /**
    * To Listen page changes are handled by device.
    *
    * @private
@@ -259,8 +268,8 @@ class NativeStackRouter extends NativeRouterBase {
       case "REPLACE":
         if (this._fromRouter) {
           this._renderer.replaceChild(
-                  (route._renderer && route._renderer._rootController) || view
-                );
+            (route._renderer && route._renderer._rootController) || view
+          );
         }
         break;
       case "PUSH":
@@ -271,10 +280,13 @@ class NativeStackRouter extends NativeRouterBase {
             ];
             const lastLocationIndex = Router.getGlobalRouter().history.index;
             let _view;
-            if(!(_view = (route._renderer && route._renderer._rootController) || view))
-              throw new TypeError(route + ' view cannot be empty');
-            console.log('view : '+_view.constructor.name);
-            route.dismiss = this._dismiss = (cb = null) => {
+            if (
+              !(_view =
+                (route._renderer && route._renderer._rootController) || view)
+            )
+              throw new TypeError(route + " view cannot be empty");
+            console.log("view : " + _view.constructor.name);
+            route._dismiss = this._dismiss = (cb = null) => {
               let diff =
                 Router.getGlobalRouter().history.index - lastLocationIndex;
               // exits all locations in the modal router
@@ -394,7 +406,7 @@ class NativeStackRouter extends NativeRouterBase {
     const index = this._historyController.findIndex(
       location => location.url === url
     );
-    
+
     return index - lastIndex;
   }
 
