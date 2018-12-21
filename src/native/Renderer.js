@@ -35,6 +35,7 @@ class Renderer {
   }
 
   present(controller, animated, onComplete) {
+    console.log("call present");
     this._rootController.present({
       controller,
       animated,

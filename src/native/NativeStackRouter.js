@@ -279,17 +279,13 @@ class NativeStackRouter extends NativeRouterBase {
               Router.getGlobalRouter().history.index
             ];
             const lastLocationIndex = Router.getGlobalRouter().history.index;
-            let _view;
-            if (
-              !(_view =
-                (route._renderer && route._renderer._rootController) || view)
-            )
-              throw new TypeError(route + " view cannot be empty");
-            console.log("view : " + _view.constructor.name);
+            this._renderer.present((route._renderer && route._renderer._rootController) || view);
             route._dismiss = this._dismiss = (cb = null) => {
               let diff =
                 Router.getGlobalRouter().history.index - lastLocationIndex;
-              // exits all locations in the modal router
+              // Rewinds global history as much as visit in the modal.
+              // Because routers in the tree are not aware of modal router will be dismissed.
+              // And if they are notified and then their current-urls will be outdated.
               while (diff > 1) {
                 Router.getGlobalRouter().history.rollback();
                 diff--;
