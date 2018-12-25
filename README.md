@@ -270,7 +270,7 @@ router.dismiss();
 
 // dismiss method may take a callback function as parameter which is called
 // right after dismiss operation is completed
-router.dismiss(() => router.push('/to/another/page"));
+router.dismiss(() => router.push("/to/another/page"));
 ```
 
 ### Working with BottomTabBarRouter
