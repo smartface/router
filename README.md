@@ -39,7 +39,7 @@ There are 4 types of routers
         - [Push a new page](#push-a-new-page)
         - [Go back to a desired page in same history stack](#go-back-to-a-desired-page-in-same-history-stack)
     - [Working with StackRouter](#working-with-stackrouter)
-      - [Present & dismiss StackRouter's view as modal](#to-openpresent-and-dismissing-stackrouters-view-as-modal)
+      - [Present & dismiss StackRouter's view as modal](#present--dismiss-stackrouters-view-as-modal)
     - [Working with BottomTabBarRouter](#working-with-bottomtabbarrouter)
     - [Working with Pages](#working-with-pages)
     - [Setting home-route to StackRouter](#setting-home-route-to-stackrouter)
