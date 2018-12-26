@@ -47,7 +47,7 @@ function handleRouteUrl(router, url, routeData, action) {
  * @property {?boolean} [sensitive=false] sensitive Path is case sensitive or not
  * @property {?function(router: Router, prevUrl: string, currentUrl: stirng, action: string)} routerDidEnter Handles the Router is actived.
  * @property {?function(router: Router, prevUrl: string, action: string)} routerDidExit Handles the Router is deactived.
- * @property {?function(router: Router, route: Route | Router, viewController : NavigationController | BottomTabBarController | Page)} [routeWillEnter=null] A route or a router which is called by request in the router will be entered.
+ * @property {?function(router: Router, route: Route, viewController : NavigationController)} [routeWillEnter=null] A route or a router which is called by request in the router will be entered.
  * @property {number} homeRoute Home route index of the router's children. If it pushes first when routed to router's.
  */
 
@@ -551,7 +551,7 @@ class Router extends Route {
 
         _lastRoute && _lastRoute.routeDidExit(this);
         this.routeDidMatch(route); // fires routeDidMatch
-        if (this._fromRouter && action !== 'POP') {
+        if (this._fromRouter && action !== "POP") {
           const view = this.renderRoute(route); // build route's view
           route.setState({ view }); // keep view in the route's state
         }
@@ -580,6 +580,7 @@ class Router extends Route {
    * @event
    * @protected
    * @param {Route} route
+   * @param {string} action
    */
   routeWillEnter(route, action) {
     const viewConroller =
