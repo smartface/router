@@ -1,13 +1,5 @@
 # Smartface Router
 
-## ChangeLog
-
-- 1.2.0
-
-  - Added Replace action to recall current route's lifescycle-methods
-    - You could find more in [Replace Example](https://github.com/smartface/router-test/blob/master/scripts/routes/replace.js)
-  - Fix bug #25
-
 - [Read API Documentation](https://smartface.github.io/router/)
 - [Router Playground](https://github.com/smartface/router-test)
 
@@ -29,6 +21,14 @@ There are 4 types of routers
 - [NativeStackRouter](https://smartface.github.io/router/class/src/native/NativeStackRouter.js~NativeStackRouter.html)
 - [NativeBottomTabBarRouter](https://smartface.github.io/router/class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html)
 - NativeTopTabBarRouter (in roadmap)
+
+## ChangeLog
+
+- 1.2.0
+
+  - Added Replace action to recall current route's lifescycle-methods
+    - You could find more in [Replace Example](https://github.com/smartface/router-test/blob/master/scripts/routes/replace.js)
+  - Fix bug #25
 
 ## Installation
 
