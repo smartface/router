@@ -1,16 +1,20 @@
 # Smartface Router
 
 ## ChangeLog
+
 - 1.2.0
-    - Added Replace action to recall current route's lifescycle-methods
-    - Fix bug #25
+
+  - Added Replace action to recall current route's lifescycle-methods
+    - You could find more in [Replace Example](https://github.com/smartface/router-test/blob/master/scripts/routes/replace.js)
+  - Fix bug #25
 
 - [Read API Documentation](https://smartface.github.io/router/)
 - [Router Playground](https://github.com/smartface/router-test)
 
 # What is a Router
 
-Router is a concept that decouples application's page-routing logic than view layer in order to make application more 
+Router is a concept that decouples application's page-routing logic than view layer in order to make application more
+
 - Manageable
 - Maintainable
 - Flexible for future growth and change
@@ -35,6 +39,7 @@ There are 4 types of routers
 ## Table of Contents
 
 - [Smartface Router](#smartface-router)
+  - [ChangeLog](#changelog)
 - [What is a Router](#what-is-a-router)
   - [Types of Smartface Routers](#types-of-smartface-routers)
   - [Installation](#installation)
@@ -43,6 +48,7 @@ There are 4 types of routers
       - [Basic Usage of push and goBack](#basic-usage-of-push-and-goback)
         - [Push a new page](#push-a-new-page)
         - [Go back to a desired page in same history stack](#go-back-to-a-desired-page-in-same-history-stack)
+      - [Replace active route's view using Replace action](#replace-active-routes-view-using-replace-action)
     - [Working with StackRouter](#working-with-stackrouter)
       - [Present & dismiss StackRouter's view as modal](#present--dismiss-stackrouters-view-as-modal)
     - [Working with BottomTabBarRouter](#working-with-bottomtabbarrouter)
@@ -152,25 +158,26 @@ const router = Router.of({
   ]
 });
 
-router.push('/pages/page1');
-router.push('/pages/page2');
-router.push('/pages/page3');
-router.push('/pages/page4');
+router.push("/pages/page1");
+router.push("/pages/page2");
+router.push("/pages/page3");
+router.push("/pages/page4");
 
 // page2.js
 
 const Page2 = extend(Page2Design)(
-    // Constructor
-    function(_super, data, router, back=-1) {
-        // Initalizes super class for this page scope
-        _super(this);
-        this.back - back;
-        this.router = router;
-        // Overrides super.onShow method
-        this.onShow = onShow.bind(this, this.onShow.bind(this));
-        // Overrides super.onLoad method
-        this.onLoad = onLoad.bind(this, this.onLoad.bind(this));
-    });
+  // Constructor
+  function(_super, data, router, back = -1) {
+    // Initalizes super class for this page scope
+    _super(this);
+    this.back - back;
+    this.router = router;
+    // Overrides super.onShow method
+    this.onShow = onShow.bind(this, this.onShow.bind(this));
+    // Overrides super.onLoad method
+    this.onLoad = onLoad.bind(this, this.onLoad.bind(this));
+  }
+);
 
 // Other stuff
 
@@ -185,55 +192,62 @@ function btn_onPress() {
   // Test if router can go 2 steps back
   if (this.router.canGoBack(-2)) {
     // do something
-  }
-  else if (this.router.canGoBacktoUrl('/some/path/to/back')) {
+  } else if (this.router.canGoBacktoUrl("/some/path/to/back")) {
     // do something else
-  }
-  else {
+  } else {
     // do something else
   }
 }
 ```
 
+#### Replace active route's view using Replace action
+
+Replace action provides rerendering for opened route.
+You could find more in [Replace Example](https://github.com/smartface/router-test/blob/master/scripts/routes/replace.js)
+
 ### Working with StackRouter
 
 ```js
 const {
-    NativeRouter: Router,
-    Router: RouterBase,
-    NativeStackRouter: StackRouter,
-    BottomTabBarRouter,
-    Route
+  NativeRouter: Router,
+  Router: RouterBase,
+  NativeStackRouter: StackRouter,
+  BottomTabBarRouter,
+  Route
 } = require("@smartface/router");
 
 const router = Router.of({
-    path: "/",
-    to: "/pages/page1",
-    isRoot: true,
-    routes: [
-        StackRouter.of({
-            path: "/bottom/stack2",
-            to: "/bottom/stack2/path1",
-            headerBarParams: () => { ios: { translucent: false } },
-            routes: [
-                Route.of({
-                    path: "/pages/page1",
-                    build: (router, route) => {
-                        let Page2 = require("pages/page2");
-                        return new Page2();
-                    }
-                }),
-                Route.of({
-                    path: "/pages/page2",
-                    build: (router, route) => {
-                        const { routeData, view } = route.getState();
-                        let Page1 = require("pages/page1");
-                        return new Page1(routeData, router);
-                    }
-                })
-            ]
+  path: "/",
+  to: "/pages/page1",
+  isRoot: true,
+  routes: [
+    StackRouter.of({
+      path: "/bottom/stack2",
+      to: "/bottom/stack2/path1",
+      headerBarParams: () => {
+        ios: {
+          translucent: false;
+        }
+      },
+      routes: [
+        Route.of({
+          path: "/pages/page1",
+          build: (router, route) => {
+            let Page2 = require("pages/page2");
+            return new Page2();
+          }
+        }),
+        Route.of({
+          path: "/pages/page2",
+          build: (router, route) => {
+            const { routeData, view } = route.getState();
+            let Page1 = require("pages/page1");
+            return new Page1(routeData, router);
+          }
         })
-    ]
+      ]
+    })
+  ]
 });
 
 // Go to page1
@@ -298,74 +312,94 @@ const {
 const Color = require("sf-core/ui/color");
 
 const router = Router.of({
-    path: "/",
-    to: "/pages/page1",
-    isRoot: true,
-    routes: [BottomTabBarRouter.of({
-            path: "/bottom",
-            to: "/bottom/stack2/path1",
-            // UI propperties of the BottomTabBarController
-            tabbarParams: () => ({
-                ios: { translucent: false },
-                itemColor: {
-                    normal: Color.RED,
-                    selected: Color.YELLOW
-                },
-                backgroundColor: Color.BLUE
+  path: "/",
+  to: "/pages/page1",
+  isRoot: true,
+  routes: [
+    BottomTabBarRouter.of({
+      path: "/bottom",
+      to: "/bottom/stack2/path1",
+      // UI propperties of the BottomTabBarController
+      tabbarParams: () => ({
+        ios: { translucent: false },
+        itemColor: {
+          normal: Color.RED,
+          selected: Color.YELLOW
+        },
+        backgroundColor: Color.BLUE
+      }),
+      // TabBarItem's of the BottomTabBarController
+      items: () => [{ title: "page1" }, { title: "page2" }, { title: "page3" }],
+      // tab routes
+      routes: [
+        // tab 1
+        StackRouter.of({
+          path: "/bottom/stack",
+          to: "/bottom/stack/path1",
+          headerBarParams: () => {
+            ios: {
+              translucent: false;
+            }
+          },
+          routes: [
+            Route.of({
+              path: "/bottom/stack/path1",
+              build: (router, route) =>
+                new Page1(route.getState().routeData, router, "/stack/path2")
             }),
-            // TabBarItem's of the BottomTabBarController
-            items: () => [{ title: "page1" }, { title: "page2" }, { title: "page3" }],
-            // tab routes
-            routes: [
-                // tab 1
-                StackRouter.of({
-                    path: "/bottom/stack",
-                    to: "/bottom/stack/path1",
-                    headerBarParams: () => { ios: { translucent: false } },
-                    routes: [
-                        Route.of({
-                            path: "/bottom/stack/path1",
-                            build: (router, route) => new Page1(route.getState().routeData, router, "/stack/path2")
-                        }),
-                        Route.of({
-                            path: "/bottom/stack/path2",
-                            build: (router, route) => {
-                                const { routeData, view } = route.getState();
+            Route.of({
+              path: "/bottom/stack/path2",
+              build: (router, route) => {
+                const { routeData, view } = route.getState();
 
-                                return new Page2(routeData, router, "/bottom/stack2/path1");
-                            }
-                        })
-                    ]
-                }),
-                // tab 2
-                StackRouter.of({
-                    path: "/bottom/stack2",
-                    to: "/bottom/stack2/path1",
-                    headerBarParams: () => { ios: { translucent: false } },
-                    routes: [
-                        Route.of({
-                            path: "/bottom/stack2/path1",
-                            build: (router, route) => new Page1(route.getState().routeData, router, "/bottom/stack/path2")
-                        }),
-                        Route.of({
-                            path: "/bottom/stack2/path2",
-                            build: (router, route) => {
-                                return new Page2(route.getState().routeData, router);
-                            }
-                        })
-                    ]
-                }),
-                // tab 3
-                Route.of({
-                    path: "/bottom/page1",
-                    build: (router, route) => {
-                        console.log(`route ${route}`);
-                        return new Page1(route.getState().routeData, router, "/bottom/stack/path1");
-                    }
-                })
-            ]
+                return new Page2(routeData, router, "/bottom/stack2/path1");
+              }
+            })
+          ]
+        }),
+        // tab 2
+        StackRouter.of({
+          path: "/bottom/stack2",
+          to: "/bottom/stack2/path1",
+          headerBarParams: () => {
+            ios: {
+              translucent: false;
+            }
+          },
+          routes: [
+            Route.of({
+              path: "/bottom/stack2/path1",
+              build: (router, route) =>
+                new Page1(
+                  route.getState().routeData,
+                  router,
+                  "/bottom/stack/path2"
+                )
+            }),
+            Route.of({
+              path: "/bottom/stack2/path2",
+              build: (router, route) => {
+                return new Page2(route.getState().routeData, router);
+              }
+            })
+          ]
+        }),
+        // tab 3
+        Route.of({
+          path: "/bottom/page1",
+          build: (router, route) => {
+            console.log(`route ${route}`);
+            return new Page1(
+              route.getState().routeData,
+              router,
+              "/bottom/stack/path1"
+            );
+          }
         })
-    ]});
+      ]
+    })
+  ]
+});
 
 // Go to page1
 router.push("/pages/page1");
@@ -376,26 +410,31 @@ router.push("/pages/page1");
 ```js
 // router
 const router = Router.of({
-    path: "/",
-    routes: [
-        StackRouter.of({
-            path: "/bottom/stack2",
-            to: "/bottom/stack2/path1",
-            headerBarParams: () => { ios: { translucent: false } },
-            routes: [
-                Route.of({
-                    path: "/bottom/stack2/path1",
-                    build: (router, route) => new Page1(route.getState().routeData, router)
-                }),
-                Route.of({
-                    path: "/bottom/stack2/path2",
-                    build: (router, route) => {
-                        return new Page2(route.getState().routeData, router);
-                    }
-                })
-            ]
+  path: "/",
+  routes: [
+    StackRouter.of({
+      path: "/bottom/stack2",
+      to: "/bottom/stack2/path1",
+      headerBarParams: () => {
+        ios: {
+          translucent: false;
+        }
+      },
+      routes: [
+        Route.of({
+          path: "/bottom/stack2/path1",
+          build: (router, route) =>
+            new Page1(route.getState().routeData, router)
+        }),
+        Route.of({
+          path: "/bottom/stack2/path2",
+          build: (router, route) => {
+            return new Page2(route.getState().routeData, router);
+          }
         })
-    ]
+      ]
+    })
+  ]
 });
 
 router.push("/bottom/stack2/path1", { sort: "ASC" });
@@ -408,22 +447,23 @@ const extend = require("js-base/core/extend");
 const Page1Design = require("ui/ui_page1");
 
 const Page1 = extend(Page1Design)(
-    // Constructor
-    function(_super, routeData, router) {
-        // Initalizes super class for this page scope
-        _super(this);
-        this.sort = routeData.sort;
-        this.router = router;
-    });
+  // Constructor
+  function(_super, routeData, router) {
+    // Initalizes super class for this page scope
+    _super(this);
+    this.sort = routeData.sort;
+    this.router = router;
+  }
+);
 
 // Other stuff
 
 // When btnNext is pressed in Page1
 function btnNext_onPress() {
-    const page = this;
-    page.router.push('/path/to/another', {
-        message: "Hello World!"
-    });
+  const page = this;
+  page.router.push("/path/to/another", {
+    message: "Hello World!"
+  });
 }
 ```
 
@@ -435,22 +475,27 @@ function btnNext_onPress() {
 // Other stuff
 
 StackRouter.of({
-    path: "/bottom/stack2",
-    to: "/bottom/stack2/path1",
-    homeRoute: 0, // it means /bottom/stack2/path
-    headerBarParams: () => { ios: { translucent: false } },
-    routes: [
-        Route.of({
-            path: "/bottom/stack2/path1",
-            build: (router, route) => new Page1(route.getState().routeData, router, "/bottom/stack/path2")
-        }),
-        Route.of({
-            path: "/bottom/stack2/path2",
-            build: (router, route) => {
-                return new Page2(route.getState().routeData, router);
-            }
-        })
-    ]
+  path: "/bottom/stack2",
+  to: "/bottom/stack2/path1",
+  homeRoute: 0, // it means /bottom/stack2/path
+  headerBarParams: () => {
+    ios: {
+      translucent: false;
+    }
+  },
+  routes: [
+    Route.of({
+      path: "/bottom/stack2/path1",
+      build: (router, route) =>
+        new Page1(route.getState().routeData, router, "/bottom/stack/path2")
+    }),
+    Route.of({
+      path: "/bottom/stack2/path2",
+      build: (router, route) => {
+        return new Page2(route.getState().routeData, router);
+      }
+    })
+  ]
 });
 
 // Other stuff
@@ -538,7 +583,6 @@ Application.onReceivedNotification = function(e) {
     // or you can directly push the url using any other router
     router.push(receivedUrl);
 };
-
 ```
 
 ### Working with life-cycle methods
@@ -550,33 +594,35 @@ Routes have some life-cycle events :
 - `build` is a builder function to create view instance associated with specified router and route or not
 - `routeShouldMatch` is triggered when route is matched as exact and then route will be blocked or not by regarding the return value of the method
 
-
 ```js
 ///
 
 Route.of({
-    path: "/bottom/page1",
-    routeDidEnter: (router, route) => {
-        // if view is singleton and visited before
-        const { view } = route.getState();
-        view && view.onRouteEnter && view.onRouteEnter(router, route);
-    },
-    routeDidExit: (router, route) => {
-        const { view } = route.getState();
-        view.onRouteExit && view.onRouteExit(router, route);
-    },
-    routeShouldMatch: (route, nextState) => {
-        if (!nextState.routeData.applied) {
-            // blocks route changing
-            return false;
-        }
-        return false;
-    },
-    build: (router, route) => {
-        const { view } = route.getState();
-        // singleton view
-        return view || new Page1(route.getState().routeData, router, "/bottom/stack/path1");
+  path: "/bottom/page1",
+  routeDidEnter: (router, route) => {
+    // if view is singleton and visited before
+    const { view } = route.getState();
+    view && view.onRouteEnter && view.onRouteEnter(router, route);
+  },
+  routeDidExit: (router, route) => {
+    const { view } = route.getState();
+    view.onRouteExit && view.onRouteExit(router, route);
+  },
+  routeShouldMatch: (route, nextState) => {
+    if (!nextState.routeData.applied) {
+      // blocks route changing
+      return false;
     }
+    return false;
+  },
+  build: (router, route) => {
+    const { view } = route.getState();
+    // singleton view
+    return (
+      view ||
+      new Page1(route.getState().routeData, router, "/bottom/stack/path1")
+    );
+  }
 });
 
 ///
@@ -586,23 +632,26 @@ Route.of({
 
 ```js
 var unload = router.addRouteBlocker((path, routeData, action, ok) => {
-    alert({
-        message: "Would you like to answer?",
-        title: "Question",
-        buttons: [{
-            text: "Yes",
-            type: AlertView.Android.ButtonType.POSITIVE,
-            onClick: () => {
-                ok(true);
-            }
-        }, {
-            text: "No",
-            type: AlertView.Android.ButtonType.NEGATIVE,
-            onClick: () => {
-                ok(false);
-            }
-        }]
-    });
+  alert({
+    message: "Would you like to answer?",
+    title: "Question",
+    buttons: [
+      {
+        text: "Yes",
+        type: AlertView.Android.ButtonType.POSITIVE,
+        onClick: () => {
+          ok(true);
+        }
+      },
+      {
+        text: "No",
+        type: AlertView.Android.ButtonType.NEGATIVE,
+        onClick: () => {
+          ok(false);
+        }
+      }
+    ]
+  });
 });
 
 unload();
@@ -619,7 +668,7 @@ Following cases cannot be handled by the blocker:
 
 ```js
 const unlisten = router.getHistory().listen((location, action) => {
-    console.log(`new route action :  ${action} path : ${location.url}`);
+  console.log(`new route action :  ${action} path : ${location.url}`);
 });
 
 unlisten();
@@ -647,7 +696,7 @@ cd ~/workspace/router
 npm test -- --watch
 ```
 
-- Syncronize router to *scripts/node_modules/@smartface/router*
+- Syncronize router to _scripts/node_modules/@smartface/router_
 
 ```
 cd ~/workspace/router
