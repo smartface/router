@@ -268,9 +268,16 @@ module.exports = StackRouter.of({
 // To close a modal StackRouter, call dismiss method
 router.dismiss();
 
+<<<<<<< HEAD
 // dismiss method may take a callback function as parameter which is called
 // right after dismiss operation is completed
 router.dismiss(() => router.push("/to/another/page"));
+=======
+// If you want to push a new page while router does dismissing.
+// You can use a callback by passing to dismiss method
+// to propagate in series.
+router.dismiss(() => router.push('/to/another/page'));
+>>>>>>> Fix #25
 ```
 
 ### Working with BottomTabBarRouter
