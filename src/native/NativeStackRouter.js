@@ -177,8 +177,8 @@ class NativeStackRouter extends NativeRouterBase {
 
   /**
    * @ignore
-   * @param {*} prevState
-   * @param {*} nextState
+   * @param {RouteState} prevState
+   * @param {RouteState} nextState
    */
   routeShouldMatch(prevState, nextState) {
     if (this.isUrlCurrent(nextState.match.url, nextState.action)) return false;
@@ -279,9 +279,11 @@ class NativeStackRouter extends NativeRouterBase {
               Router.getGlobalRouter().history.index
             ];
             const lastLocationIndex = Router.getGlobalRouter().history.index;
-            this._renderer.present((route._renderer && route._renderer._rootController) || view);
+            this._renderer.present(
+              (route._renderer && route._renderer._rootController) || view
+            );
             route._dismiss = (cb = null) => {
-              console.log('dismiss '+route)
+              console.log("dismiss " + route);
               let diff =
                 Router.getGlobalRouter().history.index - lastLocationIndex;
               // Rewinds global history as much as visit in the modal.

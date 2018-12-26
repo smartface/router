@@ -116,13 +116,8 @@ describe("Router", () => {
     ]);
 
     _router1.goBack();
-    expect(lastUrl).toBe("/path/to/the/1");
-
     _router2.goBack();
-    expect(lastUrl).toBe("/path2/to/1");
-
     _router2.goBack();
-    expect(lastUrl).toBe("/path/to/the/1");
 
     expect(router.getHistoryasArray()).toEqual([
       "/path/to/the/1",
@@ -136,7 +131,7 @@ describe("Router", () => {
     expect(_router2.getHistoryasArray()).toEqual(["/path2/to/1"]);
   });
 
-  it("should call route's build when history goes back", () => {
+  it("shouldn't call route's build when history goes back", () => {
     let lastUrl, router1;
     const router = new Router({
       path: "/",
@@ -166,7 +161,7 @@ describe("Router", () => {
     router1.push("/path2/to/1");
     expect(lastUrl).toBe("/path2/to/1");
     router1.goBack();
-    expect(lastUrl).toBe("/path2/to/0");
+    expect(lastUrl).toBe("/path2/to/1");
   });
   it("should add last route to root router whenever a route redirects.", () => {
     let _router1;
@@ -237,18 +232,14 @@ describe("Router", () => {
     ]);
 
     _router1.goBack();
-    expect(lastUrl).toBe("/path/to/the/1");
+    expect(lastUrl).toBe("/path/to/the/2");
     expect(_router1.getHistoryasArray()).toEqual([
       "/path/to/the/1",
       "/path/to/the/2"
     ]);
 
     _router2.goBack();
-
-    expect(lastUrl).toBe("/path2/to/1");
-
     _router2.goBack();
-    expect(lastUrl).toBe("/path/to/the/1");
 
     expect(router.getHistoryasArray()).toEqual([
       "/path/to/the/1",
