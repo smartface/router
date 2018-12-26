@@ -1,5 +1,10 @@
 # Smartface Router
 
+## ChangeLog
+- 1.2.0
+    - Added Replace action to recall current route's lifescycle-methods
+    - Fix bug #25
+
 - [Read API Documentation](https://smartface.github.io/router/)
 - [Router Playground](https://github.com/smartface/router-test)
 
