@@ -77,7 +77,7 @@ There are 4 types of routers
 ```javascript
 const {
   NativeRouter: Router,
-  Router: RouterBase
+  Router: RouterBase,
   NativeStackRouter: StackRouter,
   BottomTabBarRouter,
   Route
