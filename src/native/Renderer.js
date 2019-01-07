@@ -43,8 +43,8 @@ class Renderer {
     });
   }
 
-  dismiss(onComplete) {
-    this._rootController.dismiss({ onComplete });
+  dismiss(onComplete, animated) {
+    this._rootController.dismiss({ onComplete, animated });
   }
   
   replaceChild(view, index=null){
