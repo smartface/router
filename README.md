@@ -33,7 +33,7 @@ There are 4 types of routers
 ## Installation
 
 ```
-(cd ~/workspace/scripts && npm i @smartface/router)
+(cd ~/workspace/scripts && npm i -S @smartface/router)
 ```
 
 ## Table of Contents
