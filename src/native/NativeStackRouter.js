@@ -282,7 +282,7 @@ class NativeStackRouter extends NativeRouterBase {
             this._renderer.present(
               (route._renderer && route._renderer._rootController) || view
             );
-            route._dismiss = (cb = null) => {
+            route._dismiss = (cb = null, animated = true) => {
               console.log("dismiss " + route);
               let diff =
                 Router.getGlobalRouter().history.index - lastLocationIndex;

@@ -539,9 +539,9 @@ class Router extends Route {
           handleRouteUrl(this, match.url, routeData, action);
         }
 
-        // View operations must leave to end of rendering,
-        // because there must not render any view before route blocking.
-        // An another reason is we build views from child to parent but routing happens
+        // Views' tasks must be end of the matches rendering,
+        // because there must not be rendered any view before route blocking.
+        // An another reason is that we build views from child to parent but routing happens
         // parent to child.
         tasks.push(
           (url, action) =>
@@ -555,6 +555,7 @@ class Router extends Route {
           const view = this.renderRoute(route); // build route's view
           route.setState({ view }); // keep view in the route's state
         }
+        // reverse views' tasks because of rendering from bottom to top
         tasks.reverse().forEach(task => task(location.url, action)); // trigger all routers' routeWillEnter in the tasks queue
         this.routerDidEnter && this.routerDidEnter(route); // fires routerDidEnter
         route.routeDidEnter(this); // fires routeDidEnter
