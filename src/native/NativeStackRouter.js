@@ -190,8 +190,8 @@ class NativeStackRouter extends NativeRouterBase {
    *
    * @param {function} fn - Callback is called before dismissing to trigger another action like routing to an another page.
    */
-  dismiss(fn) {
-    this._dismiss && this._dismiss(fn);
+  dismiss(fn, animated) {
+    this._dismiss && this._dismiss(fn, animated);
   }
 
   /**
@@ -309,7 +309,7 @@ class NativeStackRouter extends NativeRouterBase {
                 this._presented = false;
                 route.setState({ active: false });
                 route.resetView();
-              });
+              }, animated);
             };
 
             this._presented = true;
