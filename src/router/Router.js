@@ -725,6 +725,10 @@ class Router extends Route {
       funcorVal(route.getRedirectto(), [this, route]) || route.getUrlPath()
     );
   }
+  
+  isAnimated(){
+    return Router._nextAnimated;
+  }
 
   /**
    * Pushes new history entry with specified path
@@ -736,6 +740,7 @@ class Router extends Route {
    * @return {Router}
    */
   push(path, routeData = {}, animated = true) {
+    Router._nextAnimated = animated;
     if (path === this._state.url) {
       Object.assign(this._historyController.history.location.state, {
         routeData
@@ -911,5 +916,7 @@ class Router extends Route {
     this._listen = null;
   }
 }
+
+Router._nextAnimated = true;
 
 module.exports = Router;

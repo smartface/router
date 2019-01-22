@@ -249,14 +249,6 @@ class NativeStackRouter extends NativeRouterBase {
   /**
    * @override
    */
-  push(path, routeData = {}, animated=true) {
-    this._nextAnimated = animated;
-    return super.push(path, routeData);
-  }
-
-  /**
-   * @override
-   */
   routeWillEnter(route, requestedUrl, act, ex, target, fromRouter) {
     const {
       view,
@@ -320,7 +312,7 @@ class NativeStackRouter extends NativeRouterBase {
             try {
               this._renderer.pushChild(
                 (route._renderer && route._renderer._rootController) || view,
-                this._nextAnimated
+                this.isAnimated()
               );
             } catch (e) {
               throw `Error when ${route} is pushed. ${e}`;
