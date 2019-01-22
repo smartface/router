@@ -147,7 +147,7 @@ class NativeStackRouter extends NativeRouterBase {
       homeRoute,
       routeWillEnter
     });
-
+    this._nextAnimated = true;
     this._homeRoute = homeRoute;
     this._headerBarParams = headerBarParams;
     this._renderer = renderer;
@@ -249,7 +249,8 @@ class NativeStackRouter extends NativeRouterBase {
   /**
    * @override
    */
-  push(path, routeData = {}) {
+  push(path, routeData = {}, animated=true) {
+    this._nextAnimated = animated;
     return super.push(path, routeData);
   }
 
@@ -318,7 +319,8 @@ class NativeStackRouter extends NativeRouterBase {
             this._currentRouteUrl = url;
             try {
               this._renderer.pushChild(
-                (route._renderer && route._renderer._rootController) || view
+                (route._renderer && route._renderer._rootController) || view,
+                this._nextAnimated
               );
             } catch (e) {
               throw `Error when ${route} is pushed. ${e}`;
