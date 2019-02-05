@@ -549,13 +549,17 @@ class Router extends Route {
             this.routeWillEnter(route, url, action, true, target)
         );
 
-        _lastRoute && _lastRoute.routeDidExit(this);
+        
+        if(_lastRoute) { // notify current route to exit
+          _lastRoute.setState({action});
+          _lastRoute.routeDidExit(this);
+        }
         this.routeDidMatch(route); // fires routeDidMatch
         if (this._fromRouter && action !== "POP") {
           const view = this.renderRoute(route); // build route's view
           route.setState({ view }); // keep view in the route's state
         }
-        // reverse views' tasks because of rendering from bottom to top
+        // reverse views' tasks because of rendering must be from bottom to top
         tasks.reverse().forEach(task => task(location.url, action)); // trigger all routers' routeWillEnter in the tasks queue
         this.routerDidEnter && this.routerDidEnter(route); // fires routerDidEnter
         route.routeDidEnter(this); // fires routeDidEnter
@@ -797,16 +801,19 @@ class Router extends Route {
   replace(path, routeData) {
     this._historyController.history.replace(path, routeData);
   }
-
+  
   /**
    * Rewinds the history
    *
    * @since 1.0.0
    * @param {string | RouteLocation} url This is an experimental feature. If you use this feature you should use for same StackRouter stack.
+   * @param {boolean} [animmated=true] 
    * @return {Router}
    */
-  goBack(url) {
+  goBack(url, animated=true) {
+    
     const go = () => {
+      Router._nextAnimated = animated;
       this._fromRouter = true;
 
       url

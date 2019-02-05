@@ -273,10 +273,10 @@ class NativeStackRouter extends NativeRouterBase {
             ];
             const lastLocationIndex = Router.getGlobalRouter().history.index;
             this._renderer.present(
-              (route._renderer && route._renderer._rootController) || view
+              (route._renderer && route._renderer._rootController) || view,
+              this.isAnimated()
             );
             route._dismiss = (cb = null, animated = true) => {
-              console.log("dismiss " + route);
               let diff =
                 Router.getGlobalRouter().history.index - lastLocationIndex;
               // Rewinds global history as much as visit in the modal.

@@ -106,7 +106,7 @@ function createHistory({
     createNode(props = {}) {
       const node = createHistory(props, this);
       _nodes.add(node);
-      // bubbles history goback to root if go back could be possible.
+      // bubbles history goback to root until go back could be possible.
       node.onGoBack = () => {
         // console.log(`on go back ${JSON.stringify(this.getHistoryasArray())} ${_history.index}`);
         if (_history.canGo(-1)) {
@@ -273,7 +273,7 @@ function createHistory({
     }
 
     /**
-     * Disposes a instance
+     * Disposes this instance
      */
     dispose() {
       _nodes.forEach(node => node.dispose());
