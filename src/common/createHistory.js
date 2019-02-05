@@ -20,7 +20,6 @@ function createHistory({
   path
 } = {}) {
   let routeBlocker = (blockerFn, callback) => {
-    // console.log(`--- routeBlocker ${blockerFn} ${_preventDefault}`);
     _preventDefault === false && getUserConfirmation
       ? getUserConfirmation(blockerFn, callback)
       : callback(true);
@@ -108,7 +107,6 @@ function createHistory({
       _nodes.add(node);
       // bubbles history goback to root until go back could be possible.
       node.onGoBack = () => {
-        // console.log(`on go back ${JSON.stringify(this.getHistoryasArray())} ${_history.index}`);
         if (_history.canGo(-1)) {
           // _listeners.forEach(listener => listener(_history.location, 'POP'))
           _history.go(-1);

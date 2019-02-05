@@ -189,8 +189,9 @@ class NativeStackRouter extends NativeRouterBase {
    * Closes StackRouter's View if it is opened as modal.
    *
    * @param {function} fn - Callback is called before dismissing to trigger another action like routing to an another page.
+   * @param {boolean} [animated=true] - Callback is called before dismissing to trigger another action like routing to an another page.
    */
-  dismiss(fn, animated) {
+  dismiss(fn, animated=true) {
     this._dismiss && this._dismiss(fn, animated);
   }
 
