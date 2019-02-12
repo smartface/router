@@ -277,7 +277,9 @@ class NativeStackRouter extends NativeRouterBase {
               (route._renderer && route._renderer._rootController) || view,
               this.isAnimated()
             );
+            let disposed = false;
             route._dismiss = (cb = null, animated = true) => {
+              if(disposed) return;
               let diff =
                 Router.getGlobalRouter().history.index - lastLocationIndex;
               // Rewinds global history as much as visit in the modal.
@@ -295,6 +297,8 @@ class NativeStackRouter extends NativeRouterBase {
               this.dispatch(lastLocation, "POP", this, false);
               cb && cb();
               route._renderer.dismiss(() => {
+                disposed = true;
+                
                 route._dismiss = null;
                 route._presented = false;
                 route._currentRouteUrl = null;

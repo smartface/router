@@ -12,6 +12,7 @@
  * @property {object} tabbarParams See {@link BottomTabbarController}
  */
 
+let order = 0;
 const NativeRouterBase = require("./NativeRouterBase");
 const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
 const createRenderer = require("./createRenderer");
@@ -134,7 +135,8 @@ class BottomTabBarRouter extends NativeRouterBase {
     };
 
     this._renderer._rootController.didSelectByIndex = ({ index }) => {
-      this.pushRoute(this._routes[index]);
+      if(this._currentIndex !== index)
+        this.pushRoute(this._routes[index]);
       this._currentIndex = index;
     };
 
@@ -190,7 +192,8 @@ class BottomTabBarRouter extends NativeRouterBase {
     // });
     // }
 
-    return this._currentIndex !== index;
+    return true;
+    this._currentIndex !== index;
     /*return (
       this._currentIndex != index && this._tabStatus === userTabStatus.IDLE
     );*/
@@ -262,7 +265,7 @@ class BottomTabBarRouter extends NativeRouterBase {
 
   push(path, routeData = {}) {
     const index = this.resolveIndex(path);
-
+    if(index === this._currentIndex)
     if (this._fromRouter === false) {
       if (this.isVisited(index)) {
         return super.push(this._visitedIndexes[index].path, routeData);
@@ -273,48 +276,24 @@ class BottomTabBarRouter extends NativeRouterBase {
   }
 
   /**
-   * Before route entered
-   *
-   * @event
-   * @protected
-   */
-  /*routeWillEnter(route, [url, backUrl]) {
-    // const { match: next } = matches[matches.length - 1];
-    const { match, url: routeUrl } = route.getState();
-    console.log(`bottomtabbar ${JSON.stringify(match)} ${JSON.stringify(route.match)} ${url} back to ${backUrl}`)
-    // matches[1] || matches[0];
-    // const lastIndex = this.resolveIndex(next.path);
-    const index = this.resolveIndex(routeUrl);
-    // sets target tabbar item as visited.
-    // selects target tabbaritem by index
-    if (this._currentRouteUrl !== url) {
-      this._renderer.setSelectedIndex(index);
-      this._renderer.showTab();
-      this.setVisited(index, backUrl || url);
-    }
-    // this.isVisited(index) && this.activateIndex(index);
-    this._currentIndex = index;
-    // if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
-    this._currentRouteUrl = url;
-  }*/
-
-  /**
    * @override
    */
   renderMatches(matches, location, action, target, fromRouter) {
+    
     // this._fromRouter = true;
     if (matches.length > 0) {
       const { match: next } = matches[matches.length - 1];
       const { match } = matches[1] || matches[0];
       // const lastIndex = this.resolveIndex(next.path);
       const index = this.resolveIndex(match.path);
+      
       // sets target tabbar item as visited.
       // selects target tabbaritem by index
-      this._renderer.setSelectedIndex(index);
-      if(this._currentIndex != index)
-        this._renderer.showTab();
-      this.setVisited(index, location.url);
       this._currentIndex = index;
+      this._renderer.setSelectedIndex(index);
+      this._renderer.showTab();
+      // this.isVisited(index) && this.activateIndex(index);
+      this.setVisited(index, location.url);
       if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
     }
 
