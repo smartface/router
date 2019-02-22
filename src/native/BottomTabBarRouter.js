@@ -301,7 +301,6 @@ class BottomTabBarRouter extends NativeRouterBase {
       this._renderer.setSelectedIndex(index);
       this._renderer.showTab();
       this._currentIndex = index;
-      console.log("location : ", location);
       this.setVisited(index, {url: location.url, action});
       // if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
     }

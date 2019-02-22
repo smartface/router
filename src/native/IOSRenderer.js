@@ -58,7 +58,6 @@ class IOSRenderer extends Renderer {
   }
   
   present(controller, animated, onComplete) {
-    console.log("call present : ", animated);
     this._rootController.present({
       controller,
       animated,
