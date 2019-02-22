@@ -12,7 +12,6 @@
  * @property {object} tabbarParams See {@link BottomTabbarController}
  */
 
-let order = 0;
 const NativeRouterBase = require("./NativeRouterBase");
 const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
 const createRenderer = require("./createRenderer");
@@ -88,7 +87,7 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @static
    * @param {BottomTabBarRouterParams} params
    */
-  static of(params) {
+  static of (params) {
     params.renderer = createRenderer();
     return new BottomTabBarRouter(params);
   }
@@ -135,8 +134,19 @@ class BottomTabBarRouter extends NativeRouterBase {
     };
 
     this._renderer._rootController.didSelectByIndex = ({ index }) => {
-      if(this._currentIndex !== index)
-        this.pushRoute(this._routes[index]);
+      // tab index is changed
+      if (this._currentIndex !== index) {
+        // selected tab is not visited
+        if (!this.isVisited(index)) {
+          // then push route object
+          this.pushRoute(this._routes[index]);
+        } else {
+          // notification of the route changing
+          this.dispatch({url: this._visitedIndexes[index].url}, this._visitedIndexes[index].action, this);
+        }
+      }
+      
+      
       this._currentIndex = index;
     };
 
@@ -191,9 +201,8 @@ class BottomTabBarRouter extends NativeRouterBase {
     //   this._fromRouter = true;
     // });
     // }
-
-    return true;
-    this._currentIndex !== index;
+    
+    return this._currentIndex !== index;
     /*return (
       this._currentIndex != index && this._tabStatus === userTabStatus.IDLE
     );*/
@@ -204,13 +213,11 @@ class BottomTabBarRouter extends NativeRouterBase {
    *
    * @protected
    * @param {number} index
-   * @param {string} path
+   * @param {{url:string, action:string}} route
    */
-  setVisited(index, path) {
+  setVisited(index, route) {
     if (index < 0) return;
-    this._visitedIndexes[index] = {
-      path
-    };
+    this._visitedIndexes[index] = route;
     this._visitedIndexes.length++;
   }
 
@@ -246,8 +253,8 @@ class BottomTabBarRouter extends NativeRouterBase {
   resolveRoute(index) {
     return this._routes.find((route, ind) => ind === index);
   }
-  
-  canGoBack(n){
+
+  canGoBack(n) {
     return this._historyController.canGoBack(n);
   }
 
@@ -265,12 +272,12 @@ class BottomTabBarRouter extends NativeRouterBase {
 
   push(path, routeData = {}) {
     const index = this.resolveIndex(path);
-    if(index === this._currentIndex)
-    if (this._fromRouter === false) {
-      if (this.isVisited(index)) {
-        return super.push(this._visitedIndexes[index].path, routeData);
+    if (index === this._currentIndex)
+      if (this._fromRouter === false) {
+        if (this.isVisited(index)) {
+          return super.push(this._visitedIndexes[index].url, routeData);
+        }
       }
-    }
 
     return super.push(path, routeData);
   }
@@ -279,22 +286,24 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @override
    */
   renderMatches(matches, location, action, target, fromRouter) {
-    
+
     // this._fromRouter = true;
     if (matches.length > 0) {
       const { match: next } = matches[matches.length - 1];
+      // current url match
       const { match } = matches[1] || matches[0];
       // const lastIndex = this.resolveIndex(next.path);
+      // get index of the current url
       const index = this.resolveIndex(match.path);
-      
+
       // sets target tabbar item as visited.
       // selects target tabbaritem by index
-      this._currentIndex = index;
       this._renderer.setSelectedIndex(index);
       this._renderer.showTab();
-      // this.isVisited(index) && this.activateIndex(index);
-      this.setVisited(index, location.url);
-      if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
+      this._currentIndex = index;
+      console.log("location : ", location);
+      this.setVisited(index, {url: location.url, action});
+      // if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
     }
 
     super.renderMatches(matches, location, action, target, fromRouter);

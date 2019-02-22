@@ -54,6 +54,7 @@ class AndroidRenderer extends Renderer {
    * @override
    */
   popChild(animated = true) {
+    this._rootController.childControllers.length > 1 &&
     this._rootController.pop &&
       this._rootController.pop({ animated: animated });
   }

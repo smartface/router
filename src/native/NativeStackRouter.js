@@ -258,6 +258,8 @@ class NativeStackRouter extends NativeRouterBase {
       action
     } = route.getState();
     const active = url === this._currentRouteUrl;
+    
+    console.log("routeWillEnter : ", act, " url : ", url, " currentRouteUrl : ", this._currentRouteUrl, " fromRouter : ", fromRouter);
     switch (action) {
       case "REPLACE":
         if (this._fromRouter) {
