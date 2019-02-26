@@ -21,7 +21,6 @@ const dispatch = (location, action) => {
   action === "PUSH"
     ? historyController.pushLocation(location) // TODO: not share loaction instance
     : historyController.goBack();
-  const err = new Error();
 };
 
 function handleRouteUrl(router, url, routeData, action) {
