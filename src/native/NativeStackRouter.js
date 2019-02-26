@@ -160,6 +160,7 @@ class NativeStackRouter extends NativeRouterBase {
   /**
    * Applies new params to the headerBar
    *
+   * @since 1.0.0
    * @param {HeaderBarParams} params
    */
   setHeaderBarParams(params) {
@@ -187,6 +188,7 @@ class NativeStackRouter extends NativeRouterBase {
 
   /**
    * Closes StackRouter's View if it is opened as modal.
+   * @since 1.0.0
    *
    * @param {function} fn - Callback is called before dismissing to trigger another action like routing to an another page.
    * @param {boolean} [animated=true] - Callback is called before dismissing to trigger another action like routing to an another page.
@@ -197,7 +199,8 @@ class NativeStackRouter extends NativeRouterBase {
 
   /**
    * To Listen page changes are handled by device.
-   *
+   * @since 1.0.0
+   * 
    * @private
    */
   addNavigatorChangeListener() {
@@ -279,20 +282,22 @@ class NativeStackRouter extends NativeRouterBase {
               this.isAnimated()
             );
             let disposed = false;
+
             route._dismiss = (cb = null, animated = true) => {
               if(disposed) return;
               let diff =
                 Router.getGlobalRouter().history.index - lastLocationIndex;
-              // Rewinds global history as much as visit in the modal.
+              // Rewinds global history by amount of visits while the modal is opened.
               // Because routers in the tree are not aware of modal router will be dismissed.
               // And if they are notified and then their current-urls will be outdated.
               while (diff > 1) {
                 Router.getGlobalRouter().history.rollback();
                 diff--;
               }
-
+              
               this._historyController.preventDefault();
               this._historyController.goBack();
+              
               // simulate a pop request to inform all routers
               // regarding route changing
               this.dispatch(lastLocation, "POP", this, false);

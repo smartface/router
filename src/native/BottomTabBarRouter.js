@@ -142,10 +142,12 @@ class BottomTabBarRouter extends NativeRouterBase {
           this.pushRoute(this._routes[index]);
         } else {
           // notification of the route changing
-          this.dispatch({url: this._visitedIndexes[index].url}, this._visitedIndexes[index].action, this);
+          // Always dispatch action as PUSH
+          // Because of POP and Replace actions cannot be reproduced in BottomTabbarRouter.
+          // When visited tabbar is revisited
+          this.dispatch({url: this._visitedIndexes[index].url}, "PUSH", this);
         }
       }
-      
       
       this._currentIndex = index;
     };
@@ -286,7 +288,6 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @override
    */
   renderMatches(matches, location, action, target, fromRouter) {
-
     // this._fromRouter = true;
     if (matches.length > 0) {
       const { match: next } = matches[matches.length - 1];
@@ -298,9 +299,9 @@ class BottomTabBarRouter extends NativeRouterBase {
 
       // sets target tabbar item as visited.
       // selects target tabbaritem by index
+      this._currentIndex = index;
       this._renderer.setSelectedIndex(index);
       this._renderer.showTab();
-      this._currentIndex = index;
       this.setVisited(index, {url: location.url, action});
       // if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
     }

@@ -15,11 +15,13 @@ const history = [];
 let store;
 
 const dispatch = (location, action) => {
-  history.push([location.pathnamme, action]);
+  history.push([location.url, action]);
   listeners.forEach(listener => listener(location, action));
+  
   action === "PUSH"
     ? historyController.pushLocation(location) // TODO: not share loaction instance
     : historyController.goBack();
+  const err = new Error();
 };
 
 function handleRouteUrl(router, url, routeData, action) {
@@ -442,6 +444,7 @@ class Router extends Route {
         [this].concat(this._routes),
         location.url
       );
+      // var err = new Error();
       this.renderMatches(this._matches, location, action, target, fromRouter);
     }
   }
