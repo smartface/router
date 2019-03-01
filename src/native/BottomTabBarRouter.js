@@ -135,16 +135,19 @@ class BottomTabBarRouter extends NativeRouterBase {
 
     this._renderer._rootController.didSelectByIndex = ({ index }) => {
       // tab index is changed
-      if (this._currentIndex !== index) {
+      // currentIndex must be checked out because of Android BottombarBarController sends initially zero index without any request.
+      // And this behaviour is causing to start a router request using zeroth element of the children routes.
+      if (this._currentIndex !== undefined && this._currentIndex !== index) {
         // selected tab is not visited
         if (!this.isVisited(index)) {
           // then push route object
           this.pushRoute(this._routes[index]);
         } else {
-          // notification of the route changing
-          // Always dispatch action as PUSH
-          // Because of POP and Replace actions cannot be reproduced in BottomTabbarRouter.
-          // When visited tabbar is revisited
+          // Notification of the route changing
+          // must always dispatch a PUSH action.
+          // Because when visited tabbar is revisited,
+          // POP and Replace actions come from visisted cache are 
+          // reproduced in BottomTabbarRouter.
           this.dispatch({url: this._visitedIndexes[index].url}, "PUSH", this);
         }
       }
@@ -180,7 +183,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     if (this._currentIndex !== index) {
       this._fromRouter = false;
     }
-
+    
     /*this._fromRouter = false;
     if (
       (this._tabStatus === userTabStatus.IDLE &&
@@ -204,7 +207,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     // });
     // }
     
-    return this._currentIndex !== index;
+    return this._currentIndex !== index || ((this._visitedIndexes[index] || {}).url !== this._lastLocationUrl);
     /*return (
       this._currentIndex != index && this._tabStatus === userTabStatus.IDLE
     );*/
@@ -300,6 +303,11 @@ class BottomTabBarRouter extends NativeRouterBase {
       // sets target tabbar item as visited.
       // selects target tabbaritem by index
       this._currentIndex = index;
+      // lastLocationUrl for checking out if routing is completed or not with currentIndex.
+      // Because visitedIndex of route tab is assigned to this url when routing is completed.
+      // Since Android bottomtabbar logic triggered shouldSelectByIndex and didSelectByIndex methods
+      // either requests come from user and router. And IOS only triggers if request comes from the user.
+      this._lastLocationUrl = location.url;
       this._renderer.setSelectedIndex(index);
       this._renderer.showTab();
       this.setVisited(index, {url: location.url, action});
