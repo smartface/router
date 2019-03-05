@@ -81,12 +81,7 @@ const userTabStatus = {
  * @since 1.0.0
  */
 class BottomTabBarRouter extends NativeRouterBase {
-  /**
-   * Builds OS specific NaitveRouter
-   *
-   * @static
-   * @param {BottomTabBarRouterParams} params
-   */
+
   static of (params) {
     params.renderer = createRenderer();
     return new BottomTabBarRouter(params);
@@ -123,44 +118,50 @@ class BottomTabBarRouter extends NativeRouterBase {
     });
 
     this._renderer = renderer;
-    this._renderer.setRootController(new BottomTabBarController(tabbarParams));
-    this._visitedIndexes = { length: 0 };
-    this._items = items;
-    this._tabStatus = userTabStatus.IDLE;
 
-    this._renderer._rootController.shouldSelectByIndex = ({ index }) => {
-      // TabbarItem should be changed
-      return this.shouldSelectByIndex(index);
-    };
+    this.initializeRenderer = () => {
+      this._renderer.setRootController(new BottomTabBarController(tabbarParams));
+      this._visitedIndexes = { length: 0 };
+      this._items = items;
+      this._tabStatus = userTabStatus.IDLE;
 
-    this._renderer._rootController.didSelectByIndex = ({ index }) => {
-      // tab index is changed
-      // currentIndex must be checked out because of Android BottombarBarController sends initially zero index without any request.
-      // And this behaviour is causing to start a router request using zeroth element of the children routes.
-      if (this._currentIndex !== undefined && this._currentIndex !== index) {
-        // selected tab is not visited
-        if (!this.isVisited(index)) {
-          // then push route object
-          this.pushRoute(this._routes[index]);
-        } else {
-          // Notification of the route changing
-          // must always dispatch a PUSH action.
-          // Because when visited tabbar is revisited,
-          // POP and Replace actions come from visisted cache are 
-          // reproduced in BottomTabbarRouter.
-          this.dispatch({url: this._visitedIndexes[index].url}, "PUSH", this);
+      this._renderer._rootController.shouldSelectByIndex = ({ index }) => {
+        // TabbarItem should be changed
+        return this.shouldSelectByIndex(index);
+      };
+
+      this._renderer._rootController.didSelectByIndex = ({ index }) => {
+        // tab index is changed
+        // currentIndex must be checked out because of Android BottombarBarController sends initially zero index without any request.
+        // And this behaviour is causing to start a router request using zeroth element of the children routes.
+        if (this._currentIndex !== undefined && this._currentIndex !== index) {
+          // selected tab is not visited
+          if (!this.isVisited(index)) {
+            // then push route object
+            this.pushRoute(this._routes[index]);
+          }
+          else {
+            // Notification of the route changing
+            // must always dispatch a PUSH action.
+            // Because when visited tabbar is revisited,
+            // POP and Replace actions come from visisted cache are 
+            // reproduced in BottomTabbarRouter.
+            this.dispatch({ url: this._visitedIndexes[index].url }, "PUSH", this);
+          }
         }
-      }
-      
-      this._currentIndex = index;
-    };
 
-    // Initilaze BottomTabBarController's TabBarItems
-    this._renderer._rootController.tabBar = tabbarParams();
+        this._currentIndex = index;
+      };
+
+      // Initilaze BottomTabBarController's TabBarItems
+      this._renderer._rootController.tabBar = tabbarParams();
+    }
+
   }
 
   initialize(parentHistory, onHistoryChange, pushHomes) {
     super.initialize(parentHistory, onHistoryChange, pushHomes);
+    this.initializeRenderer();
     // Initilaze BottomTabBarController's child controllers
     this._renderer.setChildControllers(
       this._routes.map(route => route.build(this, route))
@@ -183,7 +184,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     if (this._currentIndex !== index) {
       this._fromRouter = false;
     }
-    
+
     /*this._fromRouter = false;
     if (
       (this._tabStatus === userTabStatus.IDLE &&
@@ -206,8 +207,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     //   this._fromRouter = true;
     // });
     // }
-    
-    return this._currentIndex !== index || ((this._visitedIndexes[index] || {}).url !== this._lastLocationUrl);
+    return this._currentIndex !== index || ((this._visitedIndexes[index] || {}).url !== this._lastLocationUrl || this._lastLocationUrl !== this._currentUrl);
     /*return (
       this._currentIndex != index && this._tabStatus === userTabStatus.IDLE
     );*/
@@ -310,7 +310,8 @@ class BottomTabBarRouter extends NativeRouterBase {
       this._lastLocationUrl = location.url;
       this._renderer.setSelectedIndex(index);
       this._renderer.showTab();
-      this.setVisited(index, {url: location.url, action});
+      this._currentUrl = location.url;
+      this.setVisited(index, { url: location.url, action });
       // if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
     }
 

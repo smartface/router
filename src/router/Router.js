@@ -484,7 +484,7 @@ class Router extends Route {
         match
       });
       if (match.isExact !== true && route !== this && route.__is_router) {
-        // if(index > 0 && this._isRoot)
+        route.initializeWaiting && route.initializeWaiting();
         tasks.push((url, action) => {
           this.routeWillEnter &&
             this.routeWillEnter(route, url, action, false, target);

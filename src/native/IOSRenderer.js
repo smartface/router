@@ -78,7 +78,7 @@ class IOSRenderer extends Renderer {
    */
   popChild(animated = true) {
     this.makeRootVisible();
-    if (this._rootController.childControllers.length > 1)
+    if (this._rootController.nativeObject.viewControllers.length > 1)
       this._rootController.pop({ animated });
   }
 
