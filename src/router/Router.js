@@ -17,10 +17,11 @@ let store;
 const dispatch = (location, action) => {
   history.push([location.url, action]);
   listeners.forEach(listener => listener(location, action));
-  
-  action === "PUSH"
-    ? historyController.pushLocation(location) // TODO: not share loaction instance
-    : historyController.goBack();
+
+  action === "PUSH" ?
+    historyController.pushLocation(location) // TODO: not share loaction instance
+    :
+    historyController.goBack();
 };
 
 function handleRouteUrl(router, url, routeData, action) {
@@ -206,7 +207,7 @@ class Router extends Route {
    *
    * @param {RouterParams} props
    */
-  static of(props = {}) {
+  static of (props = {}) {
     return new Router(props);
   }
 
@@ -274,7 +275,7 @@ class Router extends Route {
       this.initialize(
         historyController,
         (location, action, target, fromRouter = true) =>
-          this.onHistoryChange(location, action, target, fromRouter),
+        this.onHistoryChange(location, action, target, fromRouter),
         pushHomes
         // pushIndexes.call(this, path)
       );
@@ -439,8 +440,7 @@ class Router extends Route {
   onHistoryChange(location, action, target, fromRouter = true) {
     if (this._isRoot) {
       this._matches = matchRoutes(
-        this.getStore(),
-        [this].concat(this._routes),
+        this.getStore(), [this].concat(this._routes),
         location.url
       );
       // var err = new Error();
@@ -504,7 +504,8 @@ class Router extends Route {
         );
 
         return true;
-      } else if (match.isExact === true) {
+      }
+      else if (match.isExact === true) {
         const redirection = funcorVal(route.getRedirectto(), [this, route]);
         if (redirection && redirection !== match.url) {
           tasks = []; // reset tasks
@@ -522,8 +523,7 @@ class Router extends Route {
               match,
               action,
               routeData
-            })) ||
-          {};
+            })) || {};
         // change route state to move data to callbacks
         route.setState({
           query: location.search,
@@ -547,13 +547,13 @@ class Router extends Route {
         // parent to child.
         tasks.push(
           (url, action) =>
-            this.routeWillEnter &&
-            this.routeWillEnter(route, url, action, true, target)
+          this.routeWillEnter &&
+          this.routeWillEnter(route, url, action, true, target)
         );
 
-        
-        if(_lastRoute) { // notify current route to exit
-          _lastRoute.setState({action});
+
+        if (_lastRoute) { // notify current route to exit
+          _lastRoute.setState({ action });
           _lastRoute.routeDidExit(this);
         }
         this.routeDidMatch(route); // fires routeDidMatch
@@ -731,8 +731,8 @@ class Router extends Route {
       funcorVal(route.getRedirectto(), [this, route]) || route.getUrlPath()
     );
   }
-  
-  isAnimated(){
+
+  isAnimated() {
     return Router._nextAnimated;
   }
 
@@ -768,15 +768,18 @@ class Router extends Route {
     }
 
     if (Router.blocker) {
-      Router.blocker(this, path, routeData, "PUSH", () =>
-        this._historyController.push(path, routeData)
-      );
+      Router.blocker(this, path, routeData, "PUSH", () => {
+        this._pushHomes(path);
+        this._historyController.push(path, routeData);
+        this._fromRouter = false;
+      });
 
       return this;
     }
     try {
       this._pushHomes(path);
-    } catch (e) {
+    }
+    catch (e) {
       throw e;
     }
 
@@ -803,7 +806,7 @@ class Router extends Route {
   replace(path, routeData) {
     this._historyController.history.replace(path, routeData);
   }
-  
+
   /**
    * Rewinds the history
    *
@@ -812,22 +815,23 @@ class Router extends Route {
    * @param {boolean} [animmated=true] 
    * @return {Router}
    */
-  goBack(url, animated=true) {
-    
+  goBack(url, animated = true) {
+
     const go = () => {
       Router._nextAnimated = animated;
       this._fromRouter = true;
 
       url
-        ? this.dispatch(
-            typeof url === "string"
-              ? { url, hash: "", search: "", state: {} }
-              : url,
-            "POP",
-            this,
-            true
-          )
-        : this._historyController.goBack();
+        ?
+        this.dispatch(
+          typeof url === "string" ?
+          { url, hash: "", search: "", state: {} } :
+          url,
+          "POP",
+          this,
+          true
+        ) :
+        this._historyController.goBack();
       this._fromRouter = false;
     };
     if (Router.blocker) {

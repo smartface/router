@@ -190,11 +190,11 @@ class NativeStackRouter extends NativeRouterBase {
    * Closes StackRouter's View if it is opened as modal.
    * @since 1.0.0
    *
-   * @param {function} fn - Callback is called before dismissing to trigger another action like routing to an another page.
+   * @param {function | {before: function, after: function}} hooks - Before and after hooks. If Hooks paramter is a function then it is used as before hook. 
    * @param {boolean} [animated=true] - Callback is called before dismissing to trigger another action like routing to an another page.
    */
-  dismiss(fn, animated=true) {
-    this._dismiss && this._dismiss(fn, animated);
+  dismiss(hooks, animated=true) {
+    this._dismiss && this._dismiss(typeof hooks === "function" ? {before: hooks} : hooks , animated);
   }
 
   /**
@@ -283,25 +283,26 @@ class NativeStackRouter extends NativeRouterBase {
             );
             let disposed = false;
 
-            route._dismiss = (cb = null, animated = true) => {
+            route._dismiss = ({before=null, after=null}, animated = true) => {
               if(disposed) return;
               let diff =
                 Router.getGlobalRouter().history.index - lastLocationIndex;
               // Rewinds global history by amount of visits while the modal is opened.
               // Because routers in the tree are not aware of modal router will be dismissed.
               // And if they are notified and then their current-urls will be outdated.
-              while (diff > 1) {
-                Router.getGlobalRouter().history.rollback();
-                diff--;
+              const back = () => {
+                while (diff-- > 1) {
+                  Router.getGlobalRouter().history.rollback();
+                }
+                
+                this._historyController.preventDefault();
+                this._historyController.goBack();
+                
+                // simulate a pop request to inform all routers
+                // regarding route changing
+                this.dispatch(lastLocation, "POP", this, false);
               }
-              
-              this._historyController.preventDefault();
-              this._historyController.goBack();
-              
-              // simulate a pop request to inform all routers
-              // regarding route changing
-              this.dispatch(lastLocation, "POP", this, false);
-              cb && cb();
+              before && before();
               route._renderer.dismiss(() => {
                 disposed = true;
                 
@@ -313,6 +314,8 @@ class NativeStackRouter extends NativeRouterBase {
                 this._presented = false;
                 route.setState({ active: false });
                 route.resetView();
+                back();
+                after && after();
               }, animated);
             };
 
@@ -382,7 +385,7 @@ class NativeStackRouter extends NativeRouterBase {
    * @param {string} url - An url will be matched in the same stack
    */
   goBacktoUrl(url) {
-    this.goBackto(this.getStepLengthByCurrent(url));
+    this.goBackto(this.getStepLengthFromCurrent(url));
   }
 
   /**
@@ -403,11 +406,12 @@ class NativeStackRouter extends NativeRouterBase {
 
   /**
    * Returns length of the history steps to be needed to receive from current to specified url
-   *
+   * 
+   * @since 1.1.0
    * @param {string} url
    * @return {number}
    */
-  getStepLengthByCurrent(url) {
+  getStepLengthFromCurrent(url) {
     const lastIndex = this._historyController.getLength() - 1;
     const index = this._historyController.findIndex(
       location => location.url === url
@@ -419,11 +423,12 @@ class NativeStackRouter extends NativeRouterBase {
   /**
    * Tests if desired url is available to go back or not
    *
+   * @since 1.1.0
    * @param {string} url Desired url to test availability to go back
    * @return {boolean}
    */
   canGoBacktoUrl(url) {
-    return this.canGoBackto(this.getStepLengthByCurrent(url));
+    return this.canGoBackto(this.getStepLengthFromCurrent(url));
   }
 
   resetView() {
