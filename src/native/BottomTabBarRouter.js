@@ -307,12 +307,10 @@ class BottomTabBarRouter extends NativeRouterBase {
         // Because visitedIndex of route tab is assigned to this url when routing is completed.
         // Since Android bottomtabbar logic triggered shouldSelectByIndex and didSelectByIndex methods
         // either requests come from user and router. And IOS only triggers if request comes from the user.
-        this._lastLocationUrl = location.url;
         this._renderer.setSelectedIndex(index);
         this._renderer.showTab();
-        this._currentUrl = location.url;
-        this.setVisited(index, { url: location.url, action });
       }
+      this.setVisited(index, { url: location.url, action });
       // if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
     }
 
