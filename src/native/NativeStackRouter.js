@@ -193,7 +193,8 @@ class NativeStackRouter extends NativeRouterBase {
    * @param {function | {before: function, after: function}} hooks - Before and after hooks. If Hooks paramter is a function then it is used as before hook. 
    * @param {boolean} [animated=true] - Callback is called before dismissing to trigger another action like routing to an another page.
    */
-  dismiss(hooks, animated=true) {
+  dismiss(hooks={}, animated=true) {
+    console.log("dismiss", hooks.toString());
     this._dismiss && this._dismiss(typeof hooks === "function" ? {before: hooks} : hooks , animated);
   }
 
@@ -290,18 +291,16 @@ class NativeStackRouter extends NativeRouterBase {
               // Rewinds global history by amount of visits while the modal is opened.
               // Because routers in the tree are not aware of modal router will be dismissed.
               // And if they are notified and then their current-urls will be outdated.
-              const back = () => {
-                while (diff-- > 1) {
-                  Router.getGlobalRouter().history.rollback();
-                }
-                
-                this._historyController.preventDefault();
-                this._historyController.goBack();
-                
-                // simulate a pop request to inform all routers
-                // regarding route changing
-                this.dispatch(lastLocation, "POP", this, false);
+              while (diff-- > 1) {
+                Router.getGlobalRouter().history.rollback();
               }
+              
+              this._historyController.preventDefault();
+              this._historyController.goBack();
+              
+              // simulate a pop request to inform all routers
+              // regarding route changing
+              before && this.dispatch(lastLocation, "POP", this, false);
               before && before();
               route._renderer.dismiss(() => {
                 disposed = true;
@@ -314,7 +313,7 @@ class NativeStackRouter extends NativeRouterBase {
                 this._presented = false;
                 route.setState({ active: false });
                 route.resetView();
-                back();
+                !before && this.dispatch(lastLocation, "POP", this, false);
                 after && after();
               }, animated);
             };
