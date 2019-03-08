@@ -188,6 +188,7 @@ function handleRouteUrl(router, url, routeData, action) {
  * @extends {Route}
  */
 class Router extends Route {
+  
   static getGlobalRouter() {
     return historyController;
   }
@@ -930,6 +931,7 @@ class Router extends Route {
   }
 }
 
+Router._lock = false;
 Router._nextAnimated = true;
 
 module.exports = Router;

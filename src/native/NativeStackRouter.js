@@ -278,9 +278,11 @@ class NativeStackRouter extends NativeRouterBase {
               Router.getGlobalRouter().history.index
             ];
             const lastLocationIndex = Router.getGlobalRouter().history.index;
+            Router._lock = true;
             this._renderer.present(
               (route._renderer && route._renderer._rootController) || view,
-              this.isAnimated()
+              this.isAnimated(),
+              () => Router._lock = false
             );
             let disposed = false;
 

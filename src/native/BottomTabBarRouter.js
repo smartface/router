@@ -17,6 +17,7 @@ const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
 const createRenderer = require("./createRenderer");
 const TabBarItem = require("sf-core/ui/tabbaritem");
 const functionMaybe = require("../utils/funcorVal");
+const Router = require("../router/Router");
 
 /**
  * @private
@@ -206,7 +207,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     //   this._fromRouter = true;
     // });
     // }
-    return System.OS === "iOS" ? this._currentIndex != index : true;
+    return Router._lock ? false : System.OS === "iOS" ? this._currentIndex != index : true;
     /*return (
       this._currentIndex != index && this._tabStatus === userTabStatus.IDLE
     );*/
