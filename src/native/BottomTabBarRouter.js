@@ -8,15 +8,13 @@
 
 /**
  * @typedef {RouterParams} BottomTabBarRouterParams
- * @property {function(router: Router, event: ChangeEvent)} onTabChange Tab is changed handler
+ * @property {function(router: Router, event: ChangeEvent)} onTabChangedByUser Tab is changed handler
  * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
  * @property {object} tabbarParams See {@link BottomTabbarController}
  */
  
  /**
  * @typedef {object} ChangeEvent
- * @property {string} url Requested url
- * @property {string} action Requested action
  * @property {number} prevTabIndex Previous tab index
  * @property {number} tabIndex Changed tab index
  */
@@ -114,7 +112,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     tabbarParams = {},
     items = [],
     isRoot = false,
-    onTabChange,
+    onTabChangedByUser,
     routerDidEnter,
     routerDidExit,
     routeShouldMatch,
@@ -133,7 +131,8 @@ class BottomTabBarRouter extends NativeRouterBase {
     });
 
     this._renderer = renderer;
-    this._onTabChange = onTabChange;
+    this._onTabChangedByUser = onTabChangedByUser;
+    this._fromUser = true;
 
     this.initializeRenderer = () => {
       this._renderer.setRootController(new BottomTabBarController(tabbarParams));
@@ -149,7 +148,7 @@ class BottomTabBarRouter extends NativeRouterBase {
       this._renderer._rootController.didSelectByIndex = ({ index }) => {
         // tab index is changed by user
         // currentIndex must be checked out because of Android BottombarBarController sends initially zero index without any request.
-        // And this behaviour is causing to start a router request using zeroth element of the children routes.
+        // And this behaviour is causing to start a router request using zeroth element of the child routes.
         if (this._currentIndex !== undefined && this._currentIndex !== index) {
           // selected tab is not visited
           if (!this.isVisited(index)) {
@@ -165,7 +164,7 @@ class BottomTabBarRouter extends NativeRouterBase {
             this.dispatch({ url: this._visitedIndexes[index].url }, "PUSH", this);
           }
         }
-
+        
         this._currentIndex = index;
       };
 
@@ -196,9 +195,9 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @param {number} index
    */
   shouldSelectByIndex(index) {
-    if (this._currentIndex !== index) {
-      this._fromRouter = false;
-    }
+    // if (this._fromUser === true) {
+    //   this._fromRouter = false;
+    // }
 
     /*this._fromRouter = false;
     if (
@@ -222,6 +221,15 @@ class BottomTabBarRouter extends NativeRouterBase {
     //   this._fromRouter = true;
     // });
     // }
+    if(this._fromUser === true){
+      this._fromRouter = false;
+      setTimeout(() => {
+        this._onTabChangedByUser && this._onTabChangedByUser(this, {prevTabIndex: this._currentIndex, tabIndex: index });
+      }, 0);
+    }
+    
+    this._fromUser = true;
+
     return Router._lock ? false : System.OS === "iOS" ? this._currentIndex != index : true;
     /*return (
       this._currentIndex != index && this._tabStatus === userTabStatus.IDLE
@@ -306,6 +314,8 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @override
    */
   renderMatches(matches, location, action, target, fromRouter) {
+    super.renderMatches(matches, location, action, target, fromRouter);
+
     // this._fromRouter = true;
     if (matches.length > 0) {
       const currentIndex = this._currentIndex;
@@ -316,7 +326,8 @@ class BottomTabBarRouter extends NativeRouterBase {
       // get index of the current url
       const index = this.resolveIndex(match.path);
 
-      if(!this._visitedIndexes[index] || this._currentIndex != index){
+      if(!this._visitedIndexes[index] || this._currentIndex != index) {
+        this._fromUser = false;
         // sets target tabbar item as visited.
         // selects target tabbaritem by index
         this._currentIndex = index;
@@ -327,13 +338,14 @@ class BottomTabBarRouter extends NativeRouterBase {
         this._renderer.setSelectedIndex(index);
         this._renderer.showTab();
         
-        this._onTabChange && this._onTabChange(this, {url: location.url, action, prevTabIndex: currentIndex, tabIndex: index });
+        this._fromUser = true;
       }
       this.setVisited(index, { url: location.url, action });
       // if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
+      // if(System.OS === "Android"){
+      // }
     }
-
-    super.renderMatches(matches, location, action, target, fromRouter);
+    
   }
 }
 

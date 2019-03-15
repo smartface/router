@@ -253,7 +253,7 @@ class NativeStackRouter extends NativeRouterBase {
   /**
    * @override
    */
-  routeWillEnter(route, requestedUrl, act, ex, target, fromRouter) {
+  routeWillEnter(route, requestedUrl, act, ex, target) {
     const {
       view,
       match: { isExact: exact },

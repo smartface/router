@@ -217,6 +217,10 @@ class Router extends Route {
       fn(path, routeData, action, ok => ok && doneFn());
     };
   }
+  
+  static getActiveRouter(){
+    return Router._activeRouter;
+  }
 
   /**
    * @constructor
@@ -288,7 +292,17 @@ class Router extends Route {
     this._sensitive = sensitive;
     this._fromRouter = false;
   }
-
+  
+  /**
+   * Finds child Route
+   * 
+   * @since 1.4.1
+   * @param {function(child:(Route|Router), index:number)}
+   */
+  findChild(fn){
+    return this._routes.find(fn)
+  }
+  
   /**
    * Router is initialized by parent
    *
@@ -517,6 +531,8 @@ class Router extends Route {
           target.redirectRoute(route, routeData, action, target);
           return false;
         }
+        
+        Router._activeRouter = this;
 
         const routingState =
           (route.getRoutingState &&
@@ -544,8 +560,8 @@ class Router extends Route {
 
         // Views' tasks must be end of the matches rendering,
         // because there must not be rendered any view before route blocking.
-        // An another reason is that we build views from child to parent but routing happens
-        // parent to child.
+        // An another reason is that we build views from child to parent 
+        // but we need to build from parent to child.
         tasks.push(
           (url, action) =>
           this.routeWillEnter &&
@@ -570,7 +586,6 @@ class Router extends Route {
         this._currentAction = action;
         this._prevRoute = route;
         dispatch(location, action);
-
         tasks = []; // clear tasks
         return true;
       }
@@ -933,5 +948,6 @@ class Router extends Route {
 
 Router._lock = false;
 Router._nextAnimated = true;
+Router._activeRouter = null;
 
 module.exports = Router;
