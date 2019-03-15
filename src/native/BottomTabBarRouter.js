@@ -223,8 +223,9 @@ class BottomTabBarRouter extends NativeRouterBase {
     // }
     if(this._fromUser === true){
       this._fromRouter = false;
+      const current = this._currentIndex;
       setTimeout(() => {
-        this._onTabChangedByUser && this._onTabChangedByUser(this, {prevTabIndex: this._currentIndex, tabIndex: index });
+        this._onTabChangedByUser && this._onTabChangedByUser(this, {prevTabIndex: current, tabIndex: index });
       }, 0);
     }
     
