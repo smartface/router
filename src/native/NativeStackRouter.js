@@ -194,7 +194,6 @@ class NativeStackRouter extends NativeRouterBase {
    * @param {boolean} [animated=true] - Callback is called before dismissing to trigger another action like routing to an another page.
    */
   dismiss(hooks={}, animated=true) {
-    console.log("dismiss", hooks.toString());
     this._dismiss && this._dismiss(typeof hooks === "function" ? {before: hooks} : hooks , animated);
   }
 

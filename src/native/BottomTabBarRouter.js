@@ -1,15 +1,24 @@
 "use strict";
 
 /**
- * @typedef {object<string,string|object>} BottomTabBarItem Represent {@link TabBarItem} params
+ * @typedef {object<string,string|object>} BottomTabBarItem Represents {@link TabBarItem} params
  * @property {Image} icon
  * @property {string} title
  */
 
 /**
  * @typedef {RouterParams} BottomTabBarRouterParams
+ * @property {function(router: Router, event: ChangeEvent)} onTabChange Tab is changed handler
  * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
  * @property {object} tabbarParams See {@link BottomTabbarController}
+ */
+ 
+ /**
+ * @typedef {object} ChangeEvent
+ * @property {string} url Requested url
+ * @property {string} action Requested action
+ * @property {number} prevTabIndex Previous tab index
+ * @property {number} tabIndex Changed tab index
  */
 const System = require("sf-core/device/system");
 const NativeRouterBase = require("./NativeRouterBase");
@@ -83,6 +92,10 @@ const userTabStatus = {
  */
 class BottomTabBarRouter extends NativeRouterBase {
 
+  /**
+   * Helper method
+   * @param {BottomTabBarRouterParams} param
+   */
   static of (params) {
     params.renderer = createRenderer();
     return new BottomTabBarRouter(params);
@@ -101,6 +114,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     tabbarParams = {},
     items = [],
     isRoot = false,
+    onTabChange,
     routerDidEnter,
     routerDidExit,
     routeShouldMatch,
@@ -119,6 +133,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     });
 
     this._renderer = renderer;
+    this._onTabChange = onTabChange;
 
     this.initializeRenderer = () => {
       this._renderer.setRootController(new BottomTabBarController(tabbarParams));
@@ -293,6 +308,7 @@ class BottomTabBarRouter extends NativeRouterBase {
   renderMatches(matches, location, action, target, fromRouter) {
     // this._fromRouter = true;
     if (matches.length > 0) {
+      const currentIndex = this._currentIndex;
       const { match: next } = matches[matches.length - 1];
       // current url match
       const { match } = matches[1] || matches[0];
@@ -310,6 +326,8 @@ class BottomTabBarRouter extends NativeRouterBase {
         // either requests come from user and router. And IOS only triggers if request comes from the user.
         this._renderer.setSelectedIndex(index);
         this._renderer.showTab();
+        
+        this._onTabChange && this._onTabChange(this, {url: location.url, action, prevTabIndex: currentIndex, tabIndex: index });
       }
       this.setVisited(index, { url: location.url, action });
       // if (userTabStatus.WAITING) this._tabStatus = userTabStatus.IDLE;
