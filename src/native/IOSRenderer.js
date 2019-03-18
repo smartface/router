@@ -47,14 +47,13 @@ class IOSRenderer extends Renderer {
    */
   pushChild(page, animated = true) {
     // prevents to push existing view
-    if (this._rootController.childControllers.some(p => p === page) || this._activePage === page) {
+    if (this._rootController.childControllers.some(p => p === page)) {
       return;
     }
     
     this.makeRootVisible();
     this._rootController.push &&
       this._rootController.push({ controller: page, animated });
-    this._activePage = page;
   }
   
   present(controller, animated, onComplete) {
