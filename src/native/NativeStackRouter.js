@@ -363,7 +363,7 @@ class NativeStackRouter extends NativeRouterBase {
    */
   goBackto(n) {
     console.log("goBackto : "+n);
-    if (n > 0 && this._historyController.canGoBack(n)) {
+    if (n < 0 && this._historyController.canGoBack(n)) {
       const back = this._historyController.currentIndex() + n;
       const location = this._historyController.find(
         (location, index) => index === back
