@@ -362,7 +362,6 @@ class NativeStackRouter extends NativeRouterBase {
    * @param {number} n Amount of back as negative value. If stack length shorter than specified number then the active router does nothing.
    */
   goBackto(n) {
-    console.log("goBackto : "+n);
     if (n < 0 && this._historyController.canGoBack(n)) {
       const back = this._historyController.currentIndex() + n;
       const location = this._historyController.find(
