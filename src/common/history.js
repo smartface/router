@@ -288,14 +288,15 @@ const createMemoryHistory = (props = {}) => {
 
   const rollback = () => {
     history.entries.pop();
-    history.length = history.length;
+    history.length = history.entries.length;
     history.index--;
+    history.location = history.entries[history.index];
+    setState();
   };
 
   const silencePush = (path, state) => {
     const action = "PUSH";
     const location = createLocation(path, state, createKey(), history.location);
-
     history.entries.push(location);
     history.length = history.length;
     history.index++;

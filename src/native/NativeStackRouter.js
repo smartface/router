@@ -260,9 +260,7 @@ class NativeStackRouter extends NativeRouterBase {
       url,
       action
     } = route.getState();
-    if(route.isModal() && action === 'POP'){
-      return;
-    }
+    
     const active = url === this._currentRouteUrl;
     switch (action) {
       case "REPLACE":
@@ -275,6 +273,10 @@ class NativeStackRouter extends NativeRouterBase {
       case "PUSH":
         if (this._fromRouter) {
           if (route.isModal() && !this._presented && !active) {
+            if(this._historyController.lastLocationUrl !== url){
+              this._historyController.preventDefault();
+              this._historyController.push(url);
+            }
             // Router.getGlobalRouter().history.push(url);
             const lastLocationIndex = Router.getGlobalRouter().history.index;
             const lastLocation = Router.getGlobalRouter().history.entries[lastLocationIndex];
@@ -296,25 +298,23 @@ class NativeStackRouter extends NativeRouterBase {
               while (diff-- > 1) {
                 Router.getGlobalRouter().history.rollback();
               }
-              
-              this._historyController.preventDefault();
-              this._historyController.goBack();
-              
               // simulate a pop request to inform all routers
               // regarding route changing
-              // before && this.dispatch(lastLocation, "POP", this, false);
+              this._historyController.rollback();
+              before && this.dispatch(this._historyController.lastLocation, "POP", this, false);
               before && before();
               route._renderer.dismiss(() => {
+                // console.log('3. _currentRouteUrl :',  this._historyController.lastLocationUrl);
+                !before && this.dispatch(this._historyController.lastLocation, "POP", this, false);
                 disposed = true;
                 
                 route._dismiss = null;
                 route._presented = false;
-                this._currentRouteUrl = null;
 
                 this._presented = false;
                 route.setState({ active: false });
                 route.resetView();
-                // !before && this.dispatch(lastLocation, "POP", this, false);
+                // console.log("2. dismiss : ", this._historyController.history.entries);
                 after && after();
               }, animated);
             };

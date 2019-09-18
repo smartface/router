@@ -62,7 +62,10 @@ function createHistory({
    * @class HistoryController
    */
   class HistoryController {
-    constructor() {}
+    
+    constructor(baseUrl) {
+      this._baseUrl = baseUrl;
+    }
 
     clearBlocker() {
       _unblock && _unblock();
@@ -127,7 +130,11 @@ function createHistory({
     }
 
     get lastLocation() {
-      return _history.location;
+      return _history.entries.length ? _history.entries[_history.entries.length - 1] : null;
+    }
+    
+    get lastLocationUrl() {
+      return _history.entries.length ? _history.entries[_history.entries.length - 1].url : null;
     }
 
     /**
