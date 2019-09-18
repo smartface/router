@@ -260,8 +260,10 @@ class NativeStackRouter extends NativeRouterBase {
       url,
       action
     } = route.getState();
+    if(route.isModal() && action === 'POP'){
+      return;
+    }
     const active = url === this._currentRouteUrl;
-    
     switch (action) {
       case "REPLACE":
         if (this._fromRouter) {
@@ -273,10 +275,9 @@ class NativeStackRouter extends NativeRouterBase {
       case "PUSH":
         if (this._fromRouter) {
           if (route.isModal() && !this._presented && !active) {
-            const lastLocation = Router.getGlobalRouter().history.entries[
-              Router.getGlobalRouter().history.index
-            ];
+            // Router.getGlobalRouter().history.push(url);
             const lastLocationIndex = Router.getGlobalRouter().history.index;
+            const lastLocation = Router.getGlobalRouter().history.entries[lastLocationIndex];
             Router._lock = true;
             this._renderer.present(
               (route._renderer && route._renderer._rootController) || view,
@@ -301,20 +302,19 @@ class NativeStackRouter extends NativeRouterBase {
               
               // simulate a pop request to inform all routers
               // regarding route changing
-              before && this.dispatch(lastLocation, "POP", this, false);
+              // before && this.dispatch(lastLocation, "POP", this, false);
               before && before();
               route._renderer.dismiss(() => {
                 disposed = true;
                 
                 route._dismiss = null;
                 route._presented = false;
-                route._currentRouteUrl = null;
                 this._currentRouteUrl = null;
 
                 this._presented = false;
                 route.setState({ active: false });
                 route.resetView();
-                !before && this.dispatch(lastLocation, "POP", this, false);
+                // !before && this.dispatch(lastLocation, "POP", this, false);
                 after && after();
               }, animated);
             };
@@ -335,12 +335,12 @@ class NativeStackRouter extends NativeRouterBase {
             }
           }
         }
-
+        
         break;
       case "POP":
         // TODO: Add dismiss logic
         if (this._fromRouter) {
-          if (!route._dismiss && exact) {
+          if (!route._dismiss && exact && !route.isModal()) {
             this._renderer.popChild();
           }
         }

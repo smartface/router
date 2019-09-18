@@ -29,7 +29,8 @@ const createLocation = (path, state, key, currentLocation) => {
     // Two-arg form: push(path, state)
     location = parseUrl(path);
     location.state = state;
-  } else {
+  }
+  else {
     // One-arg form: push(location)
     location = Object.assign({}, path);
 
@@ -38,13 +39,15 @@ const createLocation = (path, state, key, currentLocation) => {
     if (location.query) {
       if (location.query.charAt(0) !== "?")
         location.query = "?" + location.query;
-    } else {
+    }
+    else {
       location.query = "";
     }
 
     if (location.hash) {
       if (location.hash.charAt(0) !== "#") location.hash = "#" + location.hash;
-    } else {
+    }
+    else {
       location.hash = "";
     }
 
@@ -54,15 +57,17 @@ const createLocation = (path, state, key, currentLocation) => {
 
   try {
     location.url = decodeURI(location.url);
-  } catch (e) {
+  }
+  catch (e) {
     if (e instanceof URIError) {
       throw new URIError(
         'Pathname "' +
-          location.url +
-          '" could not be decoded. ' +
-          "This is likely caused by an invalid percent-encoding."
+        location.url +
+        '" could not be decoded. ' +
+        "This is likely caused by an invalid percent-encoding."
       );
-    } else {
+    }
+    else {
       throw e;
     }
   }
@@ -73,13 +78,15 @@ const createLocation = (path, state, key, currentLocation) => {
     // Resolve incomplete/relative pathname relative to current location.
     if (!location.url) {
       location.url = currentLocation.url;
-    } else if (location.url.charAt(0) !== "/") {
+    }
+    else if (location.url.charAt(0) !== "/") {
       location.url = resolvePathname(
         location.url,
         currentLocation.url
       );
     }
-  } else {
+  }
+  else {
     // When there is no prior location and pathname is empty, set it to /
     if (!location.url) {
       location.url = "/";
@@ -114,15 +121,15 @@ const createMemoryHistory = (props = {}) => {
 
   const createKey = () =>
     Math.random()
-      .toString(36)
-      .substr(2, keyLength);
+    .toString(36)
+    .substr(2, keyLength);
 
   const index = clamp(initialIndex, 0, initialEntries.length - 1);
   const entries = initialEntries.map(
     entry =>
-      typeof entry === "string"
-        ? createLocation(entry, undefined, createKey())
-        : createLocation(entry, undefined, entry.key || createKey())
+    typeof entry === "string" ?
+    createLocation(entry, undefined, createKey()) :
+    createLocation(entry, undefined, entry.key || createKey())
   );
 
   // Public interface
@@ -153,14 +160,13 @@ const createMemoryHistory = (props = {}) => {
   let lastPath;
   const push = (path, state) => {
     lastPath = path;
-    warning(
-      !(
+    warning(!(
         typeof path === "object" &&
         path.state !== undefined &&
         state !== undefined
       ),
       "You should avoid providing a 2nd state argument to push when the 1st " +
-        "argument is a location-like object that already has state; it is ignored"
+      "argument is a location-like object that already has state; it is ignored"
     );
 
     const action = "PUSH";
@@ -183,7 +189,8 @@ const createMemoryHistory = (props = {}) => {
             nextEntries.length - nextIndex,
             location
           );
-        } else {
+        }
+        else {
           nextEntries.push(location);
         }
 
@@ -198,14 +205,13 @@ const createMemoryHistory = (props = {}) => {
   };
 
   const replace = (path, state) => {
-    warning(
-      !(
+    warning(!(
         typeof path === "object" &&
         path.state !== undefined &&
         state !== undefined
       ),
       "You should avoid providing a 2nd state argument to replace when the 1st " +
-        "argument is a location-like object that already has state; it is ignored"
+      "argument is a location-like object that already has state; it is ignored"
     );
 
     const action = "REPLACE";
@@ -225,11 +231,24 @@ const createMemoryHistory = (props = {}) => {
     );
   };
 
+
   const go = n => {
     const nextIndex = clamp(history.index + n, 0, history.entries.length - 1);
 
     const action = "POP";
     const location = history.entries[nextIndex];
+    try {
+      throw new Error();
+    }
+    catch (e) {
+      console.warn("GO => ", {
+        nextIndex,
+        historyIndex: history.index,
+        location,
+        hisEntries: history.entries,
+        e
+      });
+    }
 
     transitionManager.confirmTransitionTo(
       location,
@@ -242,7 +261,8 @@ const createMemoryHistory = (props = {}) => {
             location,
             index: nextIndex
           });
-        } else {
+        }
+        else {
           // Mimic the behavior of DOM histories by
           // causing a render after a cancelled POP.
           setState();

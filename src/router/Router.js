@@ -17,11 +17,11 @@ let store;
 const dispatch = (location, action) => {
   history.push([location.url, action]);
   listeners.forEach(listener => listener(location, action));
-
+  console.info("dispatch: locationnn:> ", action, "  ---  ",location);
   action === "PUSH" ?
     historyController.pushLocation(location) // TODO: not share loaction instance
     :
-    historyController.goBack();
+    historyController.canGoBack() && historyController.goBack();
 };
 
 function handleRouteUrl(router, url, routeData, action) {
@@ -459,6 +459,7 @@ class Router extends Route {
         location.url
       );
       // var err = new Error();
+      console.log('renderMatches', ' ', location, this._matches, this._routes);
       this.renderMatches(this._matches, location, action, target, fromRouter);
     }
   }
@@ -489,7 +490,6 @@ class Router extends Route {
   renderMatches(matches, location, action, target, fromRouter) {
     this._fromRouter = fromRouter;
     const routeData = location.state;
-
     matches.some(({ match, route }, index) => {
       route.setState({
         hash: location.hash,
@@ -522,6 +522,7 @@ class Router extends Route {
       }
       else if (match.isExact === true) {
         const redirection = funcorVal(route.getRedirectto(), [this, route]);
+        
         if (redirection && redirection !== match.url) {
           tasks = []; // reset tasks
           target.routeRollback(); // remove redirected path from target Router
@@ -743,9 +744,8 @@ class Router extends Route {
   pushRoute(route) {
     if (!(route instanceof Route))
       throw new TypeError(`route must be instance of Route`);
-    this.push(
-      funcorVal(route.getRedirectto(), [this, route]) || route.getUrlPath()
-    );
+    const url = funcorVal(route.getRedirectto(), [this, route]) || route.getUrlPath();
+    this.push(url);
   }
 
   isAnimated() {
@@ -762,26 +762,29 @@ class Router extends Route {
    * @return {Router}
    */
   push(path, routeData = {}, animated = true) {
+    console.log('PUSH : ', path, ' ', this._state.url);
     Router._nextAnimated = animated;
-    if (path === this._state.url) {
-      Object.assign(this._historyController.history.location.state, {
-        routeData
-      });
-      this.dispatch(
-        this._historyController.history.location,
-        "PUSH",
-        this,
-        true
-      );
+    // if (path === this._state.url) {
+    //   Object.assign(this._historyController.history.location.state, {
+    //     routeData
+    //   });
+    //   this.dispatch(
+    //     this._historyController.history.location,
+    //     "PUSH",
+    //     this,
+    //     true
+    //   );
 
-      return this;
-    }
+    //   return this;
+    // }
 
     this._fromRouter = true;
     // if (!this.isValidPath(path)) throw new TypeError(`[${path}] Pat h is invalid`);
     if (path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;
     }
+    
+    console.log(1);
 
     if (Router.blocker) {
       Router.blocker(this, path, routeData, "PUSH", () => {
@@ -798,7 +801,6 @@ class Router extends Route {
     catch (e) {
       throw e;
     }
-
     this._historyController.push(path, routeData);
     this._fromRouter = false;
     return this;
@@ -851,11 +853,12 @@ class Router extends Route {
       this._fromRouter = false;
     };
     if (Router.blocker) {
+      console.error("Yes Blockerrrr:>> ");
       Router.blocker(this, null, null, "POP", () => go());
 
       return this;
     }
-
+    console.error("No Blockerrrr:>> ");
     go();
   }
 
