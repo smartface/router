@@ -194,7 +194,7 @@ class NativeStackRouter extends NativeRouterBase {
    * @param {boolean} [animated=true] - Callback is called before dismissing to trigger another action like routing to an another page.
    */
   dismiss(hooks={}, animated=true) {
-    this._dismiss && this._dismiss(typeof hooks === "function" ? {before: hooks} : hooks , animated);
+    this._dismiss && this._dismiss(typeof hooks === "function" ? {after: hooks} : hooks , animated);
   }
 
   /**
@@ -273,7 +273,7 @@ class NativeStackRouter extends NativeRouterBase {
       case "PUSH":
         if (this._fromRouter) {
           if (route.isModal() && !this._presented && !active) {
-            if(this._historyController.lastLocationUrl !== url){
+            if(this._historyController.lastLocationUrl !== url) {
               this._historyController.preventDefault();
               this._historyController.push(url);
             }
@@ -304,8 +304,6 @@ class NativeStackRouter extends NativeRouterBase {
               before && this.dispatch(this._historyController.lastLocation, "POP", this, false);
               before && before();
               route._renderer.dismiss(() => {
-                // console.log('3. _currentRouteUrl :',  this._historyController.lastLocationUrl);
-                !before && this.dispatch(this._historyController.lastLocation, "POP", this, false);
                 disposed = true;
                 
                 route._dismiss = null;
@@ -314,7 +312,7 @@ class NativeStackRouter extends NativeRouterBase {
                 this._presented = false;
                 route.setState({ active: false });
                 route.resetView();
-                // console.log("2. dismiss : ", this._historyController.history.entries);
+                !before && this.dispatch(this._historyController.lastLocation, "POP", this, false);
                 after && after();
               }, animated);
             };
@@ -348,6 +346,7 @@ class NativeStackRouter extends NativeRouterBase {
         route.setState({ active: false });
         break;
     }
+    
     this._currentRouteUrl = url;
     super.routeWillEnter(route);
   }

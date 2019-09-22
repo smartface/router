@@ -17,7 +17,7 @@ let store;
 const dispatch = (location, action) => {
   history.push([location.url, action]);
   listeners.forEach(listener => listener(location, action));
-  console.info("dispatch: locationnn:> ", action, "  ---  ",location);
+  console.info("dispatch: locationnn:> ", action, "  ---  ", location);
   action === "PUSH" ?
     historyController.pushLocation(location) // TODO: not share loaction instance
     :
@@ -188,7 +188,7 @@ function handleRouteUrl(router, url, routeData, action) {
  * @extends {Route}
  */
 class Router extends Route {
-  
+
   static getGlobalRouter() {
     return historyController;
   }
@@ -217,8 +217,8 @@ class Router extends Route {
       fn(path, routeData, action, ok => ok && doneFn());
     };
   }
-  
-  static getActiveRouter(){
+
+  static getActiveRouter() {
     return Router._activeRouter;
   }
 
@@ -292,17 +292,17 @@ class Router extends Route {
     this._sensitive = sensitive;
     this._fromRouter = false;
   }
-  
+
   /**
-   * Finds child Route
+   * Finds and returns child Route or undefined
    * 
    * @since 1.4.1
    * @param {function(child:(Route|Router), index:number)}
    */
-  findChild(fn){
+  findChild(fn) {
     return this._routes.find(fn)
   }
-  
+
   /**
    * Router is initialized by parent
    *
@@ -453,13 +453,15 @@ class Router extends Route {
    * @param {boolean} [fromRouter=true]
    */
   onHistoryChange(location, action, target, fromRouter = true) {
+    if(!location)
+      throw new Error("Location cannot be empty.");
     if (this._isRoot) {
       this._matches = matchRoutes(
         this.getStore(), [this].concat(this._routes),
         location.url
       );
+      // console.log('onHistoryChange : ', location, action);
       // var err = new Error();
-      console.log('renderMatches', ' ', location, this._matches, this._routes);
       this.renderMatches(this._matches, location, action, target, fromRouter);
     }
   }
@@ -522,7 +524,7 @@ class Router extends Route {
       }
       else if (match.isExact === true) {
         const redirection = funcorVal(route.getRedirectto(), [this, route]);
-        
+
         if (redirection && redirection !== match.url) {
           tasks = []; // reset tasks
           target.routeRollback(); // remove redirected path from target Router
@@ -532,7 +534,7 @@ class Router extends Route {
           target.redirectRoute(route, routeData, action, target);
           return false;
         }
-        
+
         Router._activeRouter = this;
 
         const routingState =
@@ -569,11 +571,11 @@ class Router extends Route {
           this.routeWillEnter(route, url, action, true, target)
         );
 
-
         if (_lastRoute) { // notify current route to exit
           _lastRoute.setState({ action });
           _lastRoute.routeDidExit(this);
         }
+
         this.routeDidMatch(route); // fires routeDidMatch
         if (this._fromRouter && action !== "POP") {
           const view = this.renderRoute(route); // build route's view
@@ -713,10 +715,10 @@ class Router extends Route {
    */
   routeDidMatch(route) {
     const { match, action, routeData } = route.getState();
-    if (match.isExact) {
-      const prevUrl = this._currentUrl;
-      this.setasActiveRouter(action);
-    }
+    // if (match.isExact) {
+    // const prevUrl = this._currentUrl;
+    this.setasActiveRouter(action);
+    // }
   }
 
   /**
@@ -783,7 +785,9 @@ class Router extends Route {
     if (path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;
     }
-    
+
+    console.info("fullPAth: ", path);
+
     if (Router.blocker) {
       Router.blocker(this, path, routeData, "PUSH", () => {
         this._pushHomes(path);
@@ -840,8 +844,7 @@ class Router extends Route {
       url
         ?
         this.dispatch(
-          typeof url === "string" ?
-          { url, hash: "", search: "", state: {} } :
+          typeof url === "string" ? { url, hash: "", search: "", state: {} } :
           url,
           "POP",
           this,
@@ -851,12 +854,10 @@ class Router extends Route {
       this._fromRouter = false;
     };
     if (Router.blocker) {
-      console.error("Yes Blockerrrr:>> ");
       Router.blocker(this, null, null, "POP", () => go());
 
       return this;
     }
-    console.error("No Blockerrrr:>> ");
     go();
   }
 
