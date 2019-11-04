@@ -246,16 +246,6 @@ class Route {
    * @return {{path: string, routes: Array<object>}}
    */
   toJSON() {
-    // const {
-    //   match,
-    //   routeData,
-    //   routingState,
-    //   action,
-    //   url,
-    //   view,
-    //   active,
-    //   prevUrl
-    // } = this._state;
     return {
       type: "route",
       match: this._state.routeData,

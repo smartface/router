@@ -17,11 +17,9 @@ let store;
 const dispatch = (location, action) => {
   history.push([location.url, action]);
   listeners.forEach(listener => listener(location, action));
-  console.info("dispatch: locationnn:> ", action, "  ---  ", location);
-  action === "PUSH" ?
-    historyController.pushLocation(location) // TODO: not share loaction instance
-    :
-    historyController.canGoBack() && historyController.goBack();
+  action === "PUSH" 
+    ? historyController.pushLocation({...location}) // TODO: not share loaction instance
+    : historyController.goBack();
 };
 
 function handleRouteUrl(router, url, routeData, action) {
@@ -200,8 +198,12 @@ class Router extends Route {
     return history[history.length - 1];
   }
 
+  static getlocationHistoryByIndex(index) {
+    return history[history.length - 1];
+  }
+
   static getHistoryByIndex(index) {
-    return history[index];
+    return index < 0 ? history[history.length - index] : history[index];
   }
   /**
    * Factory method to create a new Router instance
@@ -300,7 +302,12 @@ class Router extends Route {
    * @param {function(child:(Route|Router), index:number)}
    */
   findChild(fn) {
-    return this._routes.find(fn)
+    return this._routes.find(fn);
+  }
+  
+  pushAndBack(url, routeData) {
+    Router._backUrl = Router.getGlobalRouter().lastLocation;
+    this.push(url, routeData);
   }
 
   /**
@@ -464,6 +471,8 @@ class Router extends Route {
       // var err = new Error();
       this.renderMatches(this._matches, location, action, target, fromRouter);
     }
+    
+    dispatch(location, action);
   }
 
   /**
@@ -588,7 +597,6 @@ class Router extends Route {
         _lastRoute = route; // save exact matched route as last route
         this._currentAction = action;
         this._prevRoute = route;
-        dispatch(location, action);
         tasks = []; // clear tasks
         return true;
       }
@@ -609,8 +617,7 @@ class Router extends Route {
    * @param {string} action
    */
   routeWillEnter(route, action) {
-    const viewConroller =
-      (route._renderer && route._renderer._rootController) ||
+    const viewConroller = (route._renderer && route._renderer._rootController) ||
       // else just instance of Route
       route.getState().view;
     this._handlers.routeWillEnter &&
@@ -714,7 +721,13 @@ class Router extends Route {
    * @param {Route} route
    */
   routeDidMatch(route) {
+    // alert(this.getUrlPath()+" "+Router._backUrl);
     const { match, action, routeData } = route.getState();
+    // this.setState({
+    //   backUrl: Router._backUrl
+    // });
+    // this._backUrl = Router._backUrl;
+    // Router._backUrl = null;
     // if (match.isExact) {
     // const prevUrl = this._currentUrl;
     this.setasActiveRouter(action);
@@ -764,7 +777,7 @@ class Router extends Route {
    * @return {Router}
    */
   push(path, routeData = {}, animated = true) {
-    console.log('PUSH : ', path, ' ', this._state.url);
+    // console.log('PUSH : ', path, ' ', this._state.url);
     Router._nextAnimated = animated;
     // if (path === this._state.url) {
     //   Object.assign(this._historyController.history.location.state, {

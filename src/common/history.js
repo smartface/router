@@ -237,18 +237,6 @@ const createMemoryHistory = (props = {}) => {
 
     const action = "POP";
     const location = history.entries[nextIndex];
-    try {
-      throw new Error();
-    }
-    catch (e) {
-      console.warn("GO => ", {
-        nextIndex,
-        historyIndex: history.index,
-        location,
-        hisEntries: history.entries,
-        e
-      });
-    }
 
     transitionManager.confirmTransitionTo(
       location,

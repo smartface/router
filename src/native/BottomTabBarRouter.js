@@ -195,10 +195,6 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @param {number} index
    */
   shouldSelectByIndex(index) {
-    // if (this._fromUser === true) {
-    //   this._fromRouter = false;
-    // }
-
     /*this._fromRouter = false;
     if (
       (this._tabStatus === userTabStatus.IDLE &&
@@ -216,12 +212,7 @@ class BottomTabBarRouter extends NativeRouterBase {
       })
       .catch(e => alert(e.message + " " + e.stack, "Error"));*/
 
-    // setTimeout(() => {
-    //   this.pushRoute(this._routes[index]);
-    //   this._fromRouter = true;
-    // });
-    // }
-    if(this._fromUser === true){
+   if(this._fromUser === true){
       this._fromRouter = false;
       const current = this._currentIndex;
       setTimeout(() => {
@@ -232,9 +223,6 @@ class BottomTabBarRouter extends NativeRouterBase {
     this._fromUser = true;
 
     return Router._lock ? false : System.OS === "iOS" ? this._currentIndex != index : true;
-    /*return (
-      this._currentIndex != index && this._tabStatus === userTabStatus.IDLE
-    );*/
   }
 
   /**
