@@ -221,17 +221,25 @@ class BottomTabBarRouter extends NativeRouterBase {
     //   this._fromRouter = true;
     // });
     // }
-    if(this._fromUser === true){
-      this._fromRouter = false;
-      const current = this._currentIndex;
-      setTimeout(() => {
-        this._onTabChangedByUser && this._onTabChangedByUser(this, {prevTabIndex: current, tabIndex: index });
-      }, 0);
-    }
     
     this._fromUser = true;
-
-    return Router._lock ? false : System.OS === "iOS" ? this._currentIndex != index : true;
+    try {
+      return true;
+      // Router._lock ? false : System.OS === "iOS" ? this._currentIndex != index : true;  
+    } finally {
+      if(this._fromUser === true){
+        this._fromRouter = false;
+        const current = this._currentIndex;
+        // setTimeout(() => {
+          
+        // }, 0);
+        this._onTabChangedByUser && this._onTabChangedByUser(this, {prevTabIndex: current, tabIndex: index });
+        
+      }
+      
+      this._fromUser = true;
+    }
+    
     /*return (
       this._currentIndex != index && this._tabStatus === userTabStatus.IDLE
     );*/

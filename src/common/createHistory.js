@@ -130,11 +130,11 @@ function createHistory({
     }
 
     get lastLocation() {
-      return _history.entries.length ? _history.entries[_history.entries.length - 1] : null;
+      return _history.entries[_history.index];
     }
     
     get lastLocationUrl() {
-      return _history.entries.length ? _history.entries[_history.entries.length - 1].url : null;
+      return _history.entries[_history.index].url;
     }
 
     /**

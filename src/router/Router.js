@@ -17,11 +17,9 @@ let store;
 const dispatch = (location, action) => {
   history.push([location.url, action]);
   listeners.forEach(listener => listener(location, action));
-  console.info("dispatch: locationnn:> ", action, "  ---  ",location);
-  action === "PUSH" ?
-    historyController.pushLocation(location) // TODO: not share loaction instance
-    :
-    historyController.canGoBack() && historyController.goBack();
+  action === "PUSH" 
+    ? historyController.pushLocation({...location}) // TODO: not share loaction instance
+    : historyController.goBack();
 };
 
 function handleRouteUrl(router, url, routeData, action) {
@@ -188,7 +186,7 @@ function handleRouteUrl(router, url, routeData, action) {
  * @extends {Route}
  */
 class Router extends Route {
-  
+
   static getGlobalRouter() {
     return historyController;
   }
@@ -200,8 +198,12 @@ class Router extends Route {
     return history[history.length - 1];
   }
 
+  static getlocationHistoryByIndex(index) {
+    return history[history.length - 1];
+  }
+
   static getHistoryByIndex(index) {
-    return history[index];
+    return index < 0 ? history[history.length - index] : history[index];
   }
   /**
    * Factory method to create a new Router instance
@@ -217,8 +219,8 @@ class Router extends Route {
       fn(path, routeData, action, ok => ok && doneFn());
     };
   }
-  
-  static getActiveRouter(){
+
+  static getActiveRouter() {
     return Router._activeRouter;
   }
 
@@ -292,17 +294,22 @@ class Router extends Route {
     this._sensitive = sensitive;
     this._fromRouter = false;
   }
-  
+
   /**
-   * Finds child Route
+   * Finds and returns child Route or undefined
    * 
    * @since 1.4.1
    * @param {function(child:(Route|Router), index:number)}
    */
-  findChild(fn){
-    return this._routes.find(fn)
+  findChild(fn) {
+    return this._routes.find(fn);
   }
   
+  pushAndBack(url, routeData) {
+    Router._backUrl = Router.getGlobalRouter().lastLocation;
+    this.push(url, routeData);
+  }
+
   /**
    * Router is initialized by parent
    *
@@ -453,15 +460,19 @@ class Router extends Route {
    * @param {boolean} [fromRouter=true]
    */
   onHistoryChange(location, action, target, fromRouter = true) {
+    if(!location)
+      throw new Error("Location cannot be empty.");
     if (this._isRoot) {
       this._matches = matchRoutes(
         this.getStore(), [this].concat(this._routes),
         location.url
       );
+      // console.log('onHistoryChange : ', location, action);
       // var err = new Error();
-      console.log('renderMatches', ' ', location, this._matches, this._routes);
       this.renderMatches(this._matches, location, action, target, fromRouter);
     }
+    
+    dispatch(location, action);
   }
 
   /**
@@ -522,7 +533,7 @@ class Router extends Route {
       }
       else if (match.isExact === true) {
         const redirection = funcorVal(route.getRedirectto(), [this, route]);
-        
+
         if (redirection && redirection !== match.url) {
           tasks = []; // reset tasks
           target.routeRollback(); // remove redirected path from target Router
@@ -532,7 +543,7 @@ class Router extends Route {
           target.redirectRoute(route, routeData, action, target);
           return false;
         }
-        
+
         Router._activeRouter = this;
 
         const routingState =
@@ -569,11 +580,11 @@ class Router extends Route {
           this.routeWillEnter(route, url, action, true, target)
         );
 
-
         if (_lastRoute) { // notify current route to exit
           _lastRoute.setState({ action });
           _lastRoute.routeDidExit(this);
         }
+
         this.routeDidMatch(route); // fires routeDidMatch
         if (this._fromRouter && action !== "POP") {
           const view = this.renderRoute(route); // build route's view
@@ -586,7 +597,6 @@ class Router extends Route {
         _lastRoute = route; // save exact matched route as last route
         this._currentAction = action;
         this._prevRoute = route;
-        dispatch(location, action);
         tasks = []; // clear tasks
         return true;
       }
@@ -607,8 +617,8 @@ class Router extends Route {
    * @param {string} action
    */
   routeWillEnter(route, action) {
-    const viewConroller =
-      (route._renderer && route._renderer._rootController) ||
+    console.log("Route will be entered : ", this.getUrlPath());
+    const viewConroller = (route._renderer && route._renderer._rootController) ||
       // else just instance of Route
       route.getState().view;
     this._handlers.routeWillEnter &&
@@ -712,11 +722,17 @@ class Router extends Route {
    * @param {Route} route
    */
   routeDidMatch(route) {
+    // alert(this.getUrlPath()+" "+Router._backUrl);
     const { match, action, routeData } = route.getState();
-    if (match.isExact) {
-      const prevUrl = this._currentUrl;
-      this.setasActiveRouter(action);
-    }
+    // this.setState({
+    //   backUrl: Router._backUrl
+    // });
+    // this._backUrl = Router._backUrl;
+    // Router._backUrl = null;
+    // if (match.isExact) {
+    // const prevUrl = this._currentUrl;
+    this.setasActiveRouter(action);
+    // }
   }
 
   /**
@@ -762,7 +778,7 @@ class Router extends Route {
    * @return {Router}
    */
   push(path, routeData = {}, animated = true) {
-    console.log('PUSH : ', path, ' ', this._state.url);
+    // console.log('PUSH : ', path, ' ', this._state.url);
     Router._nextAnimated = animated;
     // if (path === this._state.url) {
     //   Object.assign(this._historyController.history.location.state, {
@@ -783,7 +799,9 @@ class Router extends Route {
     if (path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;
     }
-    
+
+    console.info("fullPAth: ", path);
+
     if (Router.blocker) {
       Router.blocker(this, path, routeData, "PUSH", () => {
         this._pushHomes(path);
@@ -840,8 +858,7 @@ class Router extends Route {
       url
         ?
         this.dispatch(
-          typeof url === "string" ?
-          { url, hash: "", search: "", state: {} } :
+          typeof url === "string" ? { url, hash: "", search: "", state: {} } :
           url,
           "POP",
           this,
@@ -851,12 +868,10 @@ class Router extends Route {
       this._fromRouter = false;
     };
     if (Router.blocker) {
-      console.error("Yes Blockerrrr:>> ");
       Router.blocker(this, null, null, "POP", () => go());
 
       return this;
     }
-    console.error("No Blockerrrr:>> ");
     go();
   }
 

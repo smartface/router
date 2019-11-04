@@ -35,11 +35,13 @@ class Renderer {
   }
 
   present(controller, animated, onComplete) {
-    this._rootController.present({
-      controller,
-      animated,
-      onComplete
-    });
+    setTimeout(() => {
+      this._rootController.present({
+        controller,
+        animated,
+        onComplete
+      });
+    }, 1);
   }
 
   dismiss(onComplete, animated) {
