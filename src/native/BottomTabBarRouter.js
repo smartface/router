@@ -195,10 +195,6 @@ class BottomTabBarRouter extends NativeRouterBase {
    * @param {number} index
    */
   shouldSelectByIndex(index) {
-    // if (this._fromUser === true) {
-    //   this._fromRouter = false;
-    // }
-
     /*this._fromRouter = false;
     if (
       (this._tabStatus === userTabStatus.IDLE &&
@@ -216,33 +212,17 @@ class BottomTabBarRouter extends NativeRouterBase {
       })
       .catch(e => alert(e.message + " " + e.stack, "Error"));*/
 
-    // setTimeout(() => {
-    //   this.pushRoute(this._routes[index]);
-    //   this._fromRouter = true;
-    // });
-    // }
-    
-    this._fromUser = true;
-    try {
-      return true;
-      // Router._lock ? false : System.OS === "iOS" ? this._currentIndex != index : true;  
-    } finally {
-      if(this._fromUser === true){
-        this._fromRouter = false;
-        const current = this._currentIndex;
-        // setTimeout(() => {
-          
-        // }, 0);
+   if(this._fromUser === true){
+      this._fromRouter = false;
+      const current = this._currentIndex;
+      setTimeout(() => {
         this._onTabChangedByUser && this._onTabChangedByUser(this, {prevTabIndex: current, tabIndex: index });
-        
-      }
-      
-      this._fromUser = true;
+      }, 0);
     }
     
-    /*return (
-      this._currentIndex != index && this._tabStatus === userTabStatus.IDLE
-    );*/
+    this._fromUser = true;
+
+    return Router._lock ? false : System.OS === "iOS" ? this._currentIndex != index : true;
   }
 
   /**

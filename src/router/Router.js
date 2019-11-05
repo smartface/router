@@ -617,7 +617,6 @@ class Router extends Route {
    * @param {string} action
    */
   routeWillEnter(route, action) {
-    console.log("Route will be entered : ", this.getUrlPath());
     const viewConroller = (route._renderer && route._renderer._rootController) ||
       // else just instance of Route
       route.getState().view;
