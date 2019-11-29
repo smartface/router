@@ -660,7 +660,7 @@ Following cases cannot be handled by the blocker:
 ## Listening history changes
 
 ```js
-const unlisten = router.getHistory().listen((location, action) => {
+const unlisten = router.listen((location, action) => {
   console.log(`new route action :  ${action} path : ${location.url}`);
 });
 
