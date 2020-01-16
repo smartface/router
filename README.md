@@ -224,11 +224,7 @@ const router = Router.of({
     StackRouter.of({
       path: "/bottom/stack2",
       to: "/bottom/stack2/path1",
-      headerBarParams: () => {
-        ios: {
-          translucent: false;
-        }
-      },
+      headerBarParams: () =>  ({ ios: { translucent: false } }),
       routes: [
         Route.of({
           path: "/pages/page1",
@@ -329,11 +325,7 @@ const router = Router.of({
         StackRouter.of({
           path: "/bottom/stack",
           to: "/bottom/stack/path1",
-          headerBarParams: () => {
-            ios: {
-              translucent: false;
-            }
-          },
+          headerBarParams: () =>  ({ ios: { translucent: false } }),
           routes: [
             Route.of({
               path: "/bottom/stack/path1",
@@ -354,11 +346,7 @@ const router = Router.of({
         StackRouter.of({
           path: "/bottom/stack2",
           to: "/bottom/stack2/path1",
-          headerBarParams: () => {
-            ios: {
-              translucent: false;
-            }
-          },
+          headerBarParams: () =>  ({ ios: { translucent: false } }),
           routes: [
             Route.of({
               path: "/bottom/stack2/path1",
@@ -408,11 +396,7 @@ const router = Router.of({
     StackRouter.of({
       path: "/bottom/stack2",
       to: "/bottom/stack2/path1",
-      headerBarParams: () => {
-        ios: {
-          translucent: false;
-        }
-      },
+      headerBarParams: () =>  ({ ios: { translucent: false } }),
       routes: [
         Route.of({
           path: "/bottom/stack2/path1",
@@ -471,11 +455,7 @@ StackRouter.of({
   path: "/bottom/stack2",
   to: "/bottom/stack2/path1",
   homeRoute: 0, // it means /bottom/stack2/path
-  headerBarParams: () => {
-    ios: {
-      translucent: false;
-    }
-  },
+  headerBarParams: () =>  ({ ios: { translucent: false } }),
   routes: [
     Route.of({
       path: "/bottom/stack2/path1",
