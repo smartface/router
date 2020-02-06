@@ -36,12 +36,12 @@ const createLocation = (path, state, key, currentLocation) => {
 
     if (location.url === undefined) location.url = "";
 
-    if (location.query) {
-      if (location.query.charAt(0) !== "?")
-        location.query = "?" + location.query;
+    if (location.rawQuery) {
+      if (location.rawQuery.charAt(0) !== "?")
+        location.rawQuery = "?" + location.rawQuery;
     }
     else {
-      location.query = "";
+      location.rawQuery = "";
     }
 
     if (location.hash) {
