@@ -6,8 +6,7 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'Default-Linux'
+pool: "Default-Linux"
 
 steps:
 - task: NodeTool@0
