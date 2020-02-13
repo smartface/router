@@ -18,6 +18,7 @@ steps:
     npm install
     npm run test
     npm version $(NPM_VERSION)
-    npm publish
+    
+    env NPM_TOKEN=$(NPM_TOKEN) npm publish
     git push && git push tags
   displayName: 'npm publish'
