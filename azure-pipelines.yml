@@ -19,6 +19,8 @@ steps:
     npm run test
   displayName: 'npm test'
 - script: |
+    git config user.name "Smartface System" 
+    git config user.email $(NPM_EMAIL)
     npm version $(NPM_VERSION)
   displayName: 'npm publish'
 - script: |
