@@ -13,12 +13,16 @@ steps:
   inputs:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
-
+- script: |
+    npm install -g npm-cli-login
+    NPM_USER=$(NPM_USER) NPM_PASS=$(NPM_PASS) NPM_EMAIL=$(NPM_EMAIL) npm-cli-login
+  displayName: 'npm login'
 - script: |
     npm install
     npm run test
+  displayName: 'npm publish'
+- script: |
     npm version $(NPM_VERSION)
-    echo "registry.npmjs.org/:_authToken=$(NPM_TOKEN)" > .npmrc
     npm publish
     git push && git push tags
   displayName: 'npm publish'
