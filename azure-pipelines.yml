@@ -20,7 +20,6 @@ steps:
   displayName: 'npm test'
 - script: |
     npm version $(NPM_VERSION)
-    npm publish
   displayName: 'npm publish'
 - script: |
     git branch temp-branch
