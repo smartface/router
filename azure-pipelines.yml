@@ -21,5 +21,11 @@ steps:
 - script: |
     npm version $(NPM_VERSION)
     npm publish
-    git push && git push tags
   displayName: 'npm publish'
+- script: |
+    git branch temp-branch
+    git checkout $(Build.SourceBranchName)
+    git merge temp-branch
+    git push origin $(Build.SourceBranchName)
+    git push --tags
+  displayName: 'git push'
