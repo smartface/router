@@ -3,9 +3,6 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
-trigger:
-- master
-
 pool: "Default-Linux"
 
 steps:
@@ -20,7 +17,7 @@ steps:
 - script: |
     npm install
     npm run test
-  displayName: 'npm publish'
+  displayName: 'npm test'
 - script: |
     npm version $(NPM_VERSION)
     npm publish
