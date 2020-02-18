@@ -799,7 +799,6 @@ class Router extends Route {
       path = this._path.getPath() + "/" + path;
     }
 
-    console.info("fullPAth: ", path);
 
     if (Router.blocker) {
       Router.blocker(this, path, routeData, "PUSH", () => {
