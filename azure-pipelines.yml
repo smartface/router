@@ -23,6 +23,7 @@ steps:
     git config user.name "Smartface System" 
     git config user.email $(NPM_EMAIL)
     npm version $(NPM_VERSION)
+    npm publish
   displayName: 'npm publish'
 - script: |
     git branch temp-branch
