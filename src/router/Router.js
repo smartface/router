@@ -18,7 +18,7 @@ const dispatch = (location, action) => {
   history.push([location.url, action]);
   listeners.forEach(listener => listener(location, action));
   action === "PUSH" 
-    ? historyController.pushLocation({...location}) // TODO: not share loaction instance
+    ? historyController.pushLocation(Object.assign({}, location)) // TODO: not share loaction instance
     : historyController.goBack();
 };
 
