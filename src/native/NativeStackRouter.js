@@ -30,7 +30,7 @@
 
 const NativeRouterBase = require("./NativeRouterBase");
 const Router = require("../router/Router");
-const NavigationController = require("sf-core/ui/navigationcontroller");
+const NavigationController = require("@smartface/native/ui/navigationcontroller");
 const createRenderer = require("./createRenderer");
 
 /**
@@ -40,8 +40,8 @@ const createRenderer = require("./createRenderer");
  * @extends {Router}
  * @example
  * const {NativeStackRouter, Route} = require('@smartface/router');
- * const Image = require('sf-core/ui/image');
- * const Color = require('sf-core/ui/color');
+ * const Image = require('@smartface/native/ui/image');
+ * const Color = require('@smartface/native/ui/color');
  *
  * var router = Router.of({
  *  path: "/",
@@ -78,9 +78,9 @@ const createRenderer = require("./createRenderer");
  *
  * @example
  * const extend = require("js-base/core/extend");
- * const System = require("sf-core/device/system");
- * const Application = require("sf-core/application");
- * const AlertView = require("sf-core/ui/alertview");
+ * const System = require("@smartface/native/device/system");
+ * const Application = require("@smartface/native/application");
+ * const AlertView = require("@smartface/native/ui/alertview");
  * const {NativeStackRouter} = require('@smartface/router');
  *
  * // Get generated UI code

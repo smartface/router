@@ -18,11 +18,11 @@
  * @property {number} prevTabIndex Previous tab index
  * @property {number} tabIndex Changed tab index
  */
-const System = require("sf-core/device/system");
+const System = require("@smartface/native/device/system");
 const NativeRouterBase = require("./NativeRouterBase");
-const BottomTabBarController = require("sf-core/ui/bottomtabbarcontroller");
+const BottomTabBarController = require("@smartface/native/ui/bottomtabbarcontroller");
 const createRenderer = require("./createRenderer");
-const TabBarItem = require("sf-core/ui/tabbaritem");
+const TabBarItem = require("@smartface/native/ui/tabbaritem");
 const functionMaybe = require("../utils/funcorVal");
 const Router = require("../router/Router");
 
@@ -47,8 +47,8 @@ const userTabStatus = {
  * @extends {Router}
  * @example
  * const {BottommTabBarRouter, Route} = require('@smartface/router')
- * const Image = require('sf-core/ui/image');
- * const Color = require('sf-core/ui/color');
+ * const Image = require('@smartface/native/ui/image');
+ * const Color = require('@smartface/native/ui/color');
  *
  * var router = Router.of({
  *  path: "/",

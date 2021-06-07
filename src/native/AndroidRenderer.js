@@ -1,6 +1,6 @@
-const AlertView = require("sf-core/ui/alertview");
+const AlertView = require("@smartface/native/ui/alertview");
 const Renderer = require("./Renderer");
-const Application = require("sf-core/application");
+const Application = require("@smartface/native/application");
 
 
 let stack = [];
