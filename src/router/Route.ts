@@ -320,7 +320,7 @@ export default class Route {
    * @param {string} url
    * @return {RouteMatch}
    */
-  matchPath(url: string): {
+  matchPath(url: string) {
     return matchUrl(url, this._options);
   }
 
