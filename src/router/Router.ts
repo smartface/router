@@ -1,20 +1,30 @@
-"use strict";
+import Route from "./Route";
+import matchRoutes from "../common/matchRoutes";
+import { HistoryController } from "../common/HistoryController";
+import funcorVal from "../utils/funcorVal";
+import createRouteStore from "./routeStore";
+import type { Location } from "common/Location";
+import type { HistoryActions } from "common";
+import { BlockHandler } from "common/history";
+import { RouteParams } from "./RouteParams";
+import Route from "./Route";
+import Route from "./Route";
 
-const Route = require("./Route");
-const matchRoutes = require("../common/matchRoutes");
-const createHistory = require("../common/createHistory");
-const createStore = require("./routeStore");
-const funcorVal = require("../utils/funcorVal");
-let tasks = [];
+type RouterParams = RouteParams & {homeRoute?: number, isRoot: boolean}
 
-let historyController;
+let tasks: any[] = [];
 
-let _lastRoute;
-const listeners = new Set();
-const history = [];
-let store;
+let historyController: HistoryController;
 
-const dispatch = (location, action) => {
+let _lastRoute: Route;
+let _backUrl:string;
+let _activeRouter: Router;
+
+const listeners = new Set<Function>();
+const history:any[] = [];
+let store: ReturnType<typeof createRouteStore>;
+
+const dispatch = (location: Location, action: string,) => {
   history.push([location.url, action]);
   listeners.forEach(listener => listener(location, action));
   action === "PUSH" 
@@ -22,16 +32,16 @@ const dispatch = (location, action) => {
     : historyController.goBack();
 };
 
-function handleRouteUrl(router, url, routeData, action) {
-  if (url === router._state.prevUrl) return;
+function handleRouteUrl(controller: HistoryController, prevUrl: string = '', url: string, routeData: object, action: HistoryActions) {
+  if (url === prevUrl) return;
 
-  router._historyController.preventDefault();
+  controller.preventDefault();
   switch (action) {
     case "PUSH":
-      router._historyController.push(url, routeData);
+      controller.push(url, routeData);
       break;
     case "POP":
-      router._historyController.goBack();
+      controller.goBack();
       break;
   }
 }
@@ -185,11 +195,12 @@ function handleRouteUrl(router, url, routeData, action) {
  * @since 1.0.0
  * @extends {Route}
  */
-class Router extends Route {
+export default class Router extends Route {
 
   static getGlobalRouter() {
     return historyController;
   }
+
   static getHistoryStack() {
     return history.slice();
   }
@@ -198,11 +209,11 @@ class Router extends Route {
     return history[history.length - 1];
   }
 
-  static getlocationHistoryByIndex(index) {
+  static getlocationHistoryByIndex(index:number) {
     return history[history.length - 1];
   }
 
-  static getHistoryByIndex(index) {
+  static getHistoryByIndex(index:number) {
     return index < 0 ? history[history.length - index] : history[index];
   }
   /**
@@ -210,65 +221,50 @@ class Router extends Route {
    *
    * @param {RouterParams} props
    */
-  static of (props = {}) {
+  static of (props: RouterParams) {
     return new Router(props);
   }
 
-  static createBlocker(fn) {
-    return (router, path, routeData, action, doneFn) => {
-      fn(path, routeData, action, ok => ok && doneFn());
+  // TODO: Make type RouteBlockHandler
+  static createBlocker(fn: Function) {
+    return (router: Router, path: string, routeData: object, action: HistoryActions, doneFn: Function) => {
+      fn(path, routeData, action, (ok: boolean) => ok && doneFn());
     };
   }
 
   static getActiveRouter() {
-    return Router._activeRouter;
+    return _activeRouter;
   }
+
+  private _historyController?: HistoryController;
+  private _homeRoute?:number;
+  private _historyUnlisten: Function = () => null;
+  // private _routes: Route[] = []
 
   /**
    * @constructor
    * @param {RouterParams} param
    */
-  constructor({
-    path = "",
-    build = null,
-    routes = [],
-    exact = false,
-    sensitive = true,
-    strict = true,
-    isRoot = false,
-    to = null,
-    modal = false,
-    routerDidEnter,
-    routerDidExit,
-    routeShouldMatch,
-    routeWillEnter = null,
-    homeRoute = null
-  }) {
-    super({ path, modal, build, routes, to, isRoot, routeShouldMatch });
-    this._homeRoute = homeRoute;
-    this._historyUnlisten = () => null;
-    this._handlers = {
-      routerDidEnter,
-      routerDidExit,
-      routeWillEnter
-    };
+  constructor(options: RouterParams) {
+    super(options, {});
+    this._homeRoute = options.homeRoute;
 
-    if (isRoot) {
-      store = createStore();
+    if (options.isRoot) {
+      store = createRouteStore();
       // this._store = createStore();
       /** @type {HistoryListener} */
       listeners.clear();
-      historyController = createHistory({
-        sensitive,
-        strict,
-        exact,
-        path,
-        getUserConfirmation: (blockerFn, callback) => {
+      historyController = new HistoryController({
+        sensitive: options.sensitive,
+        strict: options.strict,
+        exact: options.exact,
+        path: options.path,
+        getUserConfirmation: (blockerFn: Function, callback: Function) => {
           return blockerFn(callback);
         }
       });
 
-      const pushHomes = path => {
+      const pushHomes = (path: string) => {
         const matches = matchRoutes(store, [this].concat(this._routes), path);
         let len = 0;
         while (++len < matches.length) {
@@ -301,11 +297,15 @@ class Router extends Route {
    * @since 1.4.1
    * @param {function(child:(Route|Router), index:number)}
    */
-  findChild(fn) {
+  findChild(fn: Parameters<Array<Route|Router>['find']>[0]) {
     return this._routes.find(fn);
   }
+
+  historyPreventDefault(){
+    this._historyController?.preventDefault();
+  }
   
-  pushAndBack(url, routeData) {
+  pushAndBack(url: string, routeData: any) {
     Router._backUrl = Router.getGlobalRouter().lastLocation;
     this.push(url, routeData);
   }
@@ -567,7 +567,7 @@ class Router extends Route {
         // then push or pop route to child router's history.
         // Because current router isn't aware of the route.
         if (target != this) {
-          handleRouteUrl(this, match.url, routeData, action);
+          this._historyController && handleRouteUrl(this._historyController, this.state.prevUrl, match.url, routeData, action);
         }
 
         // Views' tasks must be end of the matches rendering,
@@ -924,20 +924,20 @@ class Router extends Route {
    * @experimental
    * @param {Route} route
    */
-  add(route) {
+  add(route: Route) {
     this._routes.push(route);
   }
 
-  /**
-   * Iterates child routes
-   *
-   * @since 1.0.0
-   * @param {function} fn
-   * @return {Array}
-   */
-  map(fn) {
-    return this._routes.map(fn);
-  }
+  // /**
+  //  * Iterates child routes
+  //  *
+  //  * @since 1.0.0
+  //  * @param {function} fn
+  //  * @return {Array}
+  //  */
+  // map(fn) {
+  //   return this._routes.map(fn);
+  // }
 
   /**
    * Unloads the router
@@ -963,5 +963,3 @@ class Router extends Route {
 Router._lock = false;
 Router._nextAnimated = true;
 Router._activeRouter = null;
-
-module.exports = Router;

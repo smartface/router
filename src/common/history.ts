@@ -1,11 +1,14 @@
 // https://github.com/ReactTraining/history
-"use strict";
-
 const resolvePathname = require("resolve-pathname/umd/resolve-pathname");
-const parseUrl = require("./parseUrl");
+const createTransitionManager = require("./createTransitionManager");
+
+import parseUrl from "./parseUrl";
+import type { RouteLocation } from "router/RouteLocation";
+import { clamp } from "./clamp";
+import { Location } from "./Location";
 
 const warning = require("./warning");
-const createPath = location => {
+const createPath = (location: { url: string, search: string, hash: string }) => {
   const { url, search, hash } = location;
 
   let path = url || "/";
@@ -18,13 +21,54 @@ const createPath = location => {
   return path;
 };
 
-const createTransitionManager = require("./createTransitionManager");
+/**
+ * @typedef {function(location: RouteLocation, action: string)} HistoryListener
+ */
+export type HistoryListenHandler = (location: Location, action: string) => void;
+export type BlockHandler = (prompt?: Function|null) => Function;
+/**
+ * History implementation
+ *
+ * @typedef {object} History
+ *
+ * @property {number} length Length of the history stack
+ * @property {string} action Last action
+ * @property {number} index Current active index of the history
+ * @property {Array<RouteLocation>} entries
+ * @property {function} createHref Creates an appropriate url given data
+ * @property {function(path: string, data: object)} push Pushes a new entry
+ * @property {function(path: string, data: object)} replace Replaces specified history entry with a desired one
+ * @property {function} rollback Rollback last entry
+ * @property {function(index: number)} go Jumps to desired history entry by index
+ * @property {function} clear Clears all history
+ * @property {function} goBack Jumps to previous entry
+ * @property {function} goForward Jumps to next entry
+ * @property {function(index: number):boolean} canGo Checks if history goes back or not
+ * @property {function(fn: BlockHandler):function} block Blocks history changes to ask user or run an another process then resume or break it.
+ * @property {function(fn: HistoryListenHandler):function} listen Adds event-handlers to listen history changes.
+ *
+ */
+export type History = {
+  length: number,
+  action: string,
+  index: number,
+  entries: Location[],
+  createHref: typeof createPath,
+  push(path: string|Location, data: object): void,
+  replace(path: string, data: object): void,
+  rollback(): void,
+  go(index: number): void,
+  clear(): void,
+  goBack(): void,
+  goForward():void,
+  canGo(index: number): boolean, 
+  block: BlockHandler,
+  listen(fn: HistoryListenHandler): Function
+}
 
-const clamp = (n, lowerBound, upperBound) =>
-  Math.min(Math.max(n, lowerBound), upperBound);
 
-const createLocation = (path, state, key, currentLocation) => {
-  let location;
+function createLocation(path: string|Location, state?: any, key?: string, currentLocation?: any): Location {
+  let location: Location;
   if (typeof path === "string") {
     // Two-arg form: push(path, state)
     location = parseUrl(path);
@@ -96,12 +140,19 @@ const createLocation = (path, state, key, currentLocation) => {
   return location;
 };
 
+export type HistoryProps = {
+  getUserConfirmation?: any,
+  initialEntries?: any[],
+  initialIndex?:number,
+  keyLength?: number
+}
+
 /**
  * Creates a history object that stores locations in memory.
  * @ignore
  * @return {History}
  */
-const createMemoryHistory = (props = {}) => {
+export default function createMemoryHistory(props:HistoryProps = {}): History {
   const {
     getUserConfirmation,
     initialEntries = [],
@@ -111,7 +162,7 @@ const createMemoryHistory = (props = {}) => {
 
   const transitionManager = createTransitionManager();
 
-  const setState = nextState => {
+  const setState = (nextState?: any) => {
     Object.assign(history, nextState);
 
     history.length = history.entries.length;
@@ -137,11 +188,11 @@ const createMemoryHistory = (props = {}) => {
   const createHref = createPath;
 
   const confirmTransitionTo = (
-    path,
-    action,
-    state,
-    getUserConfirmation,
-    handler,
+    path: string,
+    action: string,
+    state: any,
+    getUserConfirmation: Function,
+    handler: (location: Location, ok: boolean) => void,
     key = ""
   ) => {
     const location = createLocation(
@@ -154,11 +205,11 @@ const createMemoryHistory = (props = {}) => {
       location,
       action,
       getUserConfirmation,
-      ok => handler(location, ok)
+      (ok: boolean) => handler(location, ok)
     );
   };
   let lastPath;
-  const push = (path, state) => {
+  const push = (path: Location|string, state: any) => {
     lastPath = path;
     warning(!(
         typeof path === "object" &&
@@ -176,7 +227,7 @@ const createMemoryHistory = (props = {}) => {
       location,
       action,
       getUserConfirmation,
-      ok => {
+      (ok: boolean) => {
         if (!ok) return;
 
         const prevIndex = history.index;
@@ -204,7 +255,7 @@ const createMemoryHistory = (props = {}) => {
     );
   };
 
-  const replace = (path, state) => {
+  const replace = (path: string|Location, state: any) => {
     warning(!(
         typeof path === "object" &&
         path.state !== undefined &&
@@ -221,7 +272,7 @@ const createMemoryHistory = (props = {}) => {
       location,
       action,
       getUserConfirmation,
-      ok => {
+      (ok: boolean) => {
         if (!ok) return;
 
         history.entries[history.index] = location;
@@ -232,7 +283,7 @@ const createMemoryHistory = (props = {}) => {
   };
 
 
-  const go = n => {
+  const go = (n:number) => {
     const nextIndex = clamp(history.index + n, 0, history.entries.length - 1);
 
     const action = "POP";
@@ -242,7 +293,7 @@ const createMemoryHistory = (props = {}) => {
       location,
       action,
       getUserConfirmation,
-      ok => {
+      (ok: boolean) => {
         if (ok) {
           setState({
             action,
@@ -259,7 +310,7 @@ const createMemoryHistory = (props = {}) => {
     );
   };
 
-  const getNextLocation = n => {
+  const getNextLocation = (n: number) => {
     const nextIndex = clamp(history.index + n, 0, history.entries.length - 1);
     return history.entries[nextIndex];
   };
@@ -282,7 +333,7 @@ const createMemoryHistory = (props = {}) => {
     setState();
   };
 
-  const silencePush = (path, state) => {
+  const silencePush = (path: string|Location, state: any) => {
     const action = "PUSH";
     const location = createLocation(path, state, createKey(), history.location);
     history.entries.push(location);
@@ -290,15 +341,15 @@ const createMemoryHistory = (props = {}) => {
     history.index++;
   };
 
-  const canGo = n => {
+  const canGo = (n: number) => {
     const nextIndex = history.index + n;
 
     return nextIndex >= 0 && nextIndex < history.entries.length;
   };
 
-  const block = (prompt = false) => transitionManager.setPrompt(prompt);
+  const block: BlockHandler = (prompt: Function|boolean|null = false) => transitionManager.setPrompt(prompt);
 
-  const listen = listener => transitionManager.appendListener(listener);
+  const listen = (listener: Function) => transitionManager.appendListener(listener);
 
   /**
    * @type History
@@ -328,5 +379,3 @@ const createMemoryHistory = (props = {}) => {
 
   return history;
 };
-
-module.exports = createMemoryHistory;

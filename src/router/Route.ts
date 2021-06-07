@@ -1,132 +1,19 @@
-"use strict";
+/** @ts-ignore */
+import Page = require("sf-core/ui/Page");
+
+import { matchUrl } from "../common/matchPath";
+import mapComposer, { MapFunction } from "../utils/map";
+import { MatchOptions } from "common/MatchOptions";
+import Router from "./Router";
+import { RoutePath } from "./RoutePath";
+import { RouteState } from "./RouteState";
+import { RouteParams } from "./RouteParams";
 
 /**
- * @typedef {object} RouteMatch Object seperately keeps parsed and matched data of the request for every route
- * @property {boolean} isExact if Requested path is an exact match or not.
- * @property {Object} params Request params like id or name is represented by '/path/:id' or '/path2/:name'
- * @property {string} path Matched route's path
- * @property {string} url Requested route path
+ * @typedef {function(path: string, routeData: object, action: string, okFn: function)} RouterBlockHandler
  */
+type RouteBlockHandler = (path: string, routeData: object, action: string, okFn: Function) => void;
 
-/**
- * @typedef {object} RouteLocation History entry of a request
- * @property {!string} url Requested url
- * @property {?string} query Url's search data
- * @property {?string} hash Url's hash data
- * @property {?RouteState} state Requested data to destination route
- * @property {!string} key Auto generated unique key
- */
-
-/**
- * @typedef {object} RouteParams
- * @property {!string} path Route Path definition
- * @property {?string | ?function(router: Router, route: route)} [to=null] Redirection url
- * @property {?Array<Route>} [routes=[]] Route children
- * @property {?function(router: Router, route: Route)} [build=null] Route's view builder
- * @property {?Array<Route>} [build=null] Route's view builder
- * @property {?boolean} [exact=false]  Points that a route match must be exact or not. If a route is exact then it's chld routes cannot be received.
- * @property {?boolean} [sensitive=false] If path matching is case-sensitive or not.
- * @property {?modal} [modal=false] If route is displayed as modal or not.
- * @property {?function(route: Route, nextState: RouteState)} routeShouldMatch Handles if route is mathed as request url
- * @property {?function(Router: Router, route: Route)} routeDidEnter Handles if route is displayed
- * @property {?function(Router: Router, route: Route)} routeDidExit Handles if route is removed
- */
-
-/**
- * @typedef {object} RouteState
- * @property {?object} [routeData ={}] Requested data by user
- * @property {!string} action Request action 'PUSH', 'POP' or 'REPLACE'
- * @property {object} query Request's query-string
- * @property {string} rawQuery String version of the request's query-string
- * @property {boolean} active If Route is currently displayed or not.
- * @property {string} hash Request's url hash comes after '#' char. For example '/path/to#a-hash'
- * @property {!RouteMatch} match Request's match result
- * @property {!object} view Keeps requested route's view
- * @property {!string} url Requested url
- * @property {!string} prevUrl Previously requested url
- * @property {?object} [routingState={}] Keeps user data when route runs
- */
-
-const matchUrl = require("../common/matchPath").matchUrl;
-const mapComposer = require("../utils/map");
-
-/**
- * Route's path ValueObject
- * For internal use
- * @access private
- * @class
- * @since 1.0.0
- */
-class RoutePath {
-  /**
-   * Factory method to create a new instance
-   *
-   * @param {string} path
-   * @since 1.0.0
-   */
-  static of(path) {
-    return new RoutePath(path);
-  }
-
-  /**
-   * @constructor
-   * @param {string} path
-   * @since 1.0.0
-   */
-  constructor(path) {
-    this._path = path;
-  }
-
-  /**
-   * Returns route path
-   * @return {string}
-   * @since 1.0.0
-   */
-  getPath() {
-    return this._path;
-  }
-
-  /**
-   * Returns route is root or not.
-   *
-   * @returns {boolean}
-   * @since 1.0.0
-   */
-  isRoot() {
-    return this._path === "/";
-  }
-
-  /**
-   * Return quick representaion of the route-path
-   *
-   * @since 1.0.0
-   * @returns {{path: string, isRoot: boolean}}
-   */
-  toObject() {
-    return {
-      path: this._path,
-      isRoot: this.isRoot
-    };
-  }
-
-  /**
-   * @since 1.0.0
-   * @returns {RoutePath}
-   */
-  clone() {
-    return new RoutePath(this._path);
-  }
-
-  /**
-   * Return path is empty or not
-   *
-   * @since 1.0.0
-   * @return {boelean}
-   */
-  hasPath() {
-    return this._path !== null || this._path !== undefined || this._path !== "";
-  }
-}
 
 /**
  * Route implementation
@@ -134,7 +21,7 @@ class RoutePath {
  * @since 1.0.0
  * @class
  */
-class Route {
+export default class Route {
   /**
    * Static helper method to create a new instance of Route
    *
@@ -144,9 +31,25 @@ class Route {
    * @param {RouteState} state Initial state
    * @return {Route}
    */
-  static of(params = {}, state = {}) {
+  static of(params: RouteParams, state: RouteState) {
     return new Route(params, state);
   }
+
+  public map?: MapFunction<Route>;
+
+  protected _options: MatchOptions = {};
+  protected _isDIrty = false;
+  protected _strict = false;
+  protected _path: RoutePath;
+  protected _routes: Route[] = [];
+  protected _to: RouteParams['to'];
+  protected _routeShouldMatch: RouteParams['routeShouldMatch'];
+  protected _routeDidEnter: RouteParams['routeDidEnter'];
+  protected _routeDidExit: RouteParams['routeDidExit'];
+  protected _modal: boolean = false;
+  protected _state: RouteState;
+  protected _exact = false;
+  protected _build: RouteParams['build'];
   /**
    * @constructor
    * @param {RouteParams} param0 Route properties
@@ -154,49 +57,56 @@ class Route {
    */
   constructor(
     {
-      path = null,
-      to = null,
+      path = "",
+      to,
       routes = [],
-      build = null,
+      build,
       exact = false,
       sensitive = false,
       strict = false,
       modal = false,
-      routeShouldMatch = null,
+      routeShouldMatch,
       routeDidEnter,
-      routeDidExit
-    } = {},
+      routeDidExit,
+    }: Omit<RouteParams, 'path'> & {path: string | RoutePath},
     {
       match = {},
       routeData = {},
       view = null,
       routingState = {},
-      action = null,
-      url = null,
+      action = "",
+      url = "",
       active = false,
-      query = "",
-      rawQuery = null,
-      hash = ""
-    } = {}
+      query = {},
+      rawQuery = "",
+      hash = "",
+    }: Partial<RouteState>
   ) {
-    this._options = {
-      exact,
-      path,
-      sensitive,
-      strict
-    };
+    
+    // this._handlers = {
+    //   routerDidEnter: options.routeDidEnter,
+    //   routerDidExit,
+    //   routeWillEnter
+    // };
+
     this._exact = exact;
     this._isDIrty = false;
     this._strict = false;
     this._build = build;
     this._path = path instanceof RoutePath ? path : new RoutePath(path);
     this._routes = routes;
-    this.map = mapComposer.call(this, this._routes);
+    this.map = mapComposer<Route>(this._routes)
     this._to = to;
     this._routeShouldMatch = routeShouldMatch;
     this._routeDidEnter = routeDidEnter;
     this._routeDidExit = routeDidExit;
     this._modal = modal;
+    this._options = {
+      exact,
+      path: this._path.getPath(),
+      sensitive,
+      strict,
+    };
     this._state = Object.seal({
       match,
       query,
@@ -208,8 +118,12 @@ class Route {
       action,
       url,
       active,
-      prevUrl: null
+      prevUrl: undefined
     });
+  }
+
+  get state() {
+    return this._state;
   }
 
   /**
@@ -225,7 +139,7 @@ class Route {
    * @since 1.0.0
    * @param {object} state
    */
-  setState(state) {
+  setState(state: Partial<RouteState>) {
     this._state = Object.assign(this._state, state);
   }
 
@@ -251,12 +165,12 @@ class Route {
       match: this._state.routeData,
       routeData: this._state.routeData,
       routingState: this._state.routingState,
-      path: this._path.getPath(),
+      path: this._path?.getPath(),
       routes: this._routes.slice(),
       state: Object.assign({}, this._state, {
         view:
-          (this._state.view && this._state.view.constructor.name) || undefined
-      })
+          (this._state.view && this._state.view.constructor.name) || undefined,
+      }),
     };
   }
 
@@ -272,8 +186,8 @@ class Route {
     }, path: ${this.getUrlPath()}, url: ${this._state.url}]`;
   }
 
-  setUrl(url) {
-    if (!url) throw new TypeError(`[${this}] Route url cannot be empty`);
+  setUrl(url: string) {
+    if (typeof url !== 'string') throw new TypeError(`[${this}] url must be string`);
     this.setState({ url, prevUrl: this._state.url });
     this._isDIrty = true;
   }
@@ -321,7 +235,7 @@ class Route {
    * @param {Router} router - Not the root router, the router which the route belongs to.
    * @return {Page} view = null - If the route has been built once, the previous view (page) is given. Otherwise it is null. If view is not null, returning the view back makes it singleton.
    */
-  build(router) {
+  build(router: Router): Page | null {
     return this._build ? this._build(router, this) : null;
   }
 
@@ -347,7 +261,7 @@ class Route {
    * @param {Router} router
    * @return {boolean}
    */
-  routeShouldMatch(router) {
+  routeShouldMatch(router: Router) {
     return this._routeShouldMatch ? this._routeShouldMatch(router, this) : true;
   }
 
@@ -367,7 +281,7 @@ class Route {
    * @event
    * @param {Router} router
    */
-  routeDidEnter(router) {
+  routeDidEnter(router: Router) {
     return this._routeDidEnter ? this._routeDidEnter(router, this) : true;
   }
 
@@ -387,7 +301,7 @@ class Route {
    * @event
    * @param {Router} router
    */
-  routeDidExit(router) {
+  routeDidExit(router: Router) {
     return this._routeDidExit ? this._routeDidExit(router, this) : true;
   }
 
@@ -406,7 +320,7 @@ class Route {
    * @param {string} url
    * @return {RouteMatch}
    */
-  matchPath(url) {
+  matchPath(url: string): {
     return matchUrl(url, this._options);
   }
 
@@ -449,7 +363,7 @@ class Route {
         path: this._path.clone(),
         path: this._path,
         props: Object.assign({}, this._props),
-        build: this._build
+        build: this._build,
       },
       Object.assign(
         {
@@ -460,12 +374,10 @@ class Route {
           active: this._state.active,
           url: this._state.url,
           view: this._state.view,
-          query: this._state.query
+          query: this._state.query,
         },
         state
       )
     );
   }
 }
-
-module.exports = Route;

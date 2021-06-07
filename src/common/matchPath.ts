@@ -1,8 +1,11 @@
 /* from react-router */
 
-const pathToRegexp = require("path-to-regexp");
-const parseUrl = require("./parseUrl");
-const patternCache = {};
+import pathToRegexp from "path-to-regexp";
+import type {Key, RegExpOptions} from "path-to-regexp";
+import parseUrl from "./parseUrl";
+import { MatchOptions } from "./MatchOptions";
+
+const patternCache: {[key: string]: any} = {};
 const cacheLimit = 10000;
 let cacheCount = 0;
 
@@ -11,13 +14,13 @@ let cacheCount = 0;
  * @param {*} pattern
  * @param {*} options
  */
-const compilePath = (pattern, options) => {
+export const compilePath = (pattern: string, options: RegExpOptions) => {
   const cacheKey = `${options.end}${options.strict}${options.sensitive}`;
   const cache = patternCache[cacheKey] || (patternCache[cacheKey] = {});
 
   if (cache[pattern]) return cache[pattern];
 
-  const keys = [];
+  const keys: Key[] = [];
   const re = pathToRegexp(pattern, keys, options);
   const compiledPattern = {
     re,
@@ -32,17 +35,22 @@ const compilePath = (pattern, options) => {
   return compiledPattern;
 };
 
+type Pathname = string;
+
 /**
  * Public API for matching a URL pathname to a path pattern.
  * @ignore
  */
-const matchPath = (pathname, options = {}, parent) => {
+export const matchPath = (pathname: string, options:MatchOptions|Pathname = {}, parent: string) => {
+  let _options: MatchOptions;
   if (typeof options === "string")
-    options = {
+    _options = {
       path: options
     };
-
-  const { path, exact = false, strict = false, sensitive = false } = options;
+  else
+    _options = options;
+  
+  const { path, exact = false, strict = false, sensitive = false } = _options;
 
   if (path == null) return parent;
 
@@ -79,13 +87,7 @@ const matchPath = (pathname, options = {}, parent) => {
  * @param {*} options
  * @return {RouteMatch}
  */
-const matchUrl = (url, options) => {
+export const matchUrl = (url: string, options: MatchOptions) => {
   const res = matchPath(parseUrl(url).url, options);
   return res;
-};
-
-module.exports = {
-  compilePath,
-  matchPath,
-  matchUrl
 };

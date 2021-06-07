@@ -1,16 +1,20 @@
 // based from react-router
 "use strict";
 
+import type Route from "router/Route";
+import type Router from "router/Router";
+import type { RouteStore } from "router/routeStore";
+
 /**
  *
  * @ignore
- * @param {object} store
+ * @param {RouteStore} store
  * @param {Array<Route>} routes
  * @param {string} pathname
  * @param {Array} [branch=[]] not public API
  * @return {Array<{match: RouteMatch, route: Route}>}
  */
-const matchRoutes = (store, routes, pathname, branch = []) => {
+const matchRoutes = (store: RouteStore, routes: (Route|Router)[], pathname: string, branch: any[] = []) => {
   routes.some(route => {
     const match = route.hasPath()
       ? route.matchPath(pathname)
@@ -25,7 +29,7 @@ const matchRoutes = (store, routes, pathname, branch = []) => {
           };
 
     if (match) {
-      if (route.__is_router) {
+      if (Object.prototype.hasOwnProperty.call(route, '__is_router')) {
         branch.push({
           route,
           match
@@ -39,7 +43,7 @@ const matchRoutes = (store, routes, pathname, branch = []) => {
         });
       }
 
-      const children = route.map(child => {
+      const children = route.map && route.map(child => {
         return child;
       });
 
@@ -52,4 +56,4 @@ const matchRoutes = (store, routes, pathname, branch = []) => {
   return branch;
 };
 
-module.exports = matchRoutes;
+export default matchRoutes;

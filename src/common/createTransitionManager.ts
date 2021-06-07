@@ -1,14 +1,15 @@
 // https://github.com/ReactTraining/history
 
-const warning = require("./warning");
+import warning from "./warning";
+import { Location } from "./Location";
 
 /**
  * @ignore
  */
 const createTransitionManager = () => {
-  let prompt = null;
+  let prompt: Function | null = null;
 
-  const setPrompt = nextPrompt => {
+  const setPrompt = (nextPrompt: Function) => {
     warning(prompt == null, "A history supports only one prompt at a time");
 
     prompt = nextPrompt;
@@ -19,10 +20,10 @@ const createTransitionManager = () => {
   };
 
   const confirmTransitionTo = (
-    location,
-    action,
-    getUserConfirmation,
-    callback
+    location: Location,
+    action: string,
+    getUserConfirmation: Function,
+    callback: Function
   ) => {
     // TODO: If another transition starts while we're still confirming
     // the previous one, we may end up in a weird state. Figure out the
@@ -51,12 +52,12 @@ const createTransitionManager = () => {
     }
   };
 
-  let listeners = [];
+  let listeners: Function[] = [];
 
-  const appendListener = fn => {
+  const appendListener = (fn: Function) => {
     let isActive = true;
 
-    const listener = (...args) => {
+    const listener = (...args: Function[]) => {
       if (isActive) fn(...args);
     };
 
@@ -68,7 +69,7 @@ const createTransitionManager = () => {
     };
   };
 
-  const notifyListeners = (...args) => {
+  const notifyListeners = (...args: Function[]) => {
     listeners.forEach(listener => listener(...args));
   };
 

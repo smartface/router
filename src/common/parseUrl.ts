@@ -1,4 +1,4 @@
-const parseUrl = path => {
+const parseUrl = (path: string) => {
   let url = path || "/";
   let query = "";
   let rawQuery = "";
@@ -32,4 +32,4 @@ const parseUrl = path => {
   };
 };
 
-module.exports = parseUrl;
+export default parseUrl;
