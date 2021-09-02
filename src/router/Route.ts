@@ -361,7 +361,6 @@ export default class Route {
         exact: this._exact,
         strict: this._strict,
         path: this._path.clone(),
-        path: this._path,
         props: Object.assign({}, this._props),
         build: this._build,
       },

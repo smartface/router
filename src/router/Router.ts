@@ -5,10 +5,7 @@ import funcorVal from "../utils/funcorVal";
 import createRouteStore from "./routeStore";
 import type { Location } from "common/Location";
 import type { HistoryActions } from "common";
-import { BlockHandler } from "common/history";
 import { RouteParams } from "./RouteParams";
-import Route from "./Route";
-import Route from "./Route";
 
 type RouterParams = RouteParams & {homeRoute?: number, isRoot: boolean}
 

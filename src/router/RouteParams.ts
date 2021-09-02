@@ -3,6 +3,7 @@ import Page = require("sf-core/ui/Page");
 import type Router from "./Router";
 import type { RouteState } from "./RouteState";
 import type Route from "./Route";
+import { RoutePath } from "./RoutePath";
 
 /**
  * @typedef {object} RouteParams
@@ -18,7 +19,7 @@ import type Route from "./Route";
  * @property {?function(Router: Router, route: Route)} routeDidExit Handles if route is removed
  */
 export type RouteParams = {
-  path: string;
+  path: string | RoutePath;
   to?: string;
   routes?: Route[];
   build?: (router: Router, route: Route) => Page;
