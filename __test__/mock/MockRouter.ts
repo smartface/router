@@ -1,7 +1,10 @@
-const Router = require("../../src/router/Router");
-const Route = require("../../src/router/Route");
+import Router from "../../src/router/Router";
+import Route from "../../src/router/Route";
+import NativeRouter from '../../src/native/NativeRouter';
 
 class MockRouter extends Router {
+  private _renderer: any;
+  private _currentPage: any; //Should be page
   /**
    * @static
    * @param {{ path: string, build: function|null, target:object|null, routes: Array, exact: boolean, isRoot: boolean }} param0
@@ -20,7 +23,7 @@ class MockRouter extends Router {
       routes,
       exact,
       renderer: {},
-      isRoot = false
+      isRoot: false
     });
   }
 
@@ -44,7 +47,9 @@ class MockRouter extends Router {
   render(location) {
     const view = super.render(location);
 
-    if (view === this._currentPage) return;
+    if (view === this._currentPage) {
+      return;
+    }
 
     try {
       view && (this._renderer = view);
@@ -54,4 +59,4 @@ class MockRouter extends Router {
   }
 }
 
-module.exports = NativeRouter;
+module.exports = MockRouter;

@@ -7,9 +7,9 @@ import { Location } from "./Location";
  * @ignore
  */
 const createTransitionManager = () => {
-  let prompt: Function | null = null;
+  let prompt: Function | null | boolean = null;
 
-  const setPrompt = (nextPrompt: Function) => {
+  const setPrompt = (nextPrompt: Function | null | boolean) => {
     warning(prompt == null, "A history supports only one prompt at a time");
 
     prompt = nextPrompt;
@@ -69,7 +69,7 @@ const createTransitionManager = () => {
     };
   };
 
-  const notifyListeners = (...args: Function[]) => {
+  const notifyListeners = (...args: any[]) => {
     listeners.forEach(listener => listener(...args));
   };
 
@@ -82,3 +82,4 @@ const createTransitionManager = () => {
 };
 
 module.exports = createTransitionManager;
+export = createTransitionManager;

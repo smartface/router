@@ -31,6 +31,7 @@ export type RouteParams = {
   routeDidEnter?: RouteLifeCycleHandler;
   routeDidExit?: RouteLifeCycleHandler;
   routeWillEnter?: RouteLifeCycleHandler;
+  props?: any;
 };
 
 export type RouteLifeCycleHandler = (Router: Router, route: Route) => void;

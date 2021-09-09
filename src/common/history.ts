@@ -1,9 +1,9 @@
 // https://github.com/ReactTraining/history
 const resolvePathname = require("resolve-pathname/umd/resolve-pathname");
-const createTransitionManager = require("./createTransitionManager");
+import createTransitionManager from "./createTransitionManager";
 
 import parseUrl from "./parseUrl";
-import type { RouteLocation } from "router/RouteLocation";
+import type { RouteLocation } from "../router/RouteLocation";
 import { clamp } from "./clamp";
 import { Location } from "./Location";
 
@@ -164,7 +164,6 @@ export default function createMemoryHistory(props:HistoryProps = {}): History {
 
   const setState = (nextState?: any) => {
     Object.assign(history, nextState);
-
     history.length = history.entries.length;
 
     transitionManager.notifyListeners(history.location, history.action);

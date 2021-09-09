@@ -50,6 +50,7 @@ export default class Route {
   protected _state: RouteState;
   protected _exact = false;
   protected _build: RouteParams['build'];
+  protected _props: any;
   /**
    * @constructor
    * @param {RouteParams} param0 Route properties
@@ -373,7 +374,6 @@ export default class Route {
           active: this._state.active,
           url: this._state.url,
           view: this._state.view,
-          query: this._state.query,
         },
         state
       )

@@ -26,5 +26,5 @@ export type RouteState = {
   url: string;
   prevUrl?: string;
   routingState?: object;
-  match: object;
+  match?: object;
 };

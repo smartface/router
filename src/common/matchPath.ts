@@ -74,7 +74,7 @@ export const matchPath = (pathname: string, options:MatchOptions|Pathname = {}, 
     path, // the path pattern used to match
     url: path === "/" && url === "" ? "/" : url, // the matched portion of the URL
     isExact, // whether or not we matched exactly
-    params: keys.reduce((memo, key, index) => {
+    params: keys.reduce((memo: any, key: any, index: number) => {
       memo[key.name] = values[index];
       return memo;
     }, {})
@@ -88,6 +88,8 @@ export const matchPath = (pathname: string, options:MatchOptions|Pathname = {}, 
  * @return {RouteMatch}
  */
 export const matchUrl = (url: string, options: MatchOptions) => {
+  // Parent parameter should be provided.
+  //@ts-ignore
   const res = matchPath(parseUrl(url).url, options);
   return res;
 };

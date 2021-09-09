@@ -3,7 +3,7 @@ import matchRoutes from "../common/matchRoutes";
 import { HistoryController } from "../common/HistoryController";
 import funcorVal from "../utils/funcorVal";
 import createRouteStore from "./routeStore";
-import type { Location } from "common/Location";
+import type { Location } from "../common/Location";
 import type { HistoryActions } from "common";
 import { RouteParams } from "./RouteParams";
 

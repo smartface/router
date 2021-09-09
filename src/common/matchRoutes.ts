@@ -45,7 +45,7 @@ const matchRoutes = (store: RouteStore, routes: (Route|Router)[], pathname: stri
 
       const children = route.map && route.map(child => {
         return child;
-      });
+      }) || [];
 
       matchRoutes(store, children, pathname, branch);
     }
