@@ -551,6 +551,11 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@smartface/native@^4.3.4 || ^4.3.5-beta || ^4.3.5.alpha":
+  version "4.3.5-beta.0"
+  resolved "https://registry.yarnpkg.com/@smartface/native/-/native-4.3.5-beta.0.tgz#ad2e3ef96322585212263c948c4a45e260529a9f"
+  integrity sha512-AZaVcLeTFdMw5lfekp+HEolp992bQxBJWtpapTDjJX8vii7e/NcCKNvr4Vm+85rW7FzbseoawlMnXHFXlR5voA==
+
 "@tootallnate/once@1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
@@ -627,6 +632,11 @@
   version "14.0.27"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.27.tgz#a151873af5a5e851b51b3b065c9e63390a9e0eb1"
   integrity sha512-kVrqXhbclHNHGu9ztnAwSncIgJv/FaxmzXJvGXNdcCpV1b8u1/Mi6z6m0vwy0LzKeXFTPLH0NzwmoJ3fNCIq0g==
+
+"@types/node@^16.0.0":
+  version "16.9.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.9.0.tgz#d9512fe037472dcb58931ce19f837348db828a62"
+  integrity sha512-nmP+VR4oT0pJUPFbKE4SXj3Yb4Q/kz3M9dSAO1GGMebRKWHQxLfDNmU/yh3xxCJha3N60nQ/JwXWwOE/ZSEVag==
 
 "@types/prettier@^2.1.5":
   version "2.3.2"
