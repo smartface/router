@@ -8,9 +8,10 @@ import type { HistoryActions } from "common";
 import { RouteParams } from "./RouteParams";
 import { HistoryListenHandler } from "common/history";
 import { RouteBlockHandler } from '../core/RouteBlockHandler';
+import { OnHistoryChange } from "core/OnHistoryChange";
+import Page from "@smartface/native/ui/Page";
 
 type RouterParams = RouteParams & {homeRoute?: number, isRoot: boolean}
-type TOnHistoryChange = (location: Location, action: string, target: Router, fromRouter: boolean);
 
 let tasks: any[] = [];
 
@@ -202,6 +203,11 @@ export default class Router extends Route {
   protected _sensitive: boolean;
   protected _fromRouter = false;
   protected _pushHomes: (path: string) => void;
+  static _lock: boolean;
+  dispatch?: (location: Location, action: string, target: Router, fromRouter?: boolean) => void;
+  static _nextAnimated: any;
+  static currentRouter: Router;
+  private _handlers: any;
   static getGlobalRouter() {
     return historyController;
   }
@@ -248,12 +254,12 @@ export default class Router extends Route {
     _backUrl = value;
   }
 
-  private static _activeRouter: Router;
+  static _activeRouter: Router;
 
   static blocker: ReturnType<typeof Router.createBlocker> | null;
   private _matches: ReturnType<typeof matchRoutes> = [];
-  private _historyController?: HistoryController;
-  private _homeRoute?:number;
+  protected _historyController?: HistoryController;
+  protected _homeRoute?:number;
   private _historyUnlisten: Function = () => null;
   private _currentUrl = '';
   // private _routes: Route[] = []
@@ -293,6 +299,7 @@ export default class Router extends Route {
         const matches = matchRoutes(store, [this].concat(this._routes), path);
         let len = 0;
         while (++len < matches.length) {
+          //@ts-ignore
           let route = matches[len].route;
           if (route.__is_router && route.hasHome()) {
             route.pushHomeBefore && route.pushHomeBefore(path);
@@ -344,7 +351,7 @@ export default class Router extends Route {
    * @param {function} onHistoryChange Root onHistoryChange handler
    * @param {function} pushHomes It uses in order to push routers' home-route
    */
-  initialize(parentHistory: unknown, onHistoryChange: TOnHistoryChange, pushHomes: (path: string) => void) {
+  initialize(parentHistory: unknown, onHistoryChange: OnHistoryChange, pushHomes: (path: string) => void) {
     this._pushHomes = pushHomes;
     /**
      * parentHistory is supposed to be a function, idk why it acts like an object.
@@ -371,7 +378,6 @@ export default class Router extends Route {
     }) || this._unlisten;
 
     // changes route without history
-    //TODO: This comes from NativeStackRouter
     this.dispatch = (location: Location, action: string, target: Router, fromRouter = false) => {
       onHistoryChange(location, action, target, fromRouter);
     };
@@ -664,7 +670,8 @@ export default class Router extends Route {
    * @param {string} action
    */
   routeWillEnter(route: Route, action: string) {
-    const viewConroller = (route._renderer && route._renderer._rootController) ||
+    //@ts-ignore
+    const viewConroller = (route._renderer?._rootController) ||
       // else just instance of Route
       route.getState().view;
     this._handlers.routeWillEnter &&
@@ -697,7 +704,7 @@ export default class Router extends Route {
    * @protected
    * @param {Route} route
    */
-  routerDidEnter(route) {
+  routerDidEnter(route: Route) {
     this._handlers.routerDidEnter && this._handlers.routerDidEnter(this, route);
   }
 
@@ -708,11 +715,10 @@ export default class Router extends Route {
    * @protected
    * @param {string} action
    */
-  setasActiveRouter(action) {
-    Router.currentRouter &&
-      this != Router.currentRouter &&
-      Router.currentRouter.routerDidExit &&
+  setasActiveRouter(action: string) {
+    if (this != Router.currentRouter && typeof Router.currentRouter?.routerDidExit === 'function') {
       Router.currentRouter.routerDidExit(action);
+    }
     Router.currentRouter = this;
   }
 
@@ -732,7 +738,7 @@ export default class Router extends Route {
    * @emits routerDidExit
    * @param {string} action
    */
-  routerDidExit(action) {
+  routerDidExit(action: string) {
     this._handlers.routerDidExit && this._handlers.routerDidExit(this, action);
   }
 
@@ -744,8 +750,9 @@ export default class Router extends Route {
    * @param {object} routeData
    * @param {string} action
    */
-  redirectRoute(route, routeData, action) {
+  redirectRoute(route: Route, routeData: Record<string, any>, action: string) {
     // redirection of a route
+    //@ts-ignore
     this.push(funcorVal(route.getRedirectto(), [this, route]), routeData); // and add new route
     // this._historyController.push(route.getRedirectto(), routeData);
   }
@@ -756,7 +763,7 @@ export default class Router extends Route {
    * @ignore
    * @param {Page} view
    */
-  isViewEmpty(view) {
+  isViewEmpty(view: Page) {
     return view !== null || view !== undefined;
   }
 
@@ -767,7 +774,7 @@ export default class Router extends Route {
    * @protected
    * @param {Route} route
    */
-  routeDidMatch(route) {
+  routeDidMatch(route: Route) {
     // alert(this.getUrlPath()+" "+Router._backUrl);
     const { match, action, routeData } = route.getState();
     // this.setState({
@@ -789,7 +796,7 @@ export default class Router extends Route {
    * @param {Route} route
    * @throws {TypeError}
    */
-  renderRoute(route) {
+  renderRoute(route: Route) {
     const view = route.build && route.build(this);
     if (!view) throw new TypeError(`${route} 's View cannot be empty!`);
 
@@ -803,9 +810,11 @@ export default class Router extends Route {
    * @protected
    * @param {Route} route
    */
-  pushRoute(route) {
-    if (!(route instanceof Route))
+  pushRoute(route: Route) {
+    if (!(route instanceof Route)) {
       throw new TypeError(`route must be instance of Route`);
+    }
+      //@ts-ignore
     const url = funcorVal(route.getRedirectto(), [this, route]) || route.getUrlPath();
     this.push(url);
   }
@@ -823,7 +832,7 @@ export default class Router extends Route {
    * @param {!boolean} [animated={}] routeData - Routing data
    * @return {Router}
    */
-  push(path, routeData = {}, animated = true) {
+  push(path: Location | string, routeData = {}, animated = true) {
     // console.log('PUSH : ', path, ' ', this._state.url);
     Router._nextAnimated = animated;
     // if (path === this._state.url) {
@@ -842,14 +851,17 @@ export default class Router extends Route {
 
     this._fromRouter = true;
     // if (!this.isValidPath(path)) throw new TypeError(`[${path}] Pat h is invalid`);
-    if (path.charAt(0) !== "/") {
+    if (typeof path === 'string' && path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;
     }
 
 
     if (Router.blocker) {
+      //@ts-ignore
       Router.blocker(this, path, routeData, "PUSH", () => {
+      //@ts-ignore
         this._pushHomes(path);
+      //@ts-ignore
         this._historyController.push(path, routeData);
         this._fromRouter = false;
       });
@@ -857,17 +869,19 @@ export default class Router extends Route {
       return this;
     }
     try {
+      //@ts-ignore
       this._pushHomes(path);
     }
     catch (e) {
       throw e;
     }
-    this._historyController.push(path, routeData);
+    //@ts-ignore
+    this._historyController?.push(path, routeData);
     this._fromRouter = false;
     return this;
   }
 
-  isValidPath(path) {
+  isValidPath(path: string) {
     return /^(\/\w+)+(\.)?\w+(\?(\w+=[\w\d]+(&\w+=[\w\d]+)*)+){0,1}$/.test(
       path
     );
@@ -882,8 +896,8 @@ export default class Router extends Route {
    * @param {string} path
    * @param {data} routeData
    */
-  replace(path, routeData) {
-    this._historyController.history.replace(path, routeData);
+  replace(path: string, routeData: Record<string,any>) {
+    this._historyController?.history.replace(path, routeData);
   }
 
   /**
@@ -894,25 +908,29 @@ export default class Router extends Route {
    * @param {boolean} [animmated=true] 
    * @return {Router}
    */
-  goBack(url, animated = true) {
+  goBack(url: string | Location, animated = true) {
 
     const go = () => {
       Router._nextAnimated = animated;
       this._fromRouter = true;
-
-      url
-        ?
+      if (url) {
+        //@ts-ignore
         this.dispatch(
+          //@ts-ignore
           typeof url === "string" ? { url, hash: "", search: "", state: {} } :
           url,
           "POP",
           this,
           true
-        ) :
-        this._historyController.goBack();
+        )
+      }
+      else {
+        this._historyController?.goBack();
+      }
       this._fromRouter = false;
     };
     if (Router.blocker) {
+      //@ts-ignore
       Router.blocker(this, null, null, "POP", () => go());
 
       return this;
@@ -927,7 +945,8 @@ export default class Router extends Route {
    * @return {RouteLocation}
    */
   getLocation() {
-    return this._historyController.history.location;
+    //@ts-ignore
+    return this._historyController?.history.location;
   }
 
   /**
@@ -937,7 +956,7 @@ export default class Router extends Route {
    * @return {Array<string>}
    */
   getHistoryasArray() {
-    return this._historyController.getHistoryasArray();
+    return this._historyController?.getHistoryasArray();
   }
 
   /**
@@ -948,7 +967,7 @@ export default class Router extends Route {
    * @since 1.0.0
    */
   goForward() {
-    this._historyController.history.goForward();
+    this._historyController?.history.goForward();
   }
 
   /**
@@ -959,8 +978,9 @@ export default class Router extends Route {
    * @ignore
    * @param {number} index
    */
-  go(index) {
-    this._historyController.go(index);
+  go(index: number) {
+    //@ts-ignore
+    this._historyController?.go(index);
   }
 
   /**
@@ -993,20 +1013,27 @@ export default class Router extends Route {
   dispose() {
     this._historyUnlisten();
     // if (this._isRoot) {
-    this._historyController.dispose();
-    this._historyController = null;
+    this._historyController?.dispose();
+    this._historyController = undefined;
     // }
+    //@ts-ignore
     this._routes.forEach(route => route.dispose());
+    //@ts-ignore
     this._routes = null;
+    //@ts-ignore
     this._historyUnlisten = null;
     this._unblock && this._unblock();
+    //@ts-ignore
     this._unblock = null;
+    //@ts-ignore
     this._handlers = null;
     this._unlisten && this._unlisten();
+    //@ts-ignore
     this._listen = null;
   }
 }
 
 Router._lock = false;
 Router._nextAnimated = true;
+//@ts-ignore
 Router._activeRouter = null;

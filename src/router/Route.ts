@@ -8,6 +8,7 @@ import Router from "./Router";
 import { RoutePath } from "./RoutePath";
 import { RouteState } from "./RouteState";
 import { RouteParams } from "./RouteParams";
+import { OnHistoryChange } from 'core/OnHistoryChange';
 
 /**
  * Route implementation
@@ -83,7 +84,6 @@ export default class Route {
     //   routerDidExit,
     //   routeWillEnter
     // };
-
     this._exact = exact;
     this._isDIrty = false;
     this._strict = false;
@@ -120,6 +120,11 @@ export default class Route {
   get state() {
     return this._state;
   }
+
+  initialize(parentHistory: unknown, onHistoryChange: OnHistoryChange, pushHomes: (path: string) => void) {
+    return; //Child class uses it.
+  }
+
 
   /**
    *

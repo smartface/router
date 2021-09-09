@@ -5,6 +5,7 @@ import type { RouteState } from "./RouteState";
 import type Route from "./Route";
 import { RoutePath } from "./RoutePath";
 import Renderer from 'native/Renderer';
+import HeaderBar from '@smartface/native/ui/headerbar';
 
 /**
  * @typedef {object} RouteParams
@@ -37,8 +38,9 @@ export type RouteParams = {
   // No idea why these are two different entities
   routeWillEnter?: RouteLifeCycleHandler;
   props?: any;
-  renderer?: Renderer,
-  rootWillChange?: RouteLifeCycleHandler,
+  renderer?: Renderer;
+  rootWillChange?: RouteLifeCycleHandler;
+  headerBarParams?: Partial<HeaderBar>
 };
 
 export type RouteLifeCycleHandler = (Router: Router, route: Route) => void;

@@ -238,7 +238,7 @@ export class HistoryController {
       return this._history.entries.findIndex(fn);
     }
 
-    find(fn: (value: Location, index: number)=> Location|undefined){
+    find(fn: (value: Location, index: number)=> boolean){
       return this._history.entries.find(fn);
     }
 
