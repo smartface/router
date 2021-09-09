@@ -4,6 +4,7 @@ import type Router from "./Router";
 import type { RouteState } from "./RouteState";
 import type Route from "./Route";
 import { RoutePath } from "./RoutePath";
+import Renderer from 'native/Renderer';
 
 /**
  * @typedef {object} RouteParams
@@ -30,8 +31,14 @@ export type RouteParams = {
   routeShouldMatch?: RouteShouldMatchHandler;
   routeDidEnter?: RouteLifeCycleHandler;
   routeDidExit?: RouteLifeCycleHandler;
+  // No idea why these are two different entities
+  routerDidEnter?: RouteLifeCycleHandler;
+  routerDidExit?: RouteLifeCycleHandler;
+  // No idea why these are two different entities
   routeWillEnter?: RouteLifeCycleHandler;
   props?: any;
+  renderer?: Renderer,
+  rootWillChange?: RouteLifeCycleHandler,
 };
 
 export type RouteLifeCycleHandler = (Router: Router, route: Route) => void;

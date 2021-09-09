@@ -18,7 +18,7 @@ import { ControllerType } from '../core/Controller';
  */
 export default abstract class Renderer {
   //@ts-ignore This is set within a function. Anti-pattern on Typescript classes.
-  protected _rootController: ControllerType;
+  _rootController: ControllerType;
   /**
    * Helper method sets statically rootController of the Application by DeviceOS
    *

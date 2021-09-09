@@ -10,12 +10,6 @@ import { RouteState } from "./RouteState";
 import { RouteParams } from "./RouteParams";
 
 /**
- * @typedef {function(path: string, routeData: object, action: string, okFn: function)} RouterBlockHandler
- */
-type RouteBlockHandler = (path: string, routeData: object, action: string, okFn: Function) => void;
-
-
-/**
  * Route implementation
  *
  * @since 1.0.0

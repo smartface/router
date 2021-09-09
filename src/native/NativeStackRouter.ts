@@ -450,7 +450,7 @@ export default class NativeStackRouter extends NativeRouterBase {
    * @param {string} url Desired url to test availability to go back
    * @return {boolean}
    */
-  canGoBacktoUrl(url) {
+  canGoBacktoUrl(url: string): boolean {
     return this.canGoBackto(this.getStepLengthFromCurrent(url));
   }
 

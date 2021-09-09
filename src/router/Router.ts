@@ -6,15 +6,18 @@ import createRouteStore from "./routeStore";
 import type { Location } from "../common/Location";
 import type { HistoryActions } from "common";
 import { RouteParams } from "./RouteParams";
+import { HistoryListenHandler } from "common/history";
+import { RouteBlockHandler } from '../core/RouteBlockHandler';
 
 type RouterParams = RouteParams & {homeRoute?: number, isRoot: boolean}
+type TOnHistoryChange = (location: Location, action: string, target: Router, fromRouter: boolean);
 
 let tasks: any[] = [];
 
 let historyController: HistoryController;
 
 let _lastRoute: Route;
-let _backUrl:string;
+let _backUrl:string | Location | null;
 let _activeRouter: Router;
 
 const listeners = new Set<Function>();
@@ -193,7 +196,12 @@ function handleRouteUrl(controller: HistoryController, prevUrl: string = '', url
  * @extends {Route}
  */
 export default class Router extends Route {
-
+  _isRoot: boolean;
+  protected _exact: boolean;
+  protected _strict: boolean;
+  protected _sensitive: boolean;
+  protected _fromRouter = false;
+  protected _pushHomes: (path: string) => void;
   static getGlobalRouter() {
     return historyController;
   }
@@ -233,11 +241,27 @@ export default class Router extends Route {
     return _activeRouter;
   }
 
+  static get _backUrl(): string | Location | null {
+    return _backUrl;
+  }
+  static set _backUrl(value: string | Location | null) {
+    _backUrl = value;
+  }
+
+  private static _activeRouter: Router;
+
+  static blocker: ReturnType<typeof Router.createBlocker> | null;
+  private _matches: ReturnType<typeof matchRoutes> = [];
   private _historyController?: HistoryController;
   private _homeRoute?:number;
   private _historyUnlisten: Function = () => null;
+  private _currentUrl = '';
   // private _routes: Route[] = []
+  private _unlisten: () => void;
+  private _unblock: () => void;
 
+  private _currentAction?: string;
+  private _prevRoute?: Route;
   /**
    * @constructor
    * @param {RouterParams} param
@@ -245,7 +269,9 @@ export default class Router extends Route {
   constructor(options: RouterParams) {
     super(options, {});
     this._homeRoute = options.homeRoute;
-
+    this._pushHomes = () => {};
+    this._unlisten = () => {};
+    this._unblock = () => {};
     if (options.isRoot) {
       store = createRouteStore();
       // this._store = createStore();
@@ -255,6 +281,7 @@ export default class Router extends Route {
         sensitive: options.sensitive,
         strict: options.strict,
         exact: options.exact,
+        //@ts-ignore
         path: options.path,
         getUserConfirmation: (blockerFn: Function, callback: Function) => {
           return blockerFn(callback);
@@ -262,6 +289,7 @@ export default class Router extends Route {
       });
 
       const pushHomes = (path: string) => {
+        //@ts-ignore ???
         const matches = matchRoutes(store, [this].concat(this._routes), path);
         let len = 0;
         while (++len < matches.length) {
@@ -274,17 +302,17 @@ export default class Router extends Route {
 
       this.initialize(
         historyController,
-        (location, action, target, fromRouter = true) =>
+        (location: Location, action: string, target: any, fromRouter = true) =>
         this.onHistoryChange(location, action, target, fromRouter),
         pushHomes
         // pushIndexes.call(this, path)
       );
     }
 
-    this._isRoot = isRoot;
-    this._exact = exact;
-    this._strict = strict;
-    this._sensitive = sensitive;
+    this._isRoot = options.isRoot;
+    this._exact = !!options.exact;
+    this._strict = !!options.strict;
+    this._sensitive = !!options.sensitive;
     this._fromRouter = false;
   }
 
@@ -316,28 +344,35 @@ export default class Router extends Route {
    * @param {function} onHistoryChange Root onHistoryChange handler
    * @param {function} pushHomes It uses in order to push routers' home-route
    */
-  initialize(parentHistory, onHistoryChange, pushHomes) {
+  initialize(parentHistory: unknown, onHistoryChange: TOnHistoryChange, pushHomes: (path: string) => void) {
     this._pushHomes = pushHomes;
-    /** @type {HistoryController} */
+    /**
+     * parentHistory is supposed to be a function, idk why it acts like an object.
+     */
+    //@ts-ignore
     this._historyController = parentHistory.createNode(
       Object.assign({}, this._options, {
-        getUserConfirmation: (blockerFn, callback) => {
+        getUserConfirmation: (blockerFn: (...args: any) => void, callback: (...args: any) => void) => {
           return blockerFn(callback);
         }
       })
     );
 
     this._routes.forEach(route => {
-      route.initialize &&
+      //TODO: This comes from one of the parents
+      if(route.initialize) {
+        //@ts-ignore
         route.initialize(this._historyController, onHistoryChange, pushHomes);
+      }
     });
 
-    this._unlisten = this._historyController.listen((location, action) => {
+    this._unlisten = this._historyController?.listen((location: Location, action: string) => {
       onHistoryChange(location, action, this, true); // fires root's onHistoryChange
-    });
+    }) || this._unlisten;
 
     // changes route without history
-    this.dispatch = (location, action, target, fromRouter = false) => {
+    //TODO: This comes from NativeStackRouter
+    this.dispatch = (location: Location, action: string, target: Router, fromRouter = false) => {
       onHistoryChange(location, action, target, fromRouter);
     };
   }
@@ -361,7 +396,7 @@ export default class Router extends Route {
    * @since 1.0.0
    */
   getHistory() {
-    return this._historyController.history;
+    return this._historyController?.history;
   }
 
   /**
@@ -384,8 +419,8 @@ export default class Router extends Route {
    * @param {number} n Amount of back as negative value
    * return {boolean}
    */
-  canGoBack(n) {
-    return this._historyController.canGoBack(n);
+  canGoBack(n: number) {
+    return this._historyController?.canGoBack(n);
   }
 
   /**
@@ -398,7 +433,7 @@ export default class Router extends Route {
    * @since 1.0.0
    * @param {HistoryListener} fn
    */
-  listen(fn) {
+  listen(fn: HistoryListenHandler) {
     listeners.add(fn);
 
     return () => listeners.delete(fn);
@@ -433,10 +468,9 @@ export default class Router extends Route {
    * @since 1.0.0
    * @param {RouterBlockHandler} fn
    */
-  addRouteBlocker(fn) {
+  addRouteBlocker(fn: RouteBlockHandler) {
     Router.blocker = Router.createBlocker(fn);
     this._unblock = () => (Router.blocker = null);
-
     return this._unblock;
   }
 
@@ -456,11 +490,12 @@ export default class Router extends Route {
    * @param {Router} target Target Router which pushed to its router.
    * @param {boolean} [fromRouter=true]
    */
-  onHistoryChange(location, action, target, fromRouter = true) {
+  onHistoryChange(location: Location, action: string, target: Router, fromRouter = true) {
     if(!location)
       throw new Error("Location cannot be empty.");
     if (this._isRoot) {
       this._matches = matchRoutes(
+        //@ts-ignore
         this.getStore(), [this].concat(this._routes),
         location.url
       );
@@ -480,7 +515,7 @@ export default class Router extends Route {
    * @protected
    */
   routeRollback() {
-    this._historyController.rollback();
+    this._historyController?.rollback();
   }
 
   /**
@@ -495,9 +530,13 @@ export default class Router extends Route {
    * @param {Router} target Target Router which pushed to its router.
    * @param {boolean} fromRouter If the specified request if from the router or an another source.
    */
-  renderMatches(matches, location, action, target, fromRouter) {
+  renderMatches(matches: ReturnType<typeof matchRoutes>, location: Location, action: string, target: Router, fromRouter: boolean) {
     this._fromRouter = fromRouter;
     const routeData = location.state;
+    /**
+     * Either matches param type or this match and route is incorrect
+     */
+    //@ts-ignore
     matches.some(({ match, route }, index) => {
       route.setState({
         hash: location.hash,
@@ -508,9 +547,14 @@ export default class Router extends Route {
       });
       if (match.isExact !== true && route !== this && route.__is_router) {
         route.initializeWaiting && route.initializeWaiting();
-        tasks.push((url, action) => {
-          this.routeWillEnter &&
+        tasks.push((url: string, action: string) => {
+          if(typeof this.routeWillEnter === 'function') {
+            /**
+             * Argument count
+             */
+            //@ts-ignore
             this.routeWillEnter(route, url, action, false, target);
+          }
           // handleRouteUrl(this, url, routeData, action);
         }); // add new router display logic from root to children
 
@@ -537,6 +581,7 @@ export default class Router extends Route {
           //  because real path can be owned by different router.
           // -----
           // And then trigger redirection path.
+          //@ts-ignore
           target.redirectRoute(route, routeData, action, target);
           return false;
         }
@@ -552,6 +597,7 @@ export default class Router extends Route {
             })) || {};
         // change route state to move data to callbacks
         route.setState({
+          //@ts-ignore
           query: location.search,
           match,
           action,
@@ -564,6 +610,7 @@ export default class Router extends Route {
         // then push or pop route to child router's history.
         // Because current router isn't aware of the route.
         if (target != this) {
+          //@ts-ignore
           this._historyController && handleRouteUrl(this._historyController, this.state.prevUrl, match.url, routeData, action);
         }
 
@@ -572,9 +619,12 @@ export default class Router extends Route {
         // An another reason is that we build views from child to parent 
         // but we need to build from parent to child.
         tasks.push(
-          (url, action) =>
-          this.routeWillEnter &&
-          this.routeWillEnter(route, url, action, true, target)
+          (url: string, action: string) => {
+            if(typeof this.routeWillEnter === 'function') {
+              //@ts-ignore
+              this.routeWillEnter(route, url, action, true, target)
+            }
+          }
         );
 
         if (_lastRoute) { // notify current route to exit
@@ -613,7 +663,7 @@ export default class Router extends Route {
    * @param {Route} route
    * @param {string} action
    */
-  routeWillEnter(route, action) {
+  routeWillEnter(route: Route, action: string) {
     const viewConroller = (route._renderer && route._renderer._rootController) ||
       // else just instance of Route
       route.getState().view;
@@ -627,7 +677,7 @@ export default class Router extends Route {
    * @param {string} url
    * @param {string} action
    */
-  isUrlCurrent(url, action) {
+  isUrlCurrent(url: string, action: string) {
     const res = this._currentUrl === url && this._currentAction === action;
     return res;
   }

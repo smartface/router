@@ -2,8 +2,10 @@
 
 import NativeRouterBase from "./NativeRouterBase";
 import createRenderer from "./createRenderer";
-import Page from '@smartface/native/ui/page';
 import { RouteParams } from "../router/RouteParams";
+import Renderer from "./Renderer";
+import type Route from "../router/Route";
+import Router from "../router/Router";
 
 /**
  * It creates a root fragment Rotuer adds and removes child routers and pages as application root.
@@ -39,6 +41,8 @@ import { RouteParams } from "../router/RouteParams";
  * @since 1.0.0
  */
 export default class NativeRouter extends NativeRouterBase {
+  protected _rootWillChange: boolean;
+  protected _route?: Route;
   /**
    * Create OS specific NativeRouter instance
    * @static
@@ -56,17 +60,17 @@ export default class NativeRouter extends NativeRouterBase {
    */
   constructor({
     path = "",
-    build = null,
+    build = undefined,
     routes = [],
     exact = false,
-    renderer = null,
-    to = null,
+    renderer = undefined,
+    to = undefined,
     routerDidEnter,
     routerDidExit,
     routeShouldMatch,
     routeWillEnter,
-    rootWillChange = null,
-  }) {
+    rootWillChange,
+  }: RouteParams) {
     super({
       path,
       build,
@@ -80,7 +84,7 @@ export default class NativeRouter extends NativeRouterBase {
       routeShouldMatch
     });
     
-    this._rootWillChange = rootWillChange;
+    this._rootWillChange = !!rootWillChange;
 
     if (!this._isRoot) {
       throw new Error("[NativeRouter] Please only use as root");
@@ -89,23 +93,19 @@ export default class NativeRouter extends NativeRouterBase {
     this._renderer = renderer;
   }
   
-  canGoBack(n){
+  canGoBack(){
     return false;
   }
 
   /**
    * @override
    */
-  routeWillEnter(route, action) {
-    const Renderer = require("./Renderer");
+  routeWillEnter(route: Router | Route, action: string) {
     // this._renderer.show(router._renderer._rootController);
     if (this._isRoot && this._route !== route) {
-      Renderer.setasRoot(
-        // If route is instance of Router
-        (route._renderer && route._renderer._rootController) ||
-        // else just instance of Route
-          route.getState().view
-      );
+      //@ts-ignore
+      const root = route instanceof Router ? route._renderer?._rootController : route.getState().view;
+      Renderer.setasRoot(root);
       this._route = route;
     }
     
