@@ -25,9 +25,10 @@
     "resolve-pathname": "^2.2.0"
   },
   "devDependencies": {
+    "@smartface/native": "^4.3.4 || ^4.3.5-beta || ^4.3.5.alpha",
+    "@types/node": "^16.0.0",
     "@types/jest": "^27.0.1",
     "esdoc": "^1.1.0",
-    "@smartface/native": "^4.3.4 || ^4.3.5-beta || ^4.3.5.alpha",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-standard-plugin": "^1.0.0",
     "eslint": "^7.32.0",
@@ -37,8 +38,7 @@
     "npm-bump": "0.0.30",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.5",
-    "typescript": "^4.4.0",
-    "@types/node": "^16.0.0"
+    "typescript": "^4.4.0"
   },
   "peerDependencies": {
     "@smartface/native": "^4.3.4 || ^4.3.5-beta || ^4.3.5.alpha"
