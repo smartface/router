@@ -1,8 +1,9 @@
 "use strict";
 
-const NativeRouterBase = require("./NativeRouterBase");
-const createRenderer = require("./createRenderer");
+import NativeRouterBase from "./NativeRouterBase";
+import createRenderer from "./createRenderer";
 import Page from '@smartface/native/ui/page';
+import { RouteParams } from "../router/RouteParams";
 
 /**
  * It creates a root fragment Rotuer adds and removes child routers and pages as application root.
@@ -37,14 +38,14 @@ import Page from '@smartface/native/ui/page';
  *
  * @since 1.0.0
  */
-class NativeRouter extends NativeRouterBase {
+export default class NativeRouter extends NativeRouterBase {
   /**
    * Create OS specific NativeRouter instance
    * @static
    * @param {RouterParams} options
    * @returns {NativeRouter}
    */
-  static of(options) {
+  static of(options: any) {
     options.renderer = createRenderer();
     return new NativeRouter(options);
   }
@@ -111,5 +112,3 @@ class NativeRouter extends NativeRouterBase {
     super.routeWillEnter(route, action);
   }
 }
-
-module.exports = NativeRouter;

@@ -28,10 +28,13 @@
  * @property {{operation: number}} operation
  */
 
-const NativeRouterBase = require("./NativeRouterBase");
-const Router = require("../router/Router");
+import NativeRouterBase from "./NativeRouterBase";
+import Router from "../router/Router";
 import NavigationController from '@smartface/native/ui/navigationcontroller';
-const createRenderer = require("./createRenderer");
+import createRenderer from "./createRenderer";
+import { RouteParams } from "../router/RouteParams";
+
+type NativeStackRouterParams = RouteParams & {homeRoute?: number, isRoot: boolean}
 
 /**
  * Creates {@link NavigationController} and manages its behavours and routes.
@@ -101,14 +104,14 @@ const createRenderer = require("./createRenderer");
  *
  * @since 1.0.0
  */
-class NativeStackRouter extends NativeRouterBase {
+export default class NativeStackRouter extends NativeRouterBase {
   /**
    * Builds OS specific NaitveRouter
    *
    * @static
    * @param {NativeStackRouterParams} params
    */
-  static of (params) {
+  static of (params: NativeStackRouterParams) {
     params.renderer = createRenderer();
     return new NativeStackRouter(params);
   }
@@ -458,5 +461,3 @@ class NativeStackRouter extends NativeRouterBase {
     this._historyController.clear();
   }
 }
-
-module.exports = NativeStackRouter;

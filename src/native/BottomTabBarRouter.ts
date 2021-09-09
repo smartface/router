@@ -19,12 +19,12 @@
  * @property {number} tabIndex Changed tab index
  */
 import System from '@smartface/native/device/system';
-const NativeRouterBase = require("./NativeRouterBase");
+import NativeRouterBase from "./NativeRouterBase";
 import BottomTabBarController from '@smartface/native/ui/bottomtabbarcontroller';
-const createRenderer = require("./createRenderer");
+import createRenderer from "./createRenderer";
 import TabBarItem from '@smartface/native/ui/tabbaritem';
-const functionMaybe = require("../utils/funcorVal");
-const Router = require("../router/Router");
+import functionMaybe from "../utils/funcorVal";
+import Router from "../router/Router";
 
 /**
  * @private

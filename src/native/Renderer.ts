@@ -2,6 +2,12 @@
 
 import Page from '@smartface/native/ui/page';
 import Application from '@smartface/native/application';
+import NavigationController from '@smartface/native/ui/navigationcontroller';
+import BottomTabBarController from '@smartface/native/ui/bottomtabbarcontroller';
+import View from '@smartface/native/ui/view';
+import TabBarItem from '@smartface/native/ui/tabbaritem';
+import { ControllerType } from '../core/Controller';
+
 
 /**
  * Abstract Renderer Strategy
@@ -10,32 +16,45 @@ import Application from '@smartface/native/application';
  * @access package
  * @abstract
  */
-class Renderer {
+export default abstract class Renderer {
+  //@ts-ignore This is set within a function. Anti-pattern on Typescript classes.
+  protected _rootController: ControllerType;
   /**
    * Helper method sets statically rootController of the Application by DeviceOS
    *
    * @static
-   * @param {BottomTabBarController|Page|NavigationController} rootController
+   * @param {BottomTabBarController|Page} rootController
    */
-  static setasRoot(rootController) {
-    Application.setRootController({
+  static setasRoot(rootController: NavigationController | Page) {
+    /**
+     * Wrong typing on @smartface/native, track the issue on Linear (TYPNG-14)
+     */
+    //@ts-ignore
+    Application.seController({
       controller: rootController,
       animated: true
     });
   }
 
   makeRootVisible() {
+    //@ts-ignore
     var sfWindow = SF.requireClass("UIApplication").sharedApplication()
       .keyWindow;
     sfWindow.makeKeyAndVisible();
   }
   
   showTab(){
+    //@ts-ignore
     this._rootController.show();
   }
 
-  present(controller, animated, onComplete) {
+  present(controller: ControllerType, animated: boolean, onComplete: (...args: any) => void) {
     setTimeout(() => {
+      /**
+       * Present method actually exists on BottomTabBarController. 
+       * Track the issue on Linear (TYPNG-15)
+       */
+      //@ts-ignore
       this._rootController.present({
         controller,
         animated,
@@ -44,16 +63,26 @@ class Renderer {
     }, 1);
   }
 
-  dismiss(onComplete, animated) {
+  dismiss(onComplete: (...args: any) => void, animated: boolean) {
+      /**
+       * dismiss method actually exists on BottomTabBarController. 
+       * Track the issue on Linear (TYPNG-15)
+       */
+      //@ts-ignore
     this._rootController.dismiss({ onComplete, animated });
   }
   
-  replaceChild(view, index=null){
-    if(!this._rootController.childControllers || !this._rootController.childControllers.length)
+  replaceChild(view: View | ControllerType, index: number){
+    if(this._rootController instanceof Page || !this._rootController?.childControllers?.length) {
       return;
+    }
     
     index = index || this._rootController.childControllers.length - 1;
     const controllers = this._rootController.childControllers;
+    /**
+     * It shouldn't take view as paramater. It should only take Controller.
+     */
+    //@ts-ignore
     controllers[index] = view;
     this._rootController.childControllers = controllers;
   }
@@ -67,7 +96,7 @@ class Renderer {
    * @param {number} [duration=0] duration
    * @param {number} [options=0] options
    */
-  showWithTransition(fromPage, toPage, duration = 0, options = 0) {
+  showWithTransition(fromPage: Page, toPage: Page, duration = 0, options = 0) {
     throw new Error("onNavigatorChange method must be overridden");
   }
 
@@ -75,7 +104,7 @@ class Renderer {
    * Template method sets specified controller as root controller
    * @param {BottomTabBarController|Page|NavigationController} controller
    */
-  setRootController(controller) {
+  seController(controller: BottomTabBarController|Page|NavigationController) {
     this._rootController = controller;
   }
 
@@ -86,7 +115,7 @@ class Renderer {
    *
    * @param {function(e:NavigationControllerTransformEvent)} fn
    */
-  onNavigationControllerTransition(fn) {
+  onNavigationControllerTransition(fn: (e: (...args: any) => void) => void) {
     throw new Error("onNavigatorChange method must be overridden");
   }
 
@@ -95,18 +124,23 @@ class Renderer {
    *
    * @param {Array<TabBarItem>} items
    */
-  setTabBarItems(items) {
-    this._rootController.tabBar.items = items;
+  setTabBarItems(items: TabBarItem[]) {
+    if(this._rootController instanceof BottomTabBarController) {
+      this._rootController.tabBar.items = items;
+    }
   }
 
   /**
-   * Set NavigationController selected index
+   * Set BottomTabbarController selected index
    *
    * @param {nummer} index
    */
-  setSelectedIndex(index) {
-    if(this._rootController.selectedIndex != index)
-      this._rootController.selectedIndex = index;
+  setSelectedIndex(index: number) {
+    if(this._rootController instanceof BottomTabBarController) {
+      if(this._rootController.selectedIndex !== index) {
+        this._rootController.selectedIndex = index;
+      }
+    }
   }
 
   /**
@@ -115,7 +149,7 @@ class Renderer {
    *
    * @params {Array<NavigationController>} children
    */
-  setChildControllers(children) {
+  setChildControllers(children: NavigationController[]) {
     throw new Error("addChildViewControllers method must be overridden");
   }
 
@@ -125,7 +159,7 @@ class Renderer {
    *
    * @param {Page} page
    */
-  removeChild(page) {
+  removeChild(page: Page) {
     throw new Error("removeChild must be overridden");
   }
 
@@ -135,7 +169,7 @@ class Renderer {
    *
    * @param {Page} page
    */
-  addChild(page) {
+  addChild(page: Page) {
     throw new Error("addChild must be overridden");
   }
 
@@ -146,7 +180,7 @@ class Renderer {
    * @param {Page} page
    * @param {boolean} [animated=true] animmated
    */
-  pushChild(page, animated = true) {
+  pushChild(page: Page, animated = true) {
     throw new Error("pushChild must be overridden");
   }
 
@@ -162,8 +196,10 @@ class Renderer {
   
   /**
    */
-  popTo(n) {
-    this._rootController.popTo({ controller: this._rootController.childControllers[n], animated: true });
+  popTo(n: number) {
+    if(this._rootController instanceof NavigationController) {
+      this._rootController.popTo({ controller: this._rootController.childControllers[n], animated: true });
+    }
   }
 
   /**
@@ -172,9 +208,8 @@ class Renderer {
    *
    * @param {Page} page
    */
-  show(page) {
-    throw new Error("popChild must be overridden");
+  show(page: Page) {
+    throw new Error("show must be overridden");
   }
 }
 
-module.exports = Renderer;

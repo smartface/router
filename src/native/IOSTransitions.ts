@@ -2,7 +2,7 @@
  * IOS Transtion Options
  * @ignore
  */
-module.exports = {
+export = {
   UIViewAnimationOptionLayoutSubviews: 1 << 0,
   UIViewAnimationOptionAllowUserInteraction: 1 << 1,
   UIViewAnimationOptionBeginFromCurrentState: 1 << 2,

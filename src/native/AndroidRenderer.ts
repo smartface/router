@@ -1,7 +1,8 @@
-import AlertView from '@smartface/native/ui/alertview';
-const Renderer = require("./Renderer");
+import Renderer from "./Renderer";
 import Application from '@smartface/native/application';
-
+import NavigationController from "@smartface/native/ui/navigationcontroller";
+import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller";
+import Page from "@smartface/native/ui/Page";
 
 let stack = [];
 let timeout = 0;
@@ -13,7 +14,8 @@ let timeout = 0;
  * @access package
  * @extends {Renderer}
  */
-class AndroidRenderer extends Renderer {
+export default class AndroidRenderer extends Renderer {
+  protected _activePage?: Page; 
   /**
    * @constructor
    */
@@ -35,27 +37,36 @@ class AndroidRenderer extends Renderer {
   /**
    * @override
    */
-  setChildControllers(controllers) {
-    this._rootController.childControllers = controllers;
+  setChildControllers(controllers: NavigationController[]) {
+    if(this._rootController instanceof NavigationController) {
+      this._rootController.childControllers = controllers;
+    }
   }
   
-  setSelectedIndex(index) {
-  if(this._rootController.selectedIndex != index)
-    this._rootController.selectedIndex = index;
+  setSelectedIndex(index: number) {
+  if (this._rootController instanceof BottomTabBarController) {
+    if(this._rootController.selectedIndex !== index)
+      this._rootController.selectedIndex = index;
+    }
   }
 
 
   /**
    * @override
    */
-  pushChild(page, animated = true) {
+  pushChild(page: Page, animated = true) {
     // To avoid Android error
-    if (this._rootController.childControllers.length !== 0 && this._rootController.childControllers.some(p => p === page)) {
-      return;
+    if (this._rootController instanceof NavigationController) {
+      if (this._rootController.childControllers.length !== 0 && this._rootController.childControllers.some((p) => p === page)) {
+        return;
+      }
+      animated = this._rootController.childControllers.length === 0 ? false : animated;
+      if (typeof this._rootController.push === 'function') {
+        //@ts-ignore Check TYPING-14
+        this._rootController.push({ controller: page, animated: animated });
+  
+      }
     }
-    animated = this._rootController.childControllers.length === 0 ? false : animated;
-    this._rootController.push &&
-    this._rootController.push({ controller: page, animated: animated });
     this._activePage = page;
     // stack.push((index) => setTimeout(() => {
     // }, index*10));
@@ -92,12 +103,14 @@ class AndroidRenderer extends Renderer {
   /**
    * @override
    */
-  onNavigationControllerTransition(fn) {
-    if (this._rootController.onTransition) {
-      this._rootController.onTransition = fn;
-      return () => (this._rootController.onTransition = () => null);
+  onNavigationControllerTransition(fn: (...args: any) => void) {
+    if (this._rootController instanceof NavigationController) {
+      if (this._rootController.onTransition) {
+        this._rootController.onTransition = fn;
+        //@ts-ignore
+        return () => (this._rootController.onTransition = () => null);
+      }
     }
-
     return () => null;
   }
 
@@ -105,20 +118,21 @@ class AndroidRenderer extends Renderer {
    * @override
    */
   popChild(animated = true) {
-    this._rootController.childControllers.length > 1 &&
-    this._rootController.pop &&
-      this._rootController.pop({ animated: animated });
+    if (this._rootController instanceof NavigationController) {
+      if (this._rootController.childControllers.length > 1 && typeof this._rootController.pop === 'function') {
+        this._rootController.pop({ animated: animated });
+      }
+    }
   }
 
   /**
    * @override
    */
-  show(page) {
-    if(this._activePage == page)
+  show(page: Page) {
+    if(this._activePage == page) {
       return;
+    }
     Application.setRootController(page);
     this._activePage = page;
   }
 }
-
-module.exports = AndroidRenderer;

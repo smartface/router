@@ -1,30 +1,40 @@
-const TransitionOptions = require("./IOSTransitions");
-
+import TransitionOptions from "./IOSTransitions";
+import { ControllerType } from "core/Controller";
+import Page from "@smartface/native/ui/Page";
 /**
  * @ignore
  *
  */
-class iOSAnimator {
-  constructor(containerView) {
+export default class iOSAnimator {
+  protected _containerView: ControllerType | null;
+  protected _options: number;
+  protected _onAnimate?: (...args: any) => void;
+  protected _onFinish?: (...args: any) => void;
+  protected _once: any;
+  protected _easingFn?: (...args: any) => void;
+  constructor(containerView: ControllerType) {
     this._containerView = containerView;
     this._options = 0 << 20;
   }
 
-  onAnimate(fn) {
+  onAnimate(fn: (...args: any) => void) {
     this._onAnimate = fn;
     return this;
   }
 
-  onFinish(fn) {
+  onFinish(fn: (...args: any) => void) {
     this._onFinish = fn;
     return this;
   }
 
-  start(from, to, duration = 0, params = {}) {
+  start(from: Page, to: Page, duration = 0, params = {}) {
     // options && (this._options = this._options | options);
     // this.getTime();
+    //@ts-ignore
     this._containerView.nativeObject.transitionFromToDurationOptionsAnimationsCompletion(
+      //@ts-ignore
       from.nativeObject,
+      //@ts-ignore
       to.nativeObject,
       duration,
       TransitionOptions.UIViewAnimationOptionTransitionNone,
@@ -39,7 +49,7 @@ class iOSAnimator {
             params
           );
       },
-      finished => {
+      (finished: boolean) => {
         this._onFinish &&
           this._onFinish(
             finished,
@@ -57,15 +67,13 @@ class iOSAnimator {
 
   dispose() {
     this._containerView = null;
-    this._onFinish = null;
-    this._onAnimate = null;
-    this._easingFn = null;
+    this._onFinish = undefined;
+    this._onAnimate = undefined;
+    this._easingFn = undefined;
   }
 
-  once(val) {
+  once(val: any) {
     this._once = val;
     return this;
   }
 }
-
-module.exports = iOSAnimator;
