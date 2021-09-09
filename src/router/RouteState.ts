@@ -1,5 +1,5 @@
 /** @ts-ignore */
-import Page = require("sf-core/ui/Page");
+import Page from '@smartface/native/ui/Page';
 /**
  * @typedef {object} RouteState
  * @property {?object} [routeData ={}] Requested data by user

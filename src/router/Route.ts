@@ -1,5 +1,5 @@
 /** @ts-ignore */
-import Page = require("sf-core/ui/Page");
+import Page from '@smartface/native/ui/Page';
 
 import { matchUrl } from "../common/matchPath";
 import mapComposer, { MapFunction } from "../utils/map";

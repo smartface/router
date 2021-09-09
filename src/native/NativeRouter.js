@@ -2,7 +2,7 @@
 
 const NativeRouterBase = require("./NativeRouterBase");
 const createRenderer = require("./createRenderer");
-const Page = require("sf-core/ui/page");
+import Page from '@smartface/native/ui/page';
 
 /**
  * It creates a root fragment Rotuer adds and removes child routers and pages as application root.
@@ -10,8 +10,8 @@ const Page = require("sf-core/ui/page");
  * @class
  * @example
  * const {NativeRouter: Router, Route} = require('@smartface/router')
- * const Image = require('sf-core/ui/image');
- * const Color = require('sf-core/ui/color');
+ * import Image from '@smartface/native/ui/image';
+ * import Color from '@smartface/native/ui/color';
  *
  * var router = Router.of({
  *  path: "/",

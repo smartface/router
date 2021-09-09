@@ -1,5 +1,5 @@
 /** @ts-ignore */
-import Page = require("sf-core/ui/Page");
+import Page from '@smartface/native/ui/Page';
 import type Router from "./Router";
 import type { RouteState } from "./RouteState";
 import type Route from "./Route";

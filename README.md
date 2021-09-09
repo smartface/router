@@ -74,14 +74,14 @@ There are 4 types of routers
 
 ##### Push a new page
 
-```javascript
-const {
+```typescript
+import {
   NativeRouter: Router,
   Router: RouterBase,
   NativeStackRouter: StackRouter,
   BottomTabBarRouter,
   Route
-} = require("@smartface/router");
+} from "@smartface/router";
 
 const router = Router.of({
     path: "/",
@@ -207,14 +207,14 @@ You could find more in [Replace Example](https://github.com/smartface/router-tes
 
 ### Working with StackRouter
 
-```js
-const {
+```ts
+import {
   NativeRouter: Router,
   Router: RouterBase,
   NativeStackRouter: StackRouter,
   BottomTabBarRouter,
   Route
-} = require("@smartface/router");
+} from "@smartface/router";
 
 const router = Router.of({
   path: "/",
@@ -290,15 +290,15 @@ router.dismiss(() => router.push("/to/another/page"));
 
 ### Working with BottomTabBarRouter
 
-```js
-const {
+```ts
+import {
   NativeRouter: Router,
   Router: RouterBase,
   NativeStackRouter: StackRouter,
   BottomTabBarRouter,
   Route
-} = require("@smartface/router");
-const Color = require("sf-core/ui/color");
+} from "@smartface/router";
+import Color from '@smartface/native/ui/color';
 
 const router = Router.of({
   path: "/",
@@ -507,11 +507,11 @@ router.push('/bottom/stack2/path1?sort=ASC&groupby=user')
 ### Working with deeplinking
 
 ```js
-const {
+import {
     Route,
     Router: RouterBase,
     NativeRouter: Router
-} = require("@smartface/router");
+} from "@smartface/router";
 
 const deeplinkRouter = new RouterBase({
     path: "/deeplink",
