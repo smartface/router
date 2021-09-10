@@ -25,12 +25,13 @@ import createRenderer from "./createRenderer";
 import TabBarItem from '@smartface/native/ui/tabbaritem';
 import functionMaybe from "../utils/funcorVal";
 import Router from "../router/Router";
+import { RouteParams } from 'router/RouteParams';
 
 /**
  * @private
  * @param {TabBarItem} item
  */
-function createTabBarItem(item) {
+function createTabBarItem(item: TabBarItem) {
   return item instanceof TabBarItem ? item : new TabBarItem(item);
 }
 
@@ -89,12 +90,33 @@ const userTabStatus = {
  * @since 1.0.0
  */
 class BottomTabBarRouter extends NativeRouterBase {
+  private _onTabChangedByUser: any;
+  private _fromUser: boolean;
+  private _items: any;
+  private _tabStatus = 0
+  private _currentIndex = 0;
+    /**
+     * @typedef {object<string,string|object>} BottomTabBarItem Represents {@link TabBarItem} params
+     * @property {Image} icon
+     * @property {string} title
+     */
+    /**
+     * @typedef {RouterParams} BottomTabBarRouterParams
+     * @property {function(router: Router, event: ChangeEvent)} onTabChangedByUser Tab is changed handler
+     * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
+     * @property {object} tabbarParams See {@link BottomTabbarController}
+     */
+    /**
+    * @typedef {object} ChangeEvent
+    * @property {number} prevTabIndex Previous tab index
+    * @property {number} tabIndex Changed tab index
+    */
 
   /**
    * Helper method
    * @param {BottomTabBarRouterParams} param
    */
-  static of (params) {
+  static of (params: RouteParams) {
     params.renderer = createRenderer();
     return new BottomTabBarRouter(params);
   }
@@ -117,7 +139,7 @@ class BottomTabBarRouter extends NativeRouterBase {
     routerDidExit,
     routeShouldMatch,
     routeWillEnter
-  }) {
+  }: RouteParams) {
     super({
       path,
       routes,
@@ -135,41 +157,46 @@ class BottomTabBarRouter extends NativeRouterBase {
     this._fromUser = true;
 
     this.initializeRenderer = () => {
-      this._renderer.setRootController(new BottomTabBarController(tabbarParams));
+      this._renderer?.setRootController(new BottomTabBarController(tabbarParams));
       this._visitedIndexes = { length: 0 };
       this._items = items;
       this._tabStatus = userTabStatus.IDLE;
 
-      this._renderer._rootController.shouldSelectByIndex = ({ index }) => {
-        // TabbarItem should be changed
-        return this.shouldSelectByIndex(index);
-      };
-
-      this._renderer._rootController.didSelectByIndex = ({ index }) => {
-        // tab index is changed by user
-        // currentIndex must be checked out because of Android BottombarBarController sends initially zero index without any request.
-        // And this behaviour is causing to start a router request using zeroth element of the child routes.
-        if (this._currentIndex !== undefined && this._currentIndex !== index) {
-          // selected tab is not visited
-          if (!this.isVisited(index)) {
-            // then push route object
-            this.pushRoute(this._routes[index]);
+      if(this._renderer?._rootController instanceof BottomTabBarController) {
+        this._renderer._rootController.shouldSelectByIndex = ({ index }) => {
+          // TabbarItem should be changed
+          return this.shouldSelectByIndex(index);
+        };
+        this._renderer._rootController.didSelectByIndex = ({ index }) => {
+          // tab index is changed by user
+          // currentIndex must be checked out because of Android BottombarBarController sends initially zero index without any request.
+          // And this behaviour is causing to start a router request using zeroth element of the child routes.
+          if (this._currentIndex !== undefined && this._currentIndex !== index) {
+            // selected tab is not visited
+            if (!this.isVisited(index)) {
+              // then push route object
+              this.pushRoute(this._routes[index]);
+            }
+            else {
+              // Notification of the route changing
+              // must always dispatch a PUSH action.
+              // Because when visited tabbar is revisited,
+              // POP and Replace actions come from visisted cache are 
+              // reproduced in BottomTabbarRouter.
+              if(typeof this.dispatch === 'function') {
+                this.dispatch({ url: this._visitedIndexes[index].url }, "PUSH", this);
+              }
+            }
           }
-          else {
-            // Notification of the route changing
-            // must always dispatch a PUSH action.
-            // Because when visited tabbar is revisited,
-            // POP and Replace actions come from visisted cache are 
-            // reproduced in BottomTabbarRouter.
-            this.dispatch({ url: this._visitedIndexes[index].url }, "PUSH", this);
-          }
-        }
-        
-        this._currentIndex = index;
-      };
+          
+          this._currentIndex = index;
+        };
+  
+        // Initilaze BottomTabBarController's TabBarItems
+        this._renderer._rootController.tabBar = tabbarParams();
+      }
 
-      // Initilaze BottomTabBarController's TabBarItems
-      this._renderer._rootController.tabBar = tabbarParams();
+
     };
   }
 

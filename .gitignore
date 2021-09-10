@@ -2,6 +2,7 @@ node_modules
 package-lock.json
 npm-debug.log
 dist
+lib/** #Typescript conversion
 .tmp
 build/package.smartface.ui-editor.js
 .npmrc

@@ -45,6 +45,7 @@ class MockRouter extends Router {
   }
 
   render(location) {
+    //@ts-ignore
     const view = super.render(location);
 
     if (view === this._currentPage) {
