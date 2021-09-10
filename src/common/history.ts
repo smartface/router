@@ -1,9 +1,7 @@
 // https://github.com/ReactTraining/history
 const resolvePathname = require("resolve-pathname/umd/resolve-pathname");
 import createTransitionManager from "./createTransitionManager";
-
 import parseUrl from "./parseUrl";
-import type { RouteLocation } from "../router/RouteLocation";
 import { clamp } from "./clamp";
 import { Location } from "./Location";
 

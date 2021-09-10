@@ -1,46 +1,46 @@
-const Router = require("../src/router/Router");
-const Route = require("../src/router/Route");
-const matchRoutes = require("../src/common/matchRoutes");
+import Router from "../src/router/Router";
+import Route from "../src/router/Route";
+import matchRoutes from "../src/common/matchRoutes";
 
 describe("Router", () => {
   afterEach(() => {
     // Router.unloadHistory();
   });
   it("has routes", () => {
-    const router = new Router({
+    const router = new Router<any>({
       isRoot: true,
       routes: [
-        new Route("/path/to/:name"),
-        new Route("/path/to/:id"),
-        new Route("/path/to")
+        new Route<any>({path: "/path/to/:name"}),
+        new Route<any>({path: "/path/to/:id"}),
+        new Route<any>({path: "/path/to"})
       ]
     });
     let routes = [];
-    router.map(route => {
-      routes.push(route);
+    routes = router.map(route => {
+      return route;
     });
     expect(routes.length).toBe(3);
   });
 
   it("fires an event when history is changed", () => {
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       exact: false,
       isRoot: true,
       routes: [
-        new Route({
+        new Route<any>({
           path: "/path/to/:name",
           build: (router, route) => ({
             type: "target1"
           })
         }),
-        new Route({
+        new Route<any>({
           path: "/path/to/:id",
           build: (router, route) => ({
             type: "target2"
           })
         }),
-        new Route({ path: "*", build: (props, match) => ({ type: "target3" }) })
+        new Route<any>({ path: "*", build: (props, match) => ({ type: "target3" }) })
       ]
     });
     // let matches = matchRoutes([router], "/path/to/1").map(
@@ -54,19 +54,19 @@ describe("Router", () => {
     let _router1;
     let _router2;
     let lastUrl;
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       exact: false,
       isRoot: true,
       routes: [
-        new Router({
+        new Router<any>({
           path: "/path",
           to: "/path/to/the/3",
           routes: [
-            new Router({
+            new Router<any>({
               path: "/path/to",
               routes: [
-                new Route({
+                new Route<any>({
                   path: "/path/to/the/:id",
                   build: (router, route) => {
                     _router1 = router;
@@ -78,13 +78,13 @@ describe("Router", () => {
             })
           ]
         }),
-        new Router({
+        new Router<any>({
           path: "/path2",
           build: (router, route) => ({
             type: "target1"
           }),
           routes: [
-            new Route({
+            new Route<any>({
               path: "/path2/to/:id",
               build: (router, route) => {
                 lastUrl = route.getState().match.url;
@@ -94,7 +94,7 @@ describe("Router", () => {
             })
           ]
         }),
-        new Route({ path: "*", build: (props, match) => ({ type: "target3" }) })
+        new Route<any>({ path: "*", build: (props, match) => ({ type: "target3" }) })
       ]
     });
     // let matches = matchRoutes([router], "/path/to/1").map(
@@ -133,17 +133,17 @@ describe("Router", () => {
 
   it("shouldn't call route's build when history goes back", () => {
     let lastUrl, router1;
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [
-        new Router({
+        new Router<any>({
           path: "/path2",
           build: (router, route) => ({
             type: "target1"
           }),
           routes: [
-            new Route({
+            new Route<any>({
               path: "/path2/to/:id",
               build: (router, route) => {
                 lastUrl = route.getState().match.url;
@@ -167,20 +167,20 @@ describe("Router", () => {
     let _router1;
     let _router2;
     let lastUrl;
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       to: "/path/to/the/1",
       exact: false,
       isRoot: true,
       routes: [
-        new Router({
+        new Router<any>({
           path: "/path",
           to: "/path/to/the/2",
           routes: [
-            new Router({
+            new Router<any>({
               path: "/path/to",
               routes: [
-                new Route({
+                new Route<any>({
                   path: "/path/to/the/:id",
                   build: (router, route) => {
                     _router1 = router;
@@ -192,10 +192,10 @@ describe("Router", () => {
             })
           ]
         }),
-        new Router({
+        new Router<any>({
           path: "/path2",
           routes: [
-            new Route({
+            new Route<any>({
               path: "/path2/to/:id",
               build: (router, route) => {
                 lastUrl = route.getState().match.url;
@@ -205,7 +205,7 @@ describe("Router", () => {
             })
           ]
         }),
-        new Route({
+        new Route<any>({
           path: "*",
           build: (props, match) => ({ type: "target3" })
         })
@@ -254,24 +254,24 @@ describe("Router", () => {
   });
 
   it("finds target by url", () => {
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       exact: false,
       isRoot: true,
       routes: [
-        new Route({
+        new Route<any>({
           path: "/path/to/:name",
           build: (props, match) => ({
             type: "target1"
           })
         }),
-        new Route({
+        new Route<any>({
           path: "/path/to/:id",
           build: (props, match) => ({
             type: "target2"
           })
         }),
-        new Route({ path: "*", build: (props, match) => ({ type: "target3" }) })
+        new Route<any>({ path: "*", build: (props, match) => ({ type: "target3" }) })
       ]
     });
     // let matches = matchRoutes([router], "/path/to/1").map(
@@ -279,7 +279,7 @@ describe("Router", () => {
     // );
     var matches = router
       .push("/path/to/1")
-      ._matches.map(({ match, route }) => ({
+      .matches.map(({ match, route }) => ({
         match,
         route: route.toJSON(),
         view: route.build()
@@ -392,27 +392,27 @@ describe("Router", () => {
     ]);
   });
   it("return only root path if any route doesn't be matched", () => {
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [
-        new Route({
+        new Route<any>({
           path: "/path/to/:name",
           build: () => {
             type: "target1";
           }
         }),
-        new Route({
+        new Route<any>({
           path: "/path/to/:id",
           build: () => {
             type: "target2";
           }
         }),
-        new Route({ path: "*", build: { type: "target3" } })
+        new Route<any>({ path: "*", build: () => { type: "target3" } })
       ]
     });
 
-    let matches = router.push("/path/to")._matches;
+    let matches = router.push("/path/to").matches;
     expect(matches.map(({ match }) => match)).toEqual([
       {
         isExact: false,
@@ -425,24 +425,24 @@ describe("Router", () => {
 
   it("sends data and params to specified route", () => {
     let data;
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [
-        new Route({
+        new Route<any>({
           path: "/path/to/:name",
           build: (router, route) => {
             data = route.getState();
             return { type: "target1" };
           }
         }),
-        new Route({
+        new Route<any>({
           path: "/path/too/:name",
           build: () => {
             type: "target2";
           }
         }),
-        new Route({ path: "*", build: { type: "target3" } })
+        new Route<any>({ path: "*", build: () => { type: "target3" } })
       ]
     });
     let matches = router.push("/path/to/1", { name: "name" });
@@ -453,14 +453,14 @@ describe("Router", () => {
     let data;
     let callCount = 0;
     var component:any = {};
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [
-        new Router({
+        new Router<any>({
           path: "/path",
           routes: [
-            new Route({
+            new Route<any>({
               routeDidEnter: () => {
                 callCount++;
               },
@@ -470,7 +470,7 @@ describe("Router", () => {
                 return { type: "target1" };
               }
             }),
-            new Route({
+            new Route<any>({
               path: "/path/too/:name",
               routeDidEnter: () => {
                 callCount++;
@@ -480,7 +480,7 @@ describe("Router", () => {
                 return component;
               }
             }),
-            new Route({ path: "*", build: { type: "target3" } })
+            new Route<any>({ path: "*", build: ()=>{ type: "target3" } })
           ]
         })
       ]
@@ -505,11 +505,11 @@ describe("Router", () => {
     let callCount = 0;
     var component:any = {};
     let data: any;
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [
-        new Route({
+        new Route<any>({
           path: "/path2/to/:name",
           build: (router, _route) => {
             route = _route;
@@ -517,10 +517,10 @@ describe("Router", () => {
             return { type: "target1" };
           }
         }),
-        new Router({
+        new Router<any>({
           path: "/path",
           routes: [
-            new Route({
+            new Route<any>({
               path: "/path/to/:name",
               build: (router, _route) => {
                 route = _route;
@@ -530,7 +530,7 @@ describe("Router", () => {
                 return component;
               }
             }),
-            new Route({
+            new Route<any>({
               path: "*",
               build: (router, route) => {
                 type: "target3";
@@ -550,7 +550,7 @@ describe("Router", () => {
     expect(route.getState().routeData).toEqual({ name: "name2" });
 
     component.router.goBack();
-    expect(router._historyController.lastLocation.url).toEqual("/path2/to/1");
+    expect(router.historyController.lastLocation.url).toEqual("/path2/to/1");
   });
   it("can call a relative path", () => {
     let data;
@@ -558,26 +558,21 @@ describe("Router", () => {
     var component1:any = {};
     var component2:any = {};
 
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [
-        new Route({
+        new Route<any>({
           path: "/path2/to/:name",
-          build: (match, state, router) => {
-            data = {
-              params: match.params,
-              state
-            };
-            // component.router = router;
+          build: (router, route) => {
             callCount++;
             return { type: "target1" };
           }
         }),
-        new Router({
+        new Router<any>({
           path: "/path",
           routes: [
-            new Route({
+            new Route<any>({
               path: "/path/to/:name([a-zA-Z]*)",
               build: (router, route) => {
                 const { match } = route.getState();
@@ -586,7 +581,7 @@ describe("Router", () => {
                 return component1;
               }
             }),
-            new Route({
+            new Route<any>({
               path: "/path/to/:id",
               build: (router, route) => {
                 const { match } = route.getState();
@@ -614,21 +609,21 @@ describe("Router", () => {
   it("can be blocked", () => {
     let callCount = 0;
     var component1:any = {};
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [
-        new Route({
+        new Route<any>({
           path: "/path/to/:name([a-zA-Z]*)",
-          build: (match, state, router) => {
+          build: (router, route) => {
             component1.router = router;
-            component1.params = match.params;
+            component1.params = route.matchPath;
             return component1;
           }
         }),
-        new Route({
+        new Route<any>({
           path: "/path/to/:id",
-          build: (match, state, router, view) => {
+          build: (router, route) => {
             return component1;
           }
         })
@@ -656,11 +651,11 @@ describe("Router", () => {
     let callCount = 0;
     var component1 :any= {};
     var activeRoute;
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [
-        new Route({
+        new Route<any>({
           path: "/path",
           to: "/path2/to/1",
           build: (router, route) => {
@@ -670,7 +665,7 @@ describe("Router", () => {
             return component1;
           }
         }),
-        new Route({
+        new Route<any>({
           path: "/path2/to/:id",
           build: (router, route) => {
             activeRoute = route;
@@ -693,7 +688,7 @@ describe("Router", () => {
       path: "/stack1",
       to: "/stack1/to/1",
       routes: [
-        new Route({
+        new Route<any>({
           path: "/stack1/to/1",
           build: (router, route) => {
             const { match } = route.getState();
@@ -702,9 +697,9 @@ describe("Router", () => {
             return component1;
           }
         }),
-        new Route({
+        new Route<any>({
           path: "/stack1/to/:id",
-          build: (match, state, router, view) => {
+          build: () => {
             return component1;
           }
         })
@@ -715,7 +710,7 @@ describe("Router", () => {
       path: "/stack2",
       to: "/stack2/to/1",
       routes: [
-        new Route({
+        new Route<any>({
           path: "/stack2/to/1",
           build: (router, route) => {
             const { match } = route.getState();
@@ -724,16 +719,16 @@ describe("Router", () => {
             return component2;
           }
         }),
-        new Route({
+        new Route<any>({
           path: "/stack2/to/:id",
-          build: (match, state, router, view) => {
+          build: (router, route) => {
             return component1;
           }
         })
       ]
     });
 
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [router1, router2]
@@ -751,10 +746,11 @@ describe("Router", () => {
     let component2:any = {};
 
     let router1 = Router.of({
+      name: "router1",
       path: "/stack1",
       to: "/stack1/to/1",
       routes: [
-        new Route({
+        new Route<any>({
           path: "/stack1/to/1",
           build: (router, route) => {
             component1.router = router;
@@ -762,7 +758,7 @@ describe("Router", () => {
             return component1;
           }
         }),
-        new Route({
+        new Route<any>({
           path: "/stack1/to/:id",
           build: (router, rotue) => {
             return component1;
@@ -771,13 +767,13 @@ describe("Router", () => {
       ]
     });
 
-    router1.name = "router1";
 
     let router2 = Router.of({
       path: "/stack2",
+      name: "router2",
       to: "/stack2/to/1",
       routes: [
-        new Route({
+        new Route<any>({
           path: "/stack2/to/1",
           build: (router, route) => {
             component2.router = router;
@@ -785,7 +781,7 @@ describe("Router", () => {
             return component2;
           }
         }),
-        new Route({
+        new Route<any>({
           path: "/stack2/to/:id",
           build: (router, route) => {
             component2.url = route.getState().match.url;
@@ -795,9 +791,7 @@ describe("Router", () => {
       ]
     });
 
-    router2.name = "router2";
-
-    const router = new Router({
+    const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [router1, router2]

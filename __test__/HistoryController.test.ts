@@ -1,7 +1,8 @@
-const Router = require("../src/router/Router");
-const Route = require("../src/router/Route");
-const matchRoutes = require("../src/common/matchRoutes");
-const createHistory = require("../src/common/createHistory");
+import Router from "../src/router/Router";
+import Route from "../src/router/Route";
+import matchRoutes from "../src/common/matchRoutes";
+import createMemoryHistory from "../src/common/history";
+import { HistoryController } from "../src/common/HistoryController";
 
 describe("HistoryController", () => {
   afterEach(() => {
@@ -9,30 +10,30 @@ describe("HistoryController", () => {
   });
 
   it("can create nested nodes", () => {
-    var history = createHistory();
+    var history = new HistoryController({});
     var node = history.createNode();
     expect(node.constructor.name).toBe("HistoryController");
   });
 
   it("can check url is valid or not", () => {
-    let history = createHistory({ path: "/path" });
+    let history = new HistoryController({ path: "/path" });
     expect(history.canPush("/path")).toBe(true);
 
-    history = createHistory({ path: "/path1" });
+    history = new HistoryController({ path: "/path1" });
     expect(history.canPush("/path")).toBe(false);
 
-    history = createHistory({ path: "/path1" });
+    history = new HistoryController({ path: "/path1" });
     expect(history.canPush("/path2")).toBe(false);
 
-    history = createHistory({ path: "/path/subpath" });
+    history = new HistoryController({ path: "/path/subpath" });
     expect(history.canPush("/path")).toBe(false);
 
-    history = createHistory({ path: "/path" });
+    history = new HistoryController({ path: "/path" });
     expect(history.canPush("/path/subpath")).toBe(true);
   });
 
   it("should be fires an event when route is changed", () => {
-    var history = createHistory();
+    var history = new HistoryController({});
     var _location;
     history.listen((location, action) => {
       _location = location;
@@ -44,7 +45,7 @@ describe("HistoryController", () => {
   });
 
   it("cannot be affected when children's state is chenged", () => {
-    var history = createHistory();
+    var history = new HistoryController({});
     var node = history.createNode();
     var node2 = history.createNode();
     var node3 = history.createNode();
@@ -136,7 +137,7 @@ describe("HistoryController", () => {
   // });
 
   it("can go back", () => {
-    var history = createHistory();
+    var history = new HistoryController({});
     var node = history.createNode();
     var _location;
     var _nodeLocation;
@@ -156,7 +157,7 @@ describe("HistoryController", () => {
   });
 
   it("can't go back if history is empty", () => {
-    var history = createHistory();
+    var history = new HistoryController({});
     var node = history.createNode();
     var _location;
     var _nodeLocation;
@@ -178,7 +179,7 @@ describe("HistoryController", () => {
   });
 
   it("can call parent go back if node history is empty", () => {
-    var history = createHistory();
+    var history = new HistoryController({});
     var node = history.createNode();
     var _location;
     var _nodeLocation;
@@ -202,7 +203,7 @@ describe("HistoryController", () => {
     expect(_nodeLocation.url).toBe("/path/too");
   });
   it("can dispose", () => {
-    var history = createHistory();
+    var history = new HistoryController({});
     var node = history.createNode();
     var _location;
     var _nodeLocation;

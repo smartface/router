@@ -21,10 +21,11 @@ import HeaderBar from '@smartface/native/ui/headerbar';
  * @property {?function(Router: Router, route: Route)} routeDidExit Handles if route is removed
  */
 export type RouteParams<Ttarget=Page> = {
-  path: string | RoutePath;
+  name?:string;
+  path?: string | RoutePath;
   to?: string;
   routes?: Route[];
-  build?: (router: Router, route: Route<Ttarget>) => Ttarget;
+  build?: (router: Router<Ttarget>, route: Route<Ttarget>) => Ttarget;
   exact?: boolean;
   sensitive?: boolean;
   modal?: boolean;
@@ -44,9 +45,9 @@ export type RouteParams<Ttarget=Page> = {
   headerBarParams?: Partial<HeaderBar>
 };
 
-export type RouteLifeCycleHandler<Ttarget> = (Router: Router, route: Route<Ttarget>) => void;
+export type RouteLifeCycleHandler<Ttarget> = (Router: Router<Ttarget>, route: Route<Ttarget>) => void;
 
 /**
  * @typedef {function(route: Route, nextState: RouteState)} RouteShouldMatchHandler
  */
-export type RouteShouldMatchHandler<Ttarget> = (router: Router, nextRoute: Route<Ttarget>) => boolean;
+export type RouteShouldMatchHandler<Ttarget> = (router: Router<Ttarget>, nextRoute: Route<Ttarget>) => boolean;

@@ -1,15 +1,15 @@
-const Route = require("../src/router/Route");
-const Router = require("../src/router/Router");
-const createStore = require("../src/router/routeStore");
-const matchRoutes = require("../src/common/matchRoutes");
-const { matchPath, matchUrl } = require("../src/common/matchPath");
-const parseUrl = require("../src/common/parseUrl");
+import Route from "../src/router/Route";
+import Router from "../src/router/Router";
+import createStore from "../src/router/routeStore";
+import matchRoutes from "../src/common/matchRoutes";
+import { matchPath, matchUrl } from "../src/common/matchPath";
+import parseUrl from "../src/common/parseUrl";
 
 describe("Match Routes", () => {
   it("should match same url with query", () => {
     const path = "/path/to/:id";
     {
-      const match = matchUrl("/path/to/1", path);
+      const match = matchUrl("/path/to/1", {path});
       expect(match).toEqual({
         isExact: true,
         params: { id: "1" },
@@ -18,7 +18,7 @@ describe("Match Routes", () => {
       });
     }
     {
-      const match = matchUrl("/path/to/1?type=any", path);
+      const match = matchUrl("/path/to/1?type=any", {path});
       expect(match).toEqual({
         isExact: true,
         params: { id: "1" },
@@ -130,7 +130,7 @@ describe("Match Routes", () => {
     const routes = [
       new Router({
         path: "/new-path",
-        routes: [new Route({ path: "/new-path/:name([A-Za-z0-9]*)" })]
+        routes: [new Route<any>({ path: "/new-path/:name([A-Za-z0-9]*)" })]
       })
     ];
 

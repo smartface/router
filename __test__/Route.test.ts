@@ -1,6 +1,7 @@
 import Route from "../src/router/Route";
 import matchRoutes from "../src/common/matchRoutes";
 import createStore from "../src/router/routeStore";
+import Router from "../src/router/Router";
 
 describe("Route", () => {
   it("can be matched any url", () => {
@@ -25,7 +26,7 @@ describe("Route", () => {
   it("has a target", () => {
     const target: Record<any, any> = {};
     const route = new Route({ path: "path", build: () => target });
-    const router = new Router();
+    const router = new Router<any>();
     expect(route.build(router)).toBe(target);
   });
 

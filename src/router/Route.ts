@@ -30,7 +30,7 @@ export default class Route<Ttarget = Page> {
     return new Route<Ttarget>(params, state);
   }
 
-  public map?: MapFunction<Route>;
+  public map?: MapFunction<Route<any>>;
 
   protected _options: MatchOptions = {};
   protected _isDIrty = false;
@@ -64,7 +64,7 @@ export default class Route<Ttarget = Page> {
       routeShouldMatch,
       routeDidEnter,
       routeDidExit,
-    }: Omit<RouteParams<Ttarget>, 'path'> & {path: string | RoutePath},
+    }: Omit<RouteParams<Ttarget>, 'path'> & {path?: string | RoutePath},
     {
       match = {},
       routeData = {},
@@ -90,7 +90,7 @@ export default class Route<Ttarget = Page> {
     this._build = build;
     this._path = path instanceof RoutePath ? path : new RoutePath(path);
     this._routes = routes;
-    this.map = mapComposer<Route>(this._routes)
+    this.map = mapComposer<Route<any>>(this._routes)
     this._to = to;
     this._routeShouldMatch = routeShouldMatch;
     this._routeDidEnter = routeDidEnter;
@@ -235,7 +235,7 @@ export default class Route<Ttarget = Page> {
    * @param {Router} router - Not the root router, the router which the route belongs to.
    * @return {Page} view = null - If the route has been built once, the previous view (page) is given. Otherwise it is null. If view is not null, returning the view back makes it singleton.
    */
-  build(router: Router): Ttarget | null {
+  build(router: Router<Ttarget>): Ttarget | null {
     return this._build ? this._build(router, this) : null;
   }
 
@@ -261,7 +261,7 @@ export default class Route<Ttarget = Page> {
    * @param {Router} router
    * @return {boolean}
    */
-  routeShouldMatch(router: Router) {
+  routeShouldMatch(router: Router<Ttarget>) {
     return this._routeShouldMatch ? this._routeShouldMatch(router, this) : true;
   }
 
@@ -281,7 +281,7 @@ export default class Route<Ttarget = Page> {
    * @event
    * @param {Router} router
    */
-  routeDidEnter(router: Router) {
+  routeDidEnter(router: Router<Ttarget>) {
     return this._routeDidEnter ? this._routeDidEnter(router, this) : true;
   }
 
@@ -301,7 +301,7 @@ export default class Route<Ttarget = Page> {
    * @event
    * @param {Router} router
    */
-  routeDidExit(router: Router) {
+  routeDidExit(router: Router<Ttarget>) {
     return this._routeDidExit ? this._routeDidExit(router, this) : true;
   }
 

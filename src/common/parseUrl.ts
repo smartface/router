@@ -1,8 +1,8 @@
-const parseUrl = (path: string) => {
+const parseUrl = (path: string): {url: string, rawQuery: string, hash: string, query?: { [key: string]: any }} => {
   let url = path || "/";
-  let query = "";
   let rawQuery = "";
   let hash = "";
+  let query;
 
   const hashIndex = url.indexOf("#");
   if (hashIndex !== -1) {
@@ -13,14 +13,12 @@ const parseUrl = (path: string) => {
   const queryIndex = url.indexOf("?");
   if (queryIndex !== -1) {
     rawQuery = url.substr(queryIndex);
-    query =
-      "{" +
+    query = JSON.parse("{" +
       rawQuery
         .replace("?", '"')
         .replace(/\&/gi, '","')
         .replace(/\=/gi, '":"') +
-      '"}';
-    query = JSON.parse(query);
+      '"}');
     url = url.substr(0, queryIndex);
   }
 

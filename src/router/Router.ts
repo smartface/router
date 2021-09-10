@@ -11,7 +11,7 @@ import { RouteBlockHandler } from '../core/RouteBlockHandler';
 import { OnHistoryChange } from "core/OnHistoryChange";
 import Page from "@smartface/native/ui/Page";
 
-type RouterParams = RouteParams & {homeRoute?: number, isRoot: boolean}
+type RouterParams<Ttarget=Page> = RouteParams<Ttarget> & {homeRoute?: number, isRoot?: boolean}
 
 let tasks: any[] = [];
 
@@ -196,7 +196,7 @@ function handleRouteUrl(controller: HistoryController, prevUrl: string = '', url
  * @since 1.0.0
  * @extends {Route}
  */
-export default class Router extends Route {
+export default class Router<Ttarget = Page> extends Route<Ttarget> {
   _isRoot: boolean;
   protected _exact: boolean;
   protected _strict: boolean;
@@ -204,9 +204,9 @@ export default class Router extends Route {
   protected _fromRouter = false;
   protected _pushHomes: (path: string) => void;
   static _lock: boolean;
-  dispatch?: (location: Location, action: string, target: Router, fromRouter?: boolean) => void;
+  dispatch?: (location: Location, action: string, target: Router<Ttarget>, fromRouter?: boolean) => void;
   static _nextAnimated: any;
-  static currentRouter: Router;
+  static currentRouter: Router<any>;
   private _handlers: any;
   static getGlobalRouter() {
     return historyController;
@@ -232,7 +232,7 @@ export default class Router extends Route {
    *
    * @param {RouterParams} props
    */
-  static of (props: RouterParams) {
+  static of<Ttarget=Page>(props: RouterParams<Ttarget>) {
     return new Router(props);
   }
 
@@ -258,7 +258,14 @@ export default class Router extends Route {
 
   static blocker: ReturnType<typeof Router.createBlocker> | null;
   private _matches: ReturnType<typeof matchRoutes> = [];
+  get matches() {
+    return this._matches
+  };
   protected _historyController?: HistoryController;
+  
+  get historyController() {
+    return this._historyController;
+  }
   protected _homeRoute?:number;
   private _historyUnlisten: Function = () => null;
   private _currentUrl = '';
@@ -272,7 +279,7 @@ export default class Router extends Route {
    * @constructor
    * @param {RouterParams} param
    */
-  constructor(options: RouterParams) {
+  constructor(options: RouterParams<Ttarget>={}) {
     super(options, {});
     this._homeRoute = options.homeRoute;
     this._pushHomes = () => {};
@@ -301,7 +308,7 @@ export default class Router extends Route {
         while (++len < matches.length) {
           //@ts-ignore
           let route = matches[len].route;
-          if (route.__is_router && route.hasHome()) {
+          if (route instanceof Router && route.hasHome()) {
             route.pushHomeBefore && route.pushHomeBefore(path);
           }
         }
@@ -316,11 +323,15 @@ export default class Router extends Route {
       );
     }
 
-    this._isRoot = options.isRoot;
+    this._isRoot = !!options.isRoot;
     this._exact = !!options.exact;
     this._strict = !!options.strict;
     this._sensitive = !!options.sensitive;
     this._fromRouter = false;
+  }
+
+  pushHomeBefore(path: string){
+
   }
 
   /**
@@ -351,7 +362,7 @@ export default class Router extends Route {
    * @param {function} onHistoryChange Root onHistoryChange handler
    * @param {function} pushHomes It uses in order to push routers' home-route
    */
-  initialize(parentHistory: unknown, onHistoryChange: OnHistoryChange, pushHomes: (path: string) => void) {
+  initialize(parentHistory: unknown, onHistoryChange: OnHistoryChange<Ttarget>, pushHomes: (path: string) => void) {
     this._pushHomes = pushHomes;
     /**
      * parentHistory is supposed to be a function, idk why it acts like an object.
@@ -378,7 +389,7 @@ export default class Router extends Route {
     }) || this._unlisten;
 
     // changes route without history
-    this.dispatch = (location: Location, action: string, target: Router, fromRouter = false) => {
+    this.dispatch = (location: Location, action: string, target: Router<Ttarget>, fromRouter = false) => {
       onHistoryChange(location, action, target, fromRouter);
     };
   }
@@ -551,8 +562,11 @@ export default class Router extends Route {
         action,
         match
       });
-      if (match.isExact !== true && route !== this && route.__is_router) {
-        route.initializeWaiting && route.initializeWaiting();
+      const self: Router<Ttarget> = this;
+      // @ts-ignore
+      const isSelf = route === self;
+      if (!isSelf && match.isExact !== true && route instanceof Router) {
+        // route.initializeWaiting && route.initializeWaiting();
         tasks.push((url: string, action: string) => {
           if(typeof this.routeWillEnter === 'function') {
             /**
@@ -572,8 +586,7 @@ export default class Router extends Route {
           location,
           action,
           target,
-          fromRouter,
-          this
+          fromRouter
         );
 
         return true;
@@ -592,10 +605,13 @@ export default class Router extends Route {
           return false;
         }
 
+        // @ts-ignore
         Router._activeRouter = this;
-
+        // @ts-ignore
         const routingState =
+          // @ts-ignore
           (route.getRoutingState &&
+            // @ts-ignore
             route.getRoutingState(route._state, {
               match,
               action,
@@ -603,8 +619,8 @@ export default class Router extends Route {
             })) || {};
         // change route state to move data to callbacks
         route.setState({
-          //@ts-ignore
-          query: location.search,
+          rawQuery: location.search,
+          query: location.query,
           match,
           action,
           routeData,
@@ -615,6 +631,7 @@ export default class Router extends Route {
         // If route owned by current child router which is different from target router
         // then push or pop route to child router's history.
         // Because current router isn't aware of the route.
+        // @ts-ignore
         if (target != this) {
           //@ts-ignore
           this._historyController && handleRouteUrl(this._historyController, this.state.prevUrl, match.url, routeData, action);
@@ -635,6 +652,7 @@ export default class Router extends Route {
 
         if (_lastRoute) { // notify current route to exit
           _lastRoute.setState({ action });
+          // @ts-ignore
           _lastRoute.routeDidExit(this);
         }
 
@@ -714,9 +732,11 @@ export default class Router extends Route {
    * @param {string} action
    */
   setasActiveRouter(action: string) {
+    // @ts-ignore
     if (this != Router.currentRouter && typeof Router.currentRouter?.routerDidExit === 'function') {
       Router.currentRouter.routerDidExit(action);
     }
+    // 
     Router.currentRouter = this;
   }
 

@@ -1,5 +1,6 @@
 /** @ts-ignore */
 import Page from '@smartface/native/ui/Page';
+import { RouteMatch } from './RouteMatch';
 /**
  * @typedef {object} RouteState
  * @property {?object} [routeData ={}] Requested data by user
@@ -18,13 +19,13 @@ import Page from '@smartface/native/ui/Page';
 export type RouteState = {
   routeData?: object;
   action: string;
-  query: object;
-  rawQuery: string;
+  query?: { [key: string]: any };
+  rawQuery?: string;
   active: boolean;
-  hash: string;
+  hash?: string;
   view?: Page | null;
   url: string;
   prevUrl?: string;
   routingState?: object;
-  match?: object;
+  match?: Partial<RouteMatch>;
 };
