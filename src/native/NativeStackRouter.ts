@@ -34,7 +34,7 @@ import NavigationController from '@smartface/native/ui/navigationcontroller';
 import createRenderer from "./createRenderer";
 import { RouteParams } from "../router/RouteParams";
 import { RouteState } from "../router/RouteState";
-import Page from "@smartface/native/ui/Page";
+import Page from "@smartface/native/ui/page";
 import HeaderBar from "@smartface/native/ui/headerbar";
 
 type NativeStackRouterParams = RouteParams & {homeRoute?: number, isRoot: boolean}
@@ -112,7 +112,7 @@ export default class NativeStackRouter extends NativeRouterBase {
   private _presented: boolean = false;
   private _unlistener: () => void = () => {};
   private _dismiss: any;
-  private _headerBarParams?: Partial<HeaderBar>
+  private _headerBarParams?: () => Partial<HeaderBar>
   private _nextAnimated:boolean;
   /**
    * Builds OS specific NaitveRouter
@@ -173,7 +173,9 @@ export default class NativeStackRouter extends NativeRouterBase {
      * Headerbar is be read-only
      */
     //@ts-ignore
-    this._renderer?._rootController.headerBar = headerBarParams();
+    if (typeof this._headerBarParams === 'function') {
+      this._renderer?._rootController.headerBar = this._headerBarParams();
+    }
   }
 
   /**

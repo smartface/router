@@ -25,12 +25,12 @@ export default abstract class Renderer {
    * @static
    * @param {BottomTabBarController|Page} rootController
    */
-  static setasRoot(rootController: NavigationController | Page) {
+  static setasRoot(rootController: ControllerType) {
     /**
      * Wrong typing on @smartface/native, track the issue on Linear (TYPNG-14)
      */
-    //@ts-ignore
-    Application.seController({
+    Application.setRootController({
+      //@ts-ignore
       controller: rootController,
       animated: true
     });
@@ -71,6 +71,14 @@ export default abstract class Renderer {
       //@ts-ignore
     this._rootController.dismiss({ onComplete, animated });
   }
+
+  /**
+   * Template method sets specified controller as root controller
+   * @param {BottomTabBarController|Page|NavigationController} controller
+   */
+    setRootController(controller: ControllerType) {
+      this._rootController = controller;
+    }
   
   replaceChild(view: View | ControllerType, index: number){
     if(this._rootController instanceof Page || !this._rootController?.childControllers?.length) {

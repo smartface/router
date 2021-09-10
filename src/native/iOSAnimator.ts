@@ -1,6 +1,6 @@
 import TransitionOptions from "./IOSTransitions";
 import { ControllerType } from "../core/Controller";
-import Page from "@smartface/native/ui/Page";
+import Page from "@smartface/native/ui/page";
 /**
  * @ignore
  *

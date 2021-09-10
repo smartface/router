@@ -9,7 +9,7 @@ import { RouteParams } from "./RouteParams";
 import { HistoryListenHandler } from "../common/history";
 import { RouteBlockHandler } from '../core/RouteBlockHandler';
 import { OnHistoryChange } from "../core/OnHistoryChange";
-import Page from "@smartface/native/ui/Page";
+import Page from "@smartface/native/ui/page";
 
 type RouterParams<Ttarget=Page> = RouteParams<Ttarget> & {homeRoute?: number, isRoot?: boolean}
 

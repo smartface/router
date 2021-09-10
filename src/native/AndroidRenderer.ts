@@ -2,7 +2,7 @@ import Renderer from "./Renderer";
 import Application from '@smartface/native/application';
 import NavigationController from "@smartface/native/ui/navigationcontroller";
 import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller";
-import Page from "@smartface/native/ui/Page";
+import Page from "@smartface/native/ui/page";
 
 let stack = [];
 let timeout = 0;

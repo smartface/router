@@ -6,7 +6,7 @@ import { RouteParams } from "../router/RouteParams";
 import Renderer from "./Renderer";
 import type Route from "../router/Route";
 import Router from "../router/Router";
-import Page from "@smartface/native/ui/Page";
+import Page from "@smartface/native/ui/page";
 
 /**
  * It creates a root fragment Rotuer adds and removes child routers and pages as application root.

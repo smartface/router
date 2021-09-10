@@ -41,7 +41,7 @@ export type RouteParams<Ttarget=Page> = {
   renderer?: Renderer;
   isRoot?: boolean;
   rootWillChange?: RouteLifeCycleHandler<Ttarget>;
-  headerBarParams?: Partial<HeaderBar>
+  headerBarParams?: () => Partial<HeaderBar>
 };
 
 export type RouteLifeCycleHandler<Ttarget> = (Router: Router<Ttarget>, route: Route<Ttarget>) => void;

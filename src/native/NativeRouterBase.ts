@@ -2,7 +2,7 @@
 import Router from "../router/Router";
 import HeaderBar from "@smartface/native/ui/headerbar";
 import Renderer from "./Renderer";
-import Page from "@smartface/native/ui/Page";
+import Page from "@smartface/native/ui/page";
 /**
  * Native router base
  * @class

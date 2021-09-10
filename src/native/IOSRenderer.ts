@@ -3,7 +3,7 @@
 import Renderer from "./Renderer";
 import Animator from "./iOSAnimator";
 import { ControllerType } from "../core/Controller";
-import Page from "@smartface/native/ui/Page";
+import Page from "@smartface/native/ui/page";
 import NavigationController from "@smartface/native/ui/navigationcontroller";
 /**
  * Rendering strategy for iOS

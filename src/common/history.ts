@@ -1,11 +1,11 @@
 // https://github.com/ReactTraining/history
-const resolvePathname = require("resolve-pathname/umd/resolve-pathname");
+import resolvePathname from "resolve-pathname/umd/resolve-pathname";
 import createTransitionManager from "./createTransitionManager";
 import parseUrl from "./parseUrl";
 import { clamp } from "./clamp";
 import { Location } from "./Location";
 
-const warning = require("./warning");
+import warning from "./warning";
 const createPath = (location: { url: string, search: string, hash: string }) => {
   const { url, search, hash } = location;
 

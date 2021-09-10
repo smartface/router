@@ -1,9 +1,9 @@
-require("./lib/types");
+// require("./lib/types");
 
 module.exports = {
-  Route: require("./lib/router/Route"),
-  Router: require("./lib/router/Router"),
-  BottomTabBarRouter: require("./lib/native/BottomTabBarRouter"),
-  NativeRouter: require("./lib/native/NativeRouter"),
-  NativeStackRouter: require("./lib/native/NativeStackRouter")
+  Route: require("./lib/router/Route").default,
+  Router: require("./lib/router/Router").default,
+  BottomTabBarRouter: require("./lib/native/BottomTabBarRouter").default,
+  NativeRouter: require("./lib/native/NativeRouter").default,
+  NativeStackRouter: require("./lib/native/NativeStackRouter").default
 };
