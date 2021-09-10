@@ -40,7 +40,8 @@ export type RouteParams = {
   props?: any;
   renderer?: Renderer;
   rootWillChange?: RouteLifeCycleHandler;
-  headerBarParams?: Partial<HeaderBar>
+  headerBarParams?: Partial<HeaderBar>;
+  isRoot?: boolean;
 };
 
 export type RouteLifeCycleHandler = (Router: Router, route: Route) => void;

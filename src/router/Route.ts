@@ -76,7 +76,7 @@ export default class Route {
       query = {},
       rawQuery = "",
       hash = "",
-    }: Partial<RouteState>
+    }: Partial<RouteState> = {}
   ) {
     
     // this._handlers = {

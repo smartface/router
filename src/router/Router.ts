@@ -536,7 +536,7 @@ export default class Router extends Route {
    * @param {Router} target Target Router which pushed to its router.
    * @param {boolean} fromRouter If the specified request if from the router or an another source.
    */
-  renderMatches(matches: ReturnType<typeof matchRoutes>, location: Location, action: string, target: Router, fromRouter: boolean) {
+  renderMatches(matches: ReturnType<typeof matchRoutes>, location: Location, action: string, target: Router, fromRouter: boolean): void {
     this._fromRouter = fromRouter;
     const routeData = location.state;
     /**
@@ -656,8 +656,6 @@ export default class Router extends Route {
     });
 
     this._fromRouter = false;
-
-    return true;
   }
 
   /**
