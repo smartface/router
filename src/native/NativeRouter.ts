@@ -6,6 +6,7 @@ import { RouteParams } from "../router/RouteParams";
 import Renderer from "./Renderer";
 import type Route from "../router/Route";
 import Router from "../router/Router";
+import Page from "@smartface/native/ui/Page";
 
 /**
  * It creates a root fragment Rotuer adds and removes child routers and pages as application root.
@@ -40,7 +41,7 @@ import Router from "../router/Router";
  *
  * @since 1.0.0
  */
-export default class NativeRouter extends NativeRouterBase {
+export default class NativeRouter<Ttarget = Page> extends NativeRouterBase<Ttarget> {
   protected _rootWillChange: boolean;
   protected _route?: Route;
   /**
@@ -49,9 +50,9 @@ export default class NativeRouter extends NativeRouterBase {
    * @param {RouterParams} options
    * @returns {NativeRouter}
    */
-  static of(options: any) {
+  static of<Ttarget = Page>(options: any) {
     options.renderer = createRenderer();
-    return new NativeRouter(options);
+    return new NativeRouter<Ttarget>(options);
   }
 
   /**
@@ -70,7 +71,7 @@ export default class NativeRouter extends NativeRouterBase {
     routeShouldMatch,
     routeWillEnter,
     rootWillChange,
-  }: RouteParams) {
+  }: RouteParams<Ttarget>) {
     super({
       path,
       build,

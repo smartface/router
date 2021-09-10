@@ -2,7 +2,7 @@
 
 import Renderer from "./Renderer";
 import Animator from "./iOSAnimator";
-import { ControllerType } from "core/Controller";
+import { ControllerType } from "../core/Controller";
 import Page from "@smartface/native/ui/Page";
 import NavigationController from "@smartface/native/ui/navigationcontroller";
 /**
@@ -91,10 +91,14 @@ export default class IOSRenderer extends Renderer {
    */
   onNavigationControllerTransition(fn: (...args: any) => void) {
     if (this._rootController instanceof NavigationController) {
-      this._rootController.onTransition = fn;
+      const controller = this._rootController
+      controller.onTransition = fn;
       //@ts-ignore
-      return () => (this._rootController.onTransition = () => null);
+      return () => {
+        controller.onTransition = () => null
+      };
     }
+    return () => {};
   }
 
   /**

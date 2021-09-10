@@ -25,12 +25,13 @@ import createRenderer from "./createRenderer";
 import TabBarItem from '@smartface/native/ui/tabbaritem';
 import functionMaybe from "../utils/funcorVal";
 import Router from "../router/Router";
-import { RouteParams } from 'router/RouteParams';
-import { OnHistoryChange } from 'core/OnHistoryChange';
-import { matchRoutes } from 'common';
-import { Location } from 'common/Location';
+import { RouteParams } from '../router/RouteParams';
+import { OnHistoryChange } from '../core/OnHistoryChange';
+import { matchRoutes } from '../common';
+import { Location } from '../common/Location';
+import Page from '@smartface/native/ui/Page';
 
-type BottomTabBarRouterParams = RouteParams & { isRoot: boolean; items: TabBarItem[]; onTabChangedByUser: (...args: any) => void; tabbarParams: any; }
+type BottomTabBarRouterParams<Ttarget> = RouteParams<Ttarget> & { isRoot: boolean; items: TabBarItem[]; onTabChangedByUser: (...args: any) => void; tabbarParams: any; }
 
 /**
  * @private
@@ -94,7 +95,7 @@ const userTabStatus = {
  *
  * @since 1.0.0
  */
-export default class BottomTabBarRouter extends NativeRouterBase {
+export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase<Ttarget> {
   private _onTabChangedByUser: any;
   private _fromUser: boolean;
   private _items: any;
@@ -122,9 +123,9 @@ export default class BottomTabBarRouter extends NativeRouterBase {
    * Helper method
    * @param {BottomTabBarRouterParams} param
    */
-  static of (params: BottomTabBarRouterParams) {
+  static of<Ttarget=Page>(params: BottomTabBarRouterParams<Ttarget>) {
     params.renderer = createRenderer();
-    return new BottomTabBarRouter(params);
+    return new BottomTabBarRouter<Ttarget>(params);
   }
 
   /**
@@ -147,7 +148,7 @@ export default class BottomTabBarRouter extends NativeRouterBase {
     routerDidExit,
     routeShouldMatch,
     routeWillEnter
-  }: BottomTabBarRouterParams) {
+  }: BottomTabBarRouterParams<Ttarget>) {
     super({
       path,
       routes,

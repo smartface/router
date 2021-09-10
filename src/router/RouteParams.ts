@@ -1,10 +1,9 @@
 /** @ts-ignore */
 import Page from '@smartface/native/ui/Page';
 import type Router from "./Router";
-import type { RouteState } from "./RouteState";
 import type Route from "./Route";
 import { RoutePath } from "./RoutePath";
-import Renderer from 'native/Renderer';
+import Renderer from '../native/Renderer';
 import HeaderBar from '@smartface/native/ui/headerbar';
 
 /**

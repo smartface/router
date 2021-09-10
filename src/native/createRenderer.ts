@@ -1,15 +1,16 @@
 import System from "@smartface/native/device/system";
 import IOSRenderer from "./IOSRenderer";
 import AndroidRenderer from "./AndroidRenderer";
+import Renderer from "./Renderer";
 
 export default function createRenderer() {
-  let Renderer: typeof AndroidRenderer | typeof IOSRenderer;
+  let RendererKlass: typeof Renderer;
   switch (System.OS) {
     case System.OSType.IOS:
-      Renderer = IOSRenderer;
+      RendererKlass = IOSRenderer;
       break;
     case System.OSType.ANDROID:
-      Renderer = AndroidRenderer;
+      RendererKlass = AndroidRenderer;
       break;
     default:
       throw new TypeError(System.OS + " Invalid OS definition.");
@@ -18,5 +19,5 @@ export default function createRenderer() {
    * The class Renderer shouldn't take any parameters.
    */
   //@ts-ignore
-  return new Renderer();
+  return new RendererKlass();
 };

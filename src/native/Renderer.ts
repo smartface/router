@@ -115,7 +115,7 @@ export default abstract class Renderer {
    *
    * @param {function(e:NavigationControllerTransformEvent)} fn
    */
-  onNavigationControllerTransition(fn: (e: (...args: any) => void) => void) {
+  onNavigationControllerTransition(fn: (...args: any) => void): () => void {
     throw new Error("onNavigatorChange method must be overridden");
   }
 

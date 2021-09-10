@@ -3,12 +3,12 @@ import Page from '@smartface/native/ui/Page';
 
 import { matchUrl } from "../common/matchPath";
 import mapComposer, { MapFunction } from "../utils/map";
-import { MatchOptions } from "common/MatchOptions";
+import { MatchOptions } from "../common/MatchOptions";
 import Router from "./Router";
 import { RoutePath } from "./RoutePath";
 import { RouteState } from "./RouteState";
 import { RouteParams } from "./RouteParams";
-import { OnHistoryChange } from 'core/OnHistoryChange';
+import { OnHistoryChange } from '../core/OnHistoryChange';
 
 /**
  * Route implementation

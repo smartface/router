@@ -33,8 +33,7 @@ import Router from "../router/Router";
 import NavigationController from '@smartface/native/ui/navigationcontroller';
 import createRenderer from "./createRenderer";
 import { RouteParams } from "../router/RouteParams";
-import Route from "router/Route";
-import { RouteState } from "router/RouteState";
+import { RouteState } from "../router/RouteState";
 import Page from "@smartface/native/ui/Page";
 import HeaderBar from "@smartface/native/ui/headerbar";
 

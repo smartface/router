@@ -4,11 +4,11 @@ import { HistoryController } from "../common/HistoryController";
 import funcorVal from "../utils/funcorVal";
 import createRouteStore from "./routeStore";
 import type { Location } from "../common/Location";
-import type { HistoryActions } from "common";
+import type { HistoryActions } from "../common";
 import { RouteParams } from "./RouteParams";
-import { HistoryListenHandler } from "common/history";
+import { HistoryListenHandler } from "../common/history";
 import { RouteBlockHandler } from '../core/RouteBlockHandler';
-import { OnHistoryChange } from "core/OnHistoryChange";
+import { OnHistoryChange } from "../core/OnHistoryChange";
 import Page from "@smartface/native/ui/Page";
 
 type RouterParams<Ttarget=Page> = RouteParams<Ttarget> & {homeRoute?: number, isRoot?: boolean}
