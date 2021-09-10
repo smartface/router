@@ -16,7 +16,7 @@ import { OnHistoryChange } from 'core/OnHistoryChange';
  * @since 1.0.0
  * @class
  */
-export default class Route {
+export default class Route<Ttarget = Page> {
   /**
    * Static helper method to create a new instance of Route
    *
@@ -24,10 +24,10 @@ export default class Route {
    * @static
    * @param {RouteParams} params Route properties
    * @param {RouteState} state Initial state
-   * @return {Route}
+   * @return {Route<Ttarget=Page>}
    */
-  static of(params: RouteParams, state: RouteState) {
-    return new Route(params, state);
+  static of<Ttarget=Page>(params: RouteParams<Ttarget>, state: Partial<RouteState>={}) {
+    return new Route<Ttarget>(params, state);
   }
 
   public map?: MapFunction<Route>;
@@ -37,14 +37,14 @@ export default class Route {
   protected _strict = false;
   protected _path: RoutePath;
   protected _routes: Route[] = [];
-  protected _to: RouteParams['to'];
-  protected _routeShouldMatch: RouteParams['routeShouldMatch'];
-  protected _routeDidEnter: RouteParams['routeDidEnter'];
-  protected _routeDidExit: RouteParams['routeDidExit'];
+  protected _to: RouteParams<Ttarget>['to'];
+  protected _routeShouldMatch: RouteParams<Ttarget>['routeShouldMatch'];
+  protected _routeDidEnter: RouteParams<Ttarget>['routeDidEnter'];
+  protected _routeDidExit: RouteParams<Ttarget>['routeDidExit'];
   protected _modal: boolean = false;
   protected _state: RouteState;
   protected _exact = false;
-  protected _build: RouteParams['build'];
+  protected _build: RouteParams<Ttarget>['build'];
   protected _props: any;
   /**
    * @constructor
@@ -64,7 +64,7 @@ export default class Route {
       routeShouldMatch,
       routeDidEnter,
       routeDidExit,
-    }: Omit<RouteParams, 'path'> & {path: string | RoutePath},
+    }: Omit<RouteParams<Ttarget>, 'path'> & {path: string | RoutePath},
     {
       match = {},
       routeData = {},
@@ -235,7 +235,7 @@ export default class Route {
    * @param {Router} router - Not the root router, the router which the route belongs to.
    * @return {Page} view = null - If the route has been built once, the previous view (page) is given. Otherwise it is null. If view is not null, returning the view back makes it singleton.
    */
-  build(router: Router): Page | null {
+  build(router: Router): Ttarget | null {
     return this._build ? this._build(router, this) : null;
   }
 
@@ -351,7 +351,7 @@ export default class Route {
    * @returns {Route}
    */
   clone(state = {}) {
-    return Route.of(
+    return Route.of<Ttarget>(
       {
         to: this._to,
         modal: this._modal,

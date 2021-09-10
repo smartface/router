@@ -5,8 +5,8 @@ import type Route from "router/Route";
 import type Router from "router/Router";
 import type { RouteStore } from "router/routeStore";
 
-type MatchReturn = Array<{isExact: boolean,params: object,path: string,url: string}>;
-
+type MatchReturn = Array<{match: MatchObject, route: Route}>;
+type MatchObject = {isExact: boolean,params: object,path: string,url: string};
 /**
  *
  * @ignore

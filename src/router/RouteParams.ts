@@ -20,33 +20,33 @@ import HeaderBar from '@smartface/native/ui/headerbar';
  * @property {?function(Router: Router, route: Route)} routeDidEnter Handles if route is displayed
  * @property {?function(Router: Router, route: Route)} routeDidExit Handles if route is removed
  */
-export type RouteParams = {
+export type RouteParams<Ttarget=Page> = {
   path: string | RoutePath;
   to?: string;
   routes?: Route[];
-  build?: (router: Router, route: Route) => Page;
+  build?: (router: Router, route: Route<Ttarget>) => Ttarget;
   exact?: boolean;
   sensitive?: boolean;
   modal?: boolean;
   strict?: boolean;
-  routeShouldMatch?: RouteShouldMatchHandler;
-  routeDidEnter?: RouteLifeCycleHandler;
-  routeDidExit?: RouteLifeCycleHandler;
+  routeShouldMatch?: RouteShouldMatchHandler<Ttarget>;
+  routeDidEnter?: RouteLifeCycleHandler<Ttarget>;
+  routeDidExit?: RouteLifeCycleHandler<Ttarget>;
   // No idea why these are two different entities
-  routerDidEnter?: RouteLifeCycleHandler;
-  routerDidExit?: RouteLifeCycleHandler;
+  routerDidEnter?: RouteLifeCycleHandler<Ttarget>;
+  routerDidExit?: RouteLifeCycleHandler<Ttarget>;
   // No idea why these are two different entities
-  routeWillEnter?: RouteLifeCycleHandler;
+  routeWillEnter?: RouteLifeCycleHandler<Ttarget>;
   props?: any;
   renderer?: Renderer;
-  rootWillChange?: RouteLifeCycleHandler;
-  headerBarParams?: Partial<HeaderBar>;
   isRoot?: boolean;
+  rootWillChange?: RouteLifeCycleHandler<Ttarget>;
+  headerBarParams?: Partial<HeaderBar>
 };
 
-export type RouteLifeCycleHandler = (Router: Router, route: Route) => void;
+export type RouteLifeCycleHandler<Ttarget> = (Router: Router, route: Route<Ttarget>) => void;
 
 /**
  * @typedef {function(route: Route, nextState: RouteState)} RouteShouldMatchHandler
  */
-export type RouteShouldMatchHandler = (router: Router, nextRoute: Route) => boolean;
+export type RouteShouldMatchHandler<Ttarget> = (router: Router, nextRoute: Route<Ttarget>) => boolean;

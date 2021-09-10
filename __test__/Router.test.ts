@@ -285,8 +285,7 @@ describe("Router", () => {
         view: route.build()
       }));
 
-    expect(matches).toEqual[
-      ({
+    expect(matches).toEqual([{
         match: { isExact: false, params: {}, path: "/", url: "/" },
         route: {
           match: {},
@@ -389,8 +388,8 @@ describe("Router", () => {
           type: "route"
         },
         view: { type: "target1" }
-      })
-    ];
+      }
+    ]);
   });
   it("return only root path if any route doesn't be matched", () => {
     const router = new Router({
@@ -453,7 +452,7 @@ describe("Router", () => {
   it("can get back in its history", () => {
     let data;
     let callCount = 0;
-    var component = {};
+    var component:any = {};
     const router = new Router({
       path: "/",
       isRoot: true,
@@ -504,8 +503,8 @@ describe("Router", () => {
   it("calls back to parent if its history is empty", () => {
     let route;
     let callCount = 0;
-    var component = {};
-
+    var component:any = {};
+    let data: any;
     const router = new Router({
       path: "/",
       isRoot: true,
@@ -556,8 +555,8 @@ describe("Router", () => {
   it("can call a relative path", () => {
     let data;
     let callCount = 0;
-    var component1 = {};
-    var component2 = {};
+    var component1:any = {};
+    var component2:any = {};
 
     const router = new Router({
       path: "/",
@@ -614,7 +613,7 @@ describe("Router", () => {
 
   it("can be blocked", () => {
     let callCount = 0;
-    var component1 = {};
+    var component1:any = {};
     const router = new Router({
       path: "/",
       isRoot: true,
@@ -655,7 +654,7 @@ describe("Router", () => {
 
   it("can redirect to specified route with route-data when route has 'to' attribute", () => {
     let callCount = 0;
-    var component1 = {};
+    var component1 :any= {};
     var activeRoute;
     const router = new Router({
       path: "/",
@@ -687,8 +686,8 @@ describe("Router", () => {
   });
   it("can call child Routers", () => {
     let callCount = 0;
-    var component1 = {};
-    var component2 = {};
+    var component1:any = {};
+    var component2:any = {};
 
     var router1 = Router.of({
       path: "/stack1",
@@ -748,8 +747,8 @@ describe("Router", () => {
 
   it("should be routed from child Routers", () => {
     let callCount = 0;
-    let component1 = {};
-    let component2 = {};
+    let component1:any = {};
+    let component2:any = {};
 
     let router1 = Router.of({
       path: "/stack1",

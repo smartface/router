@@ -177,8 +177,8 @@ export class HistoryController {
     }
 
     /**
-     * If history can be gone back or not
-     * @param {number} n it's a negative number to go bac
+     * History can be stepped back or not
+     * @param {number} n a negative number is amount of stepping back
      *
      * @return boolean
      */
@@ -196,7 +196,7 @@ export class HistoryController {
     }
 
     /**
-     * Calls History.goBack
+     * One step back
      */
     goBack() {
       this._history.canGo(-1)

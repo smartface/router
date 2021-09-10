@@ -1,6 +1,6 @@
-const Route = require("../src/router/Route");
-const matchRoutes = require("../src/common/matchRoutes");
-const createStore = require("../src/router/routeStore");
+import Route from "../src/router/Route";
+import matchRoutes from "../src/common/matchRoutes";
+import createStore from "../src/router/routeStore";
 
 describe("Route", () => {
   it("can be matched any url", () => {
@@ -17,16 +17,16 @@ describe("Route", () => {
     });
   });
   it("has a path", () => {
-    const route = new Route({ path: "/path" });
+    const route = new Route<any>({ path: "/path" });
 
     expect(route.getPath().getPath()).toBe("/path");
   });
 
   it("has a target", () => {
-    const target = {};
+    const target: Record<any, any> = {};
     const route = new Route({ path: "path", build: () => target });
-
-    expect(route._build()).toBe(target);
+    const router = new Router();
+    expect(route.build(router)).toBe(target);
   });
 
   it("can match with valid url", () => {
@@ -61,7 +61,7 @@ describe("Route", () => {
     const route = Route.of({
       path: "/",
       routes: [
-        Route.of({
+        Route.of<any>({
           path: "/path/to",
           build: () => {
             type: "target1";

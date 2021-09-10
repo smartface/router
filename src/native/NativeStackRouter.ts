@@ -114,33 +114,7 @@ export default class NativeStackRouter extends NativeRouterBase {
   private _unlistener: () => void = () => {};
   private _dismiss: any;
   private _headerBarParams?: Partial<HeaderBar>
-  private _nextAnimated:
-    /**
-     * @typedef {RouterParams} NativeStackRouterParams
-     * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
-     * @property {function():HeaderBarParams} modal
-     * @property {function():HeaderBarParams} headerBarParams Properties of NavigationController's headerbar. See {@link NavigationController}.
-     */
-    /**
-     * @typedef {object} HeaderBarParams For more info {@link NavigationController}
-     * @property {{ transulent: boolean,
-     *              alpha: number,
-     *              backIndicatorImage: Image,
-     *              backIndicatorTransitionMaskImage: Image,
-     *              prefersLargeTitles: boolean}} ios
-     * @property {boolean} borderVisibility
-     * @property {Color} titleColor
-     * @property {boolean} transparent
-     * @property {boolean} visible
-     * @property {Color} backgroundColor
-     */
-    /**
-     * @typedef NavigationControllerTransformEvent
-     * @property {Page} frompage`
-     * @property {Page} topage
-     * @property {{operation: number}} operation
-     */
-    boolean;
+  private _nextAnimated:boolean;
   /**
    * Builds OS specific NaitveRouter
    *
@@ -155,6 +129,29 @@ export default class NativeStackRouter extends NativeRouterBase {
   /**
    * @constructor
    * @param {NativeStackRouterParams} param0
+    * @typedef {RouterParams} NativeStackRouterParams
+    * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
+    * @property {function():HeaderBarParams} modal
+    * @property {function():HeaderBarParams} headerBarParams Properties of NavigationController's headerbar. See {@link NavigationController}.
+    */
+  /**
+   * @typedef {object} HeaderBarParams For more info {@link NavigationController}
+   * @property {{ transulent: boolean,
+   *              alpha: number,
+   *              backIndicatorImage: Image,
+   *              backIndicatorTransitionMaskImage: Image,
+   *              prefersLargeTitles: boolean}} ios
+   * @property {boolean} borderVisibility
+   * @property {Color} titleColor
+   * @property {boolean} transparent
+   * @property {boolean} visible
+   * @property {Color} backgroundColor
+   */
+  /**
+   * @typedef NavigationControllerTransformEvent
+   * @property {Page} frompage`
+   * @property {Page} topage
+   * @property {{operation: number}} operation
    */
   constructor(options: NativeStackRouterParams) {
     super(options);
