@@ -926,7 +926,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    * @param {boolean} [animmated=true] 
    * @return {Router}
    */
-  goBack(url: string | Location, animated = true) {
+  goBack(url?: string | Location, animated = true) {
 
     const go = () => {
       Router._nextAnimated = animated;

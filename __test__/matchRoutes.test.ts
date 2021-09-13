@@ -37,7 +37,7 @@ describe("Match Routes", () => {
         query: { parent: "111", sort: "ASC", type: "any" },
         rawQuery: "?type=any&sort=ASC&parent=111"
       });
-      expect(res.query.type).toBe("any");
+      expect(res.query?.type).toBe("any");
     }
   });
   it("can match with param", () => {

@@ -215,7 +215,7 @@ export class HistoryController {
      * @param {HistoryListener} fn Event handler callback
      * @return {function} unlisten function
      */
-    listen(fn: Function) {
+    listen(fn: (location: Location, action: string, previous: Location) => void) {
       const unlisten = new Set<Function>();
 
       this._listeners.add(fn);
