@@ -2,7 +2,7 @@
 "use strict";
 
 import type Route from "../router/Route";
-import type Router from "../router/Router";
+import Router from "../router/Router";
 import type { RouteStore } from "../router/routeStore";
 
 type MatchReturn = Array<{match: MatchObject, route: Route<any> | Router<any>}>;
@@ -31,7 +31,7 @@ const matchRoutes = (store: RouteStore, routes: (Route|Router)[], pathname: stri
           };
 
     if (match) {
-      if (Object.prototype.hasOwnProperty.call(route, '__is_router')) {
+      if (route instanceof Router && route.__is_router) {
         branch.push({
           route,
           match
@@ -45,9 +45,7 @@ const matchRoutes = (store: RouteStore, routes: (Route|Router)[], pathname: stri
         });
       }
 
-      const children = route.map && route.map(child => {
-        return child;
-      }) || [];
+      const children = route.map(child => child);
 
       matchRoutes(store, children, pathname, branch);
     }

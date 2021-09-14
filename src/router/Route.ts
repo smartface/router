@@ -46,6 +46,7 @@ export default class Route<Ttarget = Page> {
   protected _exact = false;
   protected _build: RouteParams<Ttarget>['build'];
   protected _props: any;
+  _isRouter = false;
   /**
    * @constructor
    * @param {RouteParams} param0 Route properties
@@ -64,6 +65,7 @@ export default class Route<Ttarget = Page> {
       routeShouldMatch,
       routeDidEnter,
       routeDidExit,
+      routeWillEnter
     }: Omit<RouteParams<Ttarget>, 'path'> & {path?: string | RoutePath},
     {
       match = {},
@@ -80,8 +82,8 @@ export default class Route<Ttarget = Page> {
   ) {
     
     // this._handlers = {
-    //   routerDidEnter: options.routeDidEnter,
-    //   routerDidExit,
+    //   routerDidEnter: routeDidEnter,
+    //   routerDidExit: routeDidExit,
     //   routeWillEnter
     // };
     this._exact = exact;
@@ -312,6 +314,7 @@ export default class Route<Ttarget = Page> {
    * @returns {boolean}
    */
   hasPath() {
+    return false;
     return this._path.hasPath();
   }
 

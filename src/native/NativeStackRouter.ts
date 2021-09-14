@@ -172,9 +172,9 @@ export default class NativeStackRouter extends NativeRouterBase {
     /**
      * Headerbar is be read-only
      */
-    //@ts-ignore
-    if (typeof this._headerBarParams === 'function') {
-      this._renderer?._rootController.headerBar = this._headerBarParams();
+    if (this._renderer?._rootController instanceof Page && typeof this._headerBarParams === 'function') {
+      //@ts-ignore
+      this._renderer._rootController.headerBar = this._headerBarParams();
     }
   }
 

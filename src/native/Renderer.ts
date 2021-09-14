@@ -26,6 +26,9 @@ export default abstract class Renderer {
    * @param {BottomTabBarController|Page} rootController
    */
   static setasRoot(rootController: ControllerType) {
+    if (rootController instanceof NavigationController) {
+      return;
+    }
     /**
      * Wrong typing on @smartface/native, track the issue on Linear (TYPNG-14)
      */

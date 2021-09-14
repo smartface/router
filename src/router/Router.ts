@@ -5,7 +5,7 @@ import funcorVal from "../utils/funcorVal";
 import createRouteStore from "./routeStore";
 import type { Location } from "../common/Location";
 import type { HistoryActions } from "../common";
-import { RouteParams } from "./RouteParams";
+import { RouteLifeCycleHandler, RouteParams } from "./RouteParams";
 import { HistoryListenHandler } from "../common/history";
 import { RouteBlockHandler } from '../core/RouteBlockHandler';
 import { OnHistoryChange } from "../core/OnHistoryChange";
@@ -207,7 +207,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
   dispatch?: (location: Location, action: string, target: Router<Ttarget>, fromRouter?: boolean) => void;
   static _nextAnimated: any;
   static currentRouter: Router<any>;
-  private _handlers: any;
+  _handlers: { routerDidEnter?: RouteLifeCycleHandler<Ttarget>; routerDidExit?: RouteLifeCycleHandler<Ttarget>; routeWillEnter?: RouteLifeCycleHandler<Ttarget>; };
   static getGlobalRouter() {
     return historyController;
   }
@@ -267,6 +267,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
     return this._historyController;
   }
   protected _homeRoute?:number;
+  
   private _historyUnlisten: Function = () => null;
   private _currentUrl = '';
   // private _routes: Route[] = []
@@ -285,6 +286,11 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
     this._pushHomes = () => {};
     this._unlisten = () => {};
     this._unblock = () => {};
+    this._handlers = {
+      routerDidEnter: options.routeDidEnter,
+      routerDidExit: options.routeDidExit,
+      routeWillEnter: options.routeWillEnter
+    };
     if (options.isRoot) {
       store = createRouteStore();
       // this._store = createStore();
@@ -663,7 +669,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
         }
         // reverse views' tasks because of rendering must be from bottom to top
         tasks.reverse().forEach(task => task(location.url, action)); // trigger all routers' routeWillEnter in the tasks queue
-        this.routerDidEnter && this.routerDidEnter(route); // fires routerDidEnter
+        typeof this.routerDidEnter === 'function' && this.routerDidEnter(route); // fires routerDidEnter
         route.routeDidEnter(this); // fires routeDidEnter
         _lastRoute = route; // save exact matched route as last route
         this._currentAction = action;
@@ -687,11 +693,12 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    */
   routeWillEnter(route: Route, action: string) {
     //@ts-ignore
-    const viewConroller = (route._renderer?._rootController) ||
-      // else just instance of Route
-      route.getState().view;
-    this._handlers.routeWillEnter &&
+    const viewConroller = (route._renderer?._rootController) || route.getState().view;
+    //@ts-ignore
+    if (typeof this._handlers?.routeWillEnter === 'function') {
+      //@ts-ignore
       this._handlers.routeWillEnter(this, route, viewConroller);
+    }
   }
 
   /**
@@ -721,7 +728,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    * @param {Route} route
    */
   routerDidEnter(route: Route) {
-    this._handlers.routerDidEnter && this._handlers.routerDidEnter(this, route);
+    typeof this._handlers?.routerDidEnter === 'function' && this._handlers.routerDidEnter(this, route);
   }
 
   /**

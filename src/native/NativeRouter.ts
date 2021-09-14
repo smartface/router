@@ -105,7 +105,7 @@ export default class NativeRouter<Ttarget = Page> extends NativeRouterBase<Ttarg
     // this._renderer.show(router._renderer._rootController);
     if (this._isRoot && this._route !== route) {
       //@ts-ignore
-      const root = route instanceof Router ? route._renderer?._rootController : route.getState().view;
+      const root = route instanceof Router && route._renderer?._rootController ? route._renderer._rootController : route.getState().view;
       Renderer.setasRoot(root);
       this._route = route;
     }
