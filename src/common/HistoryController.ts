@@ -2,7 +2,7 @@ import createMemoryHistory, { History } from "./history";
 import type { BlockHandler, HistoryProps } from "./history";
 import { matchUrl } from "./matchPath";
 import { Location } from "./Location";
-let rootHistory;
+import { HistoryActions } from "common";
 
 type HistoryParams = HistoryProps & {exact: boolean, sensitive: boolean, strict: boolean, path: string };
 
@@ -42,11 +42,6 @@ export class HistoryController {
       : callback(true);
   };
 
-    private listener(location: Location, action: string) {
-      this._preventDefault === false &&
-        this._listeners.forEach((handler:Function) => handler(location, action));
-      this._preventDefault = false;
-    }
   
     clearBlocker() {
       this._unblock && this._unblock();
@@ -90,7 +85,7 @@ export class HistoryController {
      * @return {HistoryController}
      */
     createNode(props: Partial<HistoryParams> = {}) {
-      const node = new HistoryController(props, this._history);
+      const node = new HistoryController(props);
       this._nodes.add(node);
       // bubbles history goback to root until go back could be possible.
       node.onGoBack = () => {
@@ -215,11 +210,11 @@ export class HistoryController {
      * @param {HistoryListener} fn Event handler callback
      * @return {function} unlisten function
      */
-    listen(fn: (location: Location, action: string, previous: Location) => void) {
+    listen(fn: (location: Location, action: HistoryActions, previous: Location) => void) {
       const unlisten = new Set<Function>();
 
       this._listeners.add(fn);
-      const wrapper = (location: Location, action: string) => {
+      const wrapper = (location: Location, action: HistoryActions) => {
         !this._preventDefault &&
           fn(location, action, this._history.entries[this._history.index]);
       };

@@ -6,6 +6,7 @@ import { clamp } from "./clamp";
 import { Location } from "./Location";
 
 import warning from "./warning";
+import { HistoryActions } from "common";
 const createPath = (location: { url: string, search: string, hash: string }) => {
   const { url, search, hash } = location;
 
@@ -22,7 +23,7 @@ const createPath = (location: { url: string, search: string, hash: string }) => 
 /**
  * @typedef {function(location: RouteLocation, action: string)} HistoryListener
  */
-export type HistoryListenHandler = (location: Location, action: string) => void;
+export type HistoryListenHandler = (location: Location, action: HistoryActions) => void;
 export type BlockHandler = (prompt?: Function|null) => Function;
 /**
  * History implementation

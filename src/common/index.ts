@@ -1,4 +1,4 @@
-export {default as HistoryActions} from "./HistoryActions";
+export {HistoryActions} from "./HistoryActions";
 export {matchPath} from "./matchPath";
 export {default as DeviceOS} from "./DeviceOS";
 export {default as matchRoutes} from "./matchRoutes";

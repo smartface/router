@@ -25,7 +25,7 @@ export default abstract class Renderer {
    * @static
    * @param {BottomTabBarController|Page} rootController
    */
-  static setasRoot(rootController: ControllerType) {
+  static setasRoot(rootController?: ControllerType | null) {
     if (rootController instanceof NavigationController) {
       return;
     }

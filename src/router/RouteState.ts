@@ -16,14 +16,14 @@ import { RouteMatch } from './RouteMatch';
  * @property {?object} [routingState={}] Keeps user data when route runs
  */
 
-export type RouteState = {
+export type RouteState<Ttarget = Page> = {
   routeData?: object;
   action: string;
   query?: { [key: string]: any };
   rawQuery?: string;
   active: boolean;
   hash?: string;
-  view?: Page | null;
+  view?: Ttarget | null;
   url: string;
   prevUrl?: string;
   routingState?: object;

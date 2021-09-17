@@ -1,10 +1,10 @@
 /** @ts-ignore */
-import Page from '@smartface/native/ui/Page';
+import Page from "@smartface/native/ui/Page";
 import type Router from "./Router";
 import type Route from "./Route";
 import { RoutePath } from "./RoutePath";
-import Renderer from '../native/Renderer';
-import HeaderBar from '@smartface/native/ui/headerbar';
+import Renderer from "../native/Renderer";
+import HeaderBar from "@smartface/native/ui/headerbar";
 
 /**
  * @typedef {object} RouteParams
@@ -19,8 +19,8 @@ import HeaderBar from '@smartface/native/ui/headerbar';
  * @property {?function(Router: Router, route: Route)} routeDidEnter Handles if route is displayed
  * @property {?function(Router: Router, route: Route)} routeDidExit Handles if route is removed
  */
-export type RouteParams<Ttarget=Page> = {
-  name?:string;
+export type RouteParams<Ttarget = Page> = {
+  name?: string;
   path?: string | RoutePath;
   to?: string;
   routes?: Route[];
@@ -34,19 +34,25 @@ export type RouteParams<Ttarget=Page> = {
   routeDidExit?: RouteLifeCycleHandler<Ttarget>;
   // No idea why these are two different entities
   routerDidEnter?: RouteLifeCycleHandler<Ttarget>;
-  routerDidExit?: RouteLifeCycleHandler<Ttarget>;
+  routerDidExit?: RouteLifeCycleHandler<Ttarget, string>;
   // No idea why these are two different entities
   routeWillEnter?: RouteLifeCycleHandler<Ttarget>;
   props?: any;
   renderer?: Renderer;
   isRoot?: boolean;
   rootWillChange?: RouteLifeCycleHandler<Ttarget>;
-  headerBarParams?: () => Partial<HeaderBar>
+  headerBarParams?: () => Partial<HeaderBar>;
 };
 
-export type RouteLifeCycleHandler<Ttarget> = (Router: Router<Ttarget>, route: Route<Ttarget>) => void;
+export type RouteLifeCycleHandler<
+  Ttarget,
+  TProps extends Route<Ttarget> | string = Route<Ttarget>
+> = (Router: Router<Ttarget>, route: TProps) => void;
 
 /**
  * @typedef {function(route: Route, nextState: RouteState)} RouteShouldMatchHandler
  */
-export type RouteShouldMatchHandler<Ttarget> = (router: Router<Ttarget>, nextRoute: Route<Ttarget>) => boolean;
+export type RouteShouldMatchHandler<Ttarget> = (
+  router: Router<Ttarget>,
+  nextRoute: Route<Ttarget>
+) => boolean;

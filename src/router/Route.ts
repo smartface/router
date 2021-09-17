@@ -30,7 +30,7 @@ export default class Route<Ttarget = Page> {
     return new Route<Ttarget>(params, state);
   }
 
-  public map?: MapFunction<Route<any>>;
+  public map: MapFunction<Route<Ttarget>>;
 
   protected _options: MatchOptions = {};
   protected _isDIrty = false;
@@ -141,7 +141,7 @@ export default class Route<Ttarget = Page> {
    * @since 1.0.0
    * @param {object} state
    */
-  setState(state: Partial<RouteState>) {
+  setState(state: Partial<RouteState<Ttarget>>) {
     this._state = Object.assign(this._state, state);
   }
 

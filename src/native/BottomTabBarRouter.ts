@@ -30,6 +30,7 @@ import { OnHistoryChange } from '../core/OnHistoryChange';
 import { matchRoutes } from '../common';
 import { Location } from '../common/Location';
 import Page from '@smartface/native/ui/Page';
+import { HistoryActionType } from 'common/HistoryActions';
 
 type BottomTabBarRouterParams<Ttarget> = RouteParams<Ttarget> & { isRoot: boolean; items: TabBarItem[]; onTabChangedByUser: (...args: any) => void; tabbarParams: any; }
 
@@ -336,6 +337,7 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
     this._items = null;
     this._renderer = undefined;
   }
+  
   private _unlistener() {
     throw new Error('Method not implemented.');
   }
@@ -355,7 +357,7 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
   /**
    * @override
    */
-  renderMatches(matches: ReturnType<typeof matchRoutes>, location: Location, action: string, target: Router, fromRouter: boolean) {
+  renderMatches(matches: ReturnType<typeof matchRoutes>, location: Location, action: HistoryActionType, target: Router, fromRouter: boolean) {
     super.renderMatches(matches, location, action, target, fromRouter);
 
     // this._fromRouter = true;
