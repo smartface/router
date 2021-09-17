@@ -286,6 +286,8 @@ describe("Router", () => {
         view: route!.build(router)
       }));
 
+    console.log(matches[0].route.state);
+
     expect(matches).toEqual([{
         match: { isExact: false, params: {}, path: "/", url: "/" },
         route: {
@@ -300,7 +302,7 @@ describe("Router", () => {
               routes: [],
               routingState: {},
               state: {
-                action: null,
+                action: "PUSH",
                 active: false,
                 match: {},
                 routeData: {},
@@ -755,7 +757,6 @@ describe("Router", () => {
         new Route<any>({
           path: "/stack1/to/1",
           build: (router, route) => {
-            console.log("COmponent 1 : ", router);
             component1.router = router;
             component1.params = route!.getState()?.match?.params;
             return component1;
@@ -800,7 +801,7 @@ describe("Router", () => {
       routes: [router1, router2]
     });
 
-    router.push("/stack1", { name: "name" });
+    router!.push("/stack1", { name: "name" });
     expect(component1.router).toBe(router1);
 
     component1.router!.push("/stack2", { name: "name" });

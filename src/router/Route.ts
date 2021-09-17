@@ -54,8 +54,8 @@ export default class Route<Ttarget = Page> {
    */
   constructor(
     {
-      path = "",
-      to,
+      path = null,
+      to = null,
       routes = [],
       build,
       exact = false,
@@ -66,14 +66,14 @@ export default class Route<Ttarget = Page> {
       routeDidEnter,
       routeDidExit,
       routeWillEnter
-    }: Omit<RouteParams<Ttarget>, 'path'> & {path?: string | RoutePath},
+    }: Omit<RouteParams<Ttarget>, 'path'> & {path?: null | string | RoutePath},
     {
       match = {},
       routeData = {},
       view = null,
       routingState = {},
-      action = "",
-      url = "",
+      action = null,
+      url = null,
       active = false,
       query = {},
       rawQuery = "",
@@ -90,7 +90,7 @@ export default class Route<Ttarget = Page> {
     this._isDIrty = false;
     this._strict = false;
     this._build = build;
-    this._path = path instanceof RoutePath ? path : new RoutePath(path);
+    this._path = path instanceof RoutePath ? path : new RoutePath(path || '');
     this._routes = routes;
     this.map = mapComposer<Route<any>>(this._routes)
     this._to = to;
@@ -167,7 +167,7 @@ export default class Route<Ttarget = Page> {
       match: this._state.routeData,
       routeData: this._state.routeData,
       routingState: this._state.routingState,
-      path: this._path?.getPath(),
+      path: this._path.getPath(),
       routes: this._routes.slice(),
       state: Object.assign({}, this._state, {
         view:
@@ -195,7 +195,7 @@ export default class Route<Ttarget = Page> {
   }
 
   clearUrl() {
-    this.setState({ url: "", prevUrl: this._state.url });
+    this.setState({ url:null, prevUrl: this._state.url });
   }
 
   clearDirty() {
@@ -314,7 +314,6 @@ export default class Route<Ttarget = Page> {
    * @returns {boolean}
    */
   hasPath() {
-    return false;
     return this._path.hasPath();
   }
 

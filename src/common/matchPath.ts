@@ -49,6 +49,7 @@ export const matchPath = (pathname: string, options:MatchOptions|Pathname = {}, 
     };
   else
     _options = options;
+    
   
   const { path, exact = false, strict = false, sensitive = false } = _options;
 

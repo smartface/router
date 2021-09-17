@@ -41,7 +41,7 @@ const dispatch = (location: Location, action: string) => {
 
 function handleRouteUrl(
   controller: HistoryController,
-  prevUrl: string = "",
+  prevUrl: string | null | undefined,
   url: string,
   routeData: object,
   action: HistoryActionType
@@ -301,7 +301,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
   protected _homeRoute?: number;
 
   private _historyUnlisten: Function = () => null;
-  private _currentUrl = "";
+  private _currentUrl?: string;
   // private _routes: Route[] = []
   private _unlisten: () => void;
   private _unblock: () => void;
@@ -664,7 +664,8 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
 
           return true;
         } else if (match?.isExact === true) {
-          const redirection = funcorVal(route.getRedirectto(), [this, route]);
+          const to = route.getRedirectto();
+          const redirection = to && funcorVal(to, [this, route]);
 
           if (redirection && redirection !== match?.url) {
             tasks = []; // reset tasks
@@ -707,11 +708,11 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
           // @ts-ignore
           if (target != this) {
             //@ts-ignore
-            this._historyController && match && 
+            this._historyController && match && match.url &&
               handleRouteUrl(
                 this._historyController,
                 this.state.prevUrl,
-                match.url || "",
+                match.url,
                 routeData,
                 action
               );
@@ -817,13 +818,13 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    * @protected
    * @param {string} action
    */
-  setasActiveRouter(action: string) {
+  setasActiveRouter(action: string | null) {
     // @ts-ignore
     if (
       this != Router.currentRouter &&
       typeof Router.currentRouter?.routerDidExit === "function"
     ) {
-      Router.currentRouter.routerDidExit(action);
+      action && Router.currentRouter.routerDidExit(action);
     }
     //
     Router.currentRouter = this;
@@ -921,9 +922,10 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
     if (!(route instanceof Route)) {
       throw new TypeError(`route must be instance of Route`);
     }
+    const to = route.getRedirectto();
     //@ts-ignore
     const url =
-      funcorVal(route.getRedirectto(), [this, route]) || route.getUrlPath();
+    to && funcorVal(to, [this, route]) || route.getUrlPath();
     this.push(url);
   }
 

@@ -18,14 +18,14 @@ import { RouteMatch } from './RouteMatch';
 
 export type RouteState<Ttarget = Page> = {
   routeData?: object;
-  action: string;
+  action: string | null;
   query?: { [key: string]: any };
   rawQuery?: string;
   active: boolean;
   hash?: string;
   view?: Ttarget | null;
-  url: string;
-  prevUrl?: string;
+  url: string | null;
+  prevUrl?: string | null;
   routingState?: object;
   match?: Partial<RouteMatch>;
 };
