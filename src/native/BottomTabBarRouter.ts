@@ -32,7 +32,7 @@ import { Location } from '../common/Location';
 import Page from '@smartface/native/ui/Page';
 import { HistoryActionType } from 'common/HistoryActions';
 
-type BottomTabBarRouterParams<Ttarget> = RouteParams<Ttarget> & { isRoot: boolean; items: TabBarItem[]; onTabChangedByUser: (...args: any) => void; tabbarParams: any; }
+type BottomTabBarRouterParams<Ttarget> = RouteParams<Ttarget> & { isRoot?: boolean; items: (Partial<TabBarItem> | TabBarItem)[]; onTabChangedByUser: (...args: any) => void; tabbarParams: any; }
 
 /**
  * @private

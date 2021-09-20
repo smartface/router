@@ -8,7 +8,7 @@
 
 export type RouteMatch = {
   isExact: boolean;
-  params: object;
+  params: any;
   path: string;
   url: string;
 };

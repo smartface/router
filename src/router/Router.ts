@@ -13,6 +13,7 @@ import Page from "@smartface/native/ui/page";
 import Renderer from "native/Renderer";
 import { HistoryActionType } from "common/HistoryActions";
 import { RouteMatch } from "./RouteMatch";
+import NativeStackRouter from "../native/NativeStackRouter";
 
 type RouterParams<Ttarget = Page> = RouteParams<Ttarget> & {
   homeRoute?: number;
@@ -223,7 +224,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
     fromRouter?: boolean
   ) => void;
   static _nextAnimated: any;
-  static currentRouter: Router<any>;
+  static currentRouter: Router<any> | NativeStackRouter;
   protected _renderer?: Renderer;
   get renderer() {
     return this._renderer;

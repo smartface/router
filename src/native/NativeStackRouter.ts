@@ -37,7 +37,7 @@ import { RouteState } from "../router/RouteState";
 import Page from "@smartface/native/ui/page";
 import HeaderBar from "@smartface/native/ui/headerbar";
 
-type NativeStackRouterParams = RouteParams & {homeRoute?: number, isRoot: boolean}
+type NativeStackRouterParams = RouteParams & {homeRoute?: number, isRoot?: boolean}
 
 /**
  * Creates {@link NavigationController} and manages its behavours and routes.
@@ -45,7 +45,7 @@ type NativeStackRouterParams = RouteParams & {homeRoute?: number, isRoot: boolea
  * @class
  * @extends {Router}
  * @example
- * const {NativeStackRouter, Route} = require('@smartface/router');
+ * import { NativeStackRouter, Route } from '@smartface/router';
  * import Image from '@smartface/native/ui/image';
  * import Color from '@smartface/native/ui/color';
  *

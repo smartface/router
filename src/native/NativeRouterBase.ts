@@ -8,7 +8,7 @@ import Page from "@smartface/native/ui/page";
  * @class
  */
 export default class NativeRouterBase<Ttarget = Page> extends Router<Ttarget> {
-  protected _renderer?: Renderer;
+  _renderer?: Renderer;
   setHeaderbarProps(props: HeaderBar) {
     if(this._renderer?._rootController instanceof Page) {
     if(this._renderer?._rootController?.headerBar) {
