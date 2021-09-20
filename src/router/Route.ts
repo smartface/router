@@ -6,6 +6,7 @@ import { RoutePath } from "./RoutePath";
 import { RouteState } from "./RouteState";
 import { RouteParams } from "./RouteParams";
 import { OnHistoryChange } from '../core/OnHistoryChange';
+import NativeStackRouter from 'native/NativeStackRouter';
 
 /**
  * Route implementation
@@ -126,7 +127,7 @@ export default class Route<Ttarget = unknown> {
 
 
   /**
-   *
+   * @deprecated
    */
   isModal() {
     return this._modal;

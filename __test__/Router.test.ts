@@ -1,6 +1,5 @@
 import Router from "../src/router/Router";
 import Route from "../src/router/Route";
-import matchRoutes from "../src/common/matchRoutes";
 import { RouteState } from "../src/router/RouteState";
 
 describe("Router", () => {
@@ -285,8 +284,6 @@ describe("Router", () => {
         route: route!.toJSON(),
         view: route!.build(router)
       }));
-
-    console.log(matches[0].route.state);
 
     expect(matches).toEqual([{
         match: { isExact: false, params: {}, path: "/", url: "/" },

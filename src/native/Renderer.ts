@@ -135,7 +135,7 @@ export default abstract class Renderer {
    *
    * @param {Array<TabBarItem>} items
    */
-  setTabBarItems(items: TabBarItem[]) {
+  setTabBarItems(items: (TabBarItem | Partial<TabBarItem>)[]) {
     if(this._rootController instanceof BottomTabBarController) {
       this._rootController.tabBar.items = items;
     }

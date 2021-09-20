@@ -45,7 +45,7 @@ type NativeStackRouterParams<Ttarget = Page> = RouterParams<Ttarget>
  * @class
  * @extends {Router}
  * @example
- * const {NativeStackRouter, Route} = require('@smartface/router');
+ * import { NativeStackRouter, Route } from '@smartface/router';
  * import Image from '@smartface/native/ui/image';
  * import Color from '@smartface/native/ui/color';
  *
