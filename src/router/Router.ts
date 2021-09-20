@@ -9,12 +9,11 @@ import { RouteLifeCycleHandler, RouteParams } from "./RouteParams";
 import { HistoryListenHandler } from "../common/history";
 import { RouteBlockHandler } from "../core/RouteBlockHandler";
 import { OnHistoryChange } from "../core/OnHistoryChange";
-import Page from "@smartface/native/ui/page";
 import Renderer from "native/Renderer";
 import { HistoryActionType } from "common/HistoryActions";
 import { RouteMatch } from "./RouteMatch";
 
-type RouterParams<Ttarget = Page> = RouteParams<Ttarget> & {
+export type RouterParams<Ttarget = unknown> = RouteParams<Ttarget> & {
   homeRoute?: number;
   isRoot?: boolean;
 };
@@ -208,7 +207,7 @@ function handleRouteUrl(
  * @since 1.0.0
  * @extends {Route}
  */
-export default class Router<Ttarget = Page> extends Route<Ttarget> {
+export default class Router<Ttarget = unknown> extends Route<Ttarget> {
   _isRoot: boolean;
   protected _exact: boolean;
   protected _strict: boolean;
@@ -219,7 +218,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
   dispatch?: (
     location: Location,
     action: HistoryActionType,
-    target: Router<Ttarget>,
+    target: Router<any>,
     fromRouter?: boolean
   ) => void;
   static _nextAnimated: any;
@@ -230,9 +229,9 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
   }
 
   _handlers: {
-    routerDidEnter?: RouteLifeCycleHandler<Ttarget>;
-    routerDidExit?: RouteLifeCycleHandler<Ttarget, string>;
-    routeWillEnter?: RouteLifeCycleHandler<Ttarget>;
+    routerDidEnter?: RouteLifeCycleHandler<any>;
+    routerDidExit?: RouteLifeCycleHandler<any, string>;
+    routeWillEnter?: RouteLifeCycleHandler<any>;
   };
   static getGlobalRouter() {
     return historyController;
@@ -258,8 +257,8 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    *
    * @param {RouterParams} props
    */
-  static of<Ttarget = Page>(props: RouterParams<Ttarget>) {
-    return new Router(props);
+  static of<Ttarget = unknown>(props: RouterParams<Ttarget>) {
+    return new Router<Ttarget>(props);
   }
 
   // TODO: Make type RouteBlockHandler
@@ -312,28 +311,28 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    * @constructor
    * @param {RouterParams} param
    */
-  constructor(options: RouterParams<Ttarget> = {}) {
-    super(options, {});
-    this._homeRoute = options.homeRoute;
+  constructor(params: RouterParams<Ttarget> = {}) {
+    super(params, {});
+    this._homeRoute = params.homeRoute;
     this._pushHomes = () => {};
     this._unlisten = () => {};
     this._unblock = () => {};
     this._handlers = {
-      routerDidEnter: options.routeDidEnter,
-      routerDidExit: options.routerDidExit,
-      routeWillEnter: options.routeWillEnter,
+      routerDidEnter: params.routeDidEnter,
+      routerDidExit: params.routerDidExit,
+      routeWillEnter: params.routeWillEnter,
     };
-    if (options.isRoot) {
+    if (params.isRoot) {
       store = createRouteStore();
       // this._store = createStore();
       /** @type {HistoryListener} */
       listeners.clear();
       historyController = new HistoryController({
-        sensitive: options.sensitive,
-        strict: options.strict,
-        exact: options.exact,
+        sensitive: params.sensitive,
+        strict: params.strict,
+        exact: params.exact,
         //@ts-ignore
-        path: options.path,
+        path: params.path,
         getUserConfirmation: (blockerFn: Function, callback: Function) => {
           return blockerFn(callback);
         },
@@ -365,10 +364,10 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
       );
     }
 
-    this._isRoot = !!options.isRoot;
-    this._exact = !!options.exact;
-    this._strict = !!options.strict;
-    this._sensitive = !!options.sensitive;
+    this._isRoot = !!params.isRoot;
+    this._exact = !!params.exact;
+    this._strict = !!params.strict;
+    this._sensitive = !!params.sensitive;
     this._fromRouter = false;
   }
 
@@ -404,7 +403,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    */
   initialize(
     parentHistory: unknown,
-    onHistoryChange: OnHistoryChange<Ttarget>,
+    onHistoryChange: OnHistoryChange<any>,
     pushHomes: (path: string) => void
   ) {
     this._pushHomes = pushHomes;
@@ -786,8 +785,8 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    * @param {string} url
    * @param {string} action
    */
-  isUrlCurrent(url: string, action: string) {
-    const res = this._currentUrl === url && this._currentAction === action;
+  isUrlCurrent(url?: string, action?: string | null) {
+    const res = action && this._currentUrl && this._currentUrl === url && this._currentAction === action;
     return res;
   }
 
@@ -806,7 +805,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    * @protected
    * @param {Route} route
    */
-  routerDidEnter(route: Route<Ttarget>) {
+  routerDidEnter(route: Route<any>) {
     typeof this._handlers?.routerDidEnter === "function" &&
       this._handlers.routerDidEnter(this, route);
   }
@@ -871,7 +870,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    * @ignore
    * @param {Page} view
    */
-  isViewEmpty(view: Page) {
+  isViewEmpty(view: any) {
     return view !== null || view !== undefined;
   }
 
@@ -882,7 +881,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    * @protected
    * @param {Route} route
    */
-  routeDidMatch(route: Route<Ttarget>) {
+  routeDidMatch(route: Route<any>) {
     // alert(this.getUrlPath()+" "+Router._backUrl);
     const { match, action, routeData } = route.getState();
     // this.setState({
@@ -904,7 +903,7 @@ export default class Router<Ttarget = Page> extends Route<Ttarget> {
    * @param {Route} route
    * @throws {TypeError}
    */
-  renderRoute(route: Route<Ttarget>) {
+  renderRoute(route: Route<any>) {
     const view = route.build && route.build(this);
     if (!view) throw new TypeError(`${route} 's View cannot be empty!`);
 

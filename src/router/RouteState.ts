@@ -1,5 +1,4 @@
 /** @ts-ignore */
-import Page from '@smartface/native/ui/Page';
 import { RouteMatch } from './RouteMatch';
 /**
  * @typedef {object} RouteState
@@ -16,7 +15,7 @@ import { RouteMatch } from './RouteMatch';
  * @property {?object} [routingState={}] Keeps user data when route runs
  */
 
-export type RouteState<Ttarget = Page> = {
+export type RouteState<Ttarget = any> = {
   routeData?: object;
   action: string | null;
   query?: { [key: string]: any };

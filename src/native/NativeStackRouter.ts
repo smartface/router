@@ -29,7 +29,7 @@
  */
 
 import NativeRouterBase from "./NativeRouterBase";
-import Router from "../router/Router";
+import Router, { RouterParams } from "../router/Router";
 import NavigationController from '@smartface/native/ui/navigationcontroller';
 import createRenderer from "./createRenderer";
 import { RouteParams } from "../router/RouteParams";
@@ -37,7 +37,7 @@ import { RouteState } from "../router/RouteState";
 import Page from "@smartface/native/ui/page";
 import HeaderBar from "@smartface/native/ui/headerbar";
 
-type NativeStackRouterParams = RouteParams & {homeRoute?: number, isRoot: boolean}
+type NativeStackRouterParams<Ttarget = Page> = RouterParams<Ttarget>
 
 /**
  * Creates {@link NavigationController} and manages its behavours and routes.
@@ -107,7 +107,7 @@ type NativeStackRouterParams = RouteParams & {homeRoute?: number, isRoot: boolea
  *
  * @since 1.0.0
  */
-export default class NativeStackRouter extends NativeRouterBase {
+export default class NativeStackRouter extends NativeRouterBase<Page> {
   _currentRouteUrl?: string;
   private _presented: boolean = false;
   private _unlistener: () => void = () => {};
@@ -120,7 +120,7 @@ export default class NativeStackRouter extends NativeRouterBase {
    * @static
    * @param {NativeStackRouterParams} params
    */
-  static of (params: NativeStackRouterParams) {
+  static of<Ttarget = Page>(params: NativeStackRouterParams<Ttarget>) {
     params.renderer = createRenderer();
     return new NativeStackRouter(params);
   }
@@ -152,12 +152,12 @@ export default class NativeStackRouter extends NativeRouterBase {
    * @property {Page} topage
    * @property {{operation: number}} operation
    */
-  constructor(options: NativeStackRouterParams) {
-    super(options);
+  constructor(params: NativeStackRouterParams<Page>) {
+    super(params);
     this._nextAnimated = true;
-    this._homeRoute = options.homeRoute || undefined;
-    this._headerBarParams = options.headerBarParams;
-    this._renderer = options.renderer || undefined;
+    this._homeRoute = params.homeRoute || undefined;
+    this._headerBarParams = params.headerBarParams;
+    this._renderer = params.renderer || undefined;
     //@ts-ignore
     this._renderer?.setRootController(new NavigationController());
     this.addNavigatorChangeListener();
@@ -210,17 +210,14 @@ export default class NativeStackRouter extends NativeRouterBase {
    * @param {RouteState} prevState
    * @param {RouteState} nextState
    */
-  //@ts-ignore
-  routeShouldMatch(prevState: RouteState, nextState: RouteState) {
-    //@ts-ignore
-    if (this.isUrlCurrent(nextState?.match?.url, nextState.action)) {
+  routeShouldMatch(router: Router<Page>) {
+    if (this.isUrlCurrent(router?.getState().match?.url, this.getState().action)) {
       return false;
     }
     /**
      * RouteState and Router does not match
      */
-    //@ts-ignore
-    return super.routeShouldMatch(prevState);
+    return super.routeShouldMatch(router);
   }
 
   /**
@@ -524,3 +521,13 @@ export default class NativeStackRouter extends NativeRouterBase {
     this._historyController?.clear();
   }
 }
+
+
+const route = Router.of({
+  routes: [
+    NativeStackRouter.of({
+      isRoot: false,
+
+    })
+  ]
+})

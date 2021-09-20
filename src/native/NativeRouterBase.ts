@@ -10,14 +10,14 @@ import Page from "@smartface/native/ui/page";
 export default class NativeRouterBase<Ttarget = Page> extends Router<Ttarget> {
   protected _renderer?: Renderer;
   setHeaderbarProps(props: HeaderBar) {
-    if(this._renderer?._rootController instanceof Page) {
-    if(this._renderer?._rootController?.headerBar) {
-      /**
-       * On Page type, headerBar is read-only property
-       */
-      //@ts-ignore
-      this._renderer._rootController.headerBar = props;
-    }
+    if (this._renderer?._rootController instanceof Page) {
+      if (this._renderer?._rootController?.headerBar) {
+        /**
+         * On Page type, headerBar is read-only property
+         */
+        //@ts-ignore
+        this._renderer._rootController.headerBar = props;
+      }
     }
   }
 }

@@ -19,28 +19,28 @@ import HeaderBar from "@smartface/native/ui/headerbar";
  * @property {?function(Router: Router, route: Route)} routeDidEnter Handles if route is displayed
  * @property {?function(Router: Router, route: Route)} routeDidExit Handles if route is removed
  */
-export type RouteParams<Ttarget = Page> = {
+export type RouteParams<Ttarget = unknown> = {
   name?: string;
   path?: string | null | RoutePath;
   to?: string | null;
   routes?: Route[];
-  build?: (router: Router<Ttarget>, route: Route<Ttarget>) => Ttarget;
+  build?: (router: Router<any>, route: Route<any>) => any;
   exact?: boolean;
   sensitive?: boolean;
   modal?: boolean;
   strict?: boolean;
-  routeShouldMatch?: RouteShouldMatchHandler<Ttarget>;
-  routeDidEnter?: RouteLifeCycleHandler<Ttarget>;
-  routeDidExit?: RouteLifeCycleHandler<Ttarget>;
+  routeShouldMatch?: RouteShouldMatchHandler<any>;
+  routeDidEnter?: RouteLifeCycleHandler<any>;
+  routeDidExit?: RouteLifeCycleHandler<any>;
   // No idea why these are two different entities
-  routerDidEnter?: RouteLifeCycleHandler<Ttarget>;
-  routerDidExit?: RouteLifeCycleHandler<Ttarget, string>;
+  routerDidEnter?: RouteLifeCycleHandler<any>;
+  routerDidExit?: RouteLifeCycleHandler<any, string>;
   // No idea why these are two different entities
-  routeWillEnter?: RouteLifeCycleHandler<Ttarget>;
+  routeWillEnter?: RouteLifeCycleHandler<any>;
   props?: any;
   renderer?: Renderer;
   isRoot?: boolean;
-  rootWillChange?: RouteLifeCycleHandler<Ttarget>;
+  rootWillChange?: RouteLifeCycleHandler<any>;
   headerBarParams?: () => Partial<HeaderBar>;
 };
 

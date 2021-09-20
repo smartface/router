@@ -1,6 +1,3 @@
-/** @ts-ignore */
-import Page from '@smartface/native/ui/Page';
-
 import { matchUrl } from "../common/matchPath";
 import mapComposer, { MapFunction } from "../utils/map";
 import { MatchOptions } from "../common/MatchOptions";
@@ -16,7 +13,7 @@ import { OnHistoryChange } from '../core/OnHistoryChange';
  * @since 1.0.0
  * @class
  */
-export default class Route<Ttarget = Page> {
+export default class Route<Ttarget = unknown> {
   /**
    * Static helper method to create a new instance of Route
    *
@@ -24,13 +21,13 @@ export default class Route<Ttarget = Page> {
    * @static
    * @param {RouteParams} params Route properties
    * @param {RouteState} state Initial state
-   * @return {Route<Ttarget=Page>}
+   * @return {Route<Ttarget=unknown>}
    */
-  static of<Ttarget=Page>(params: RouteParams<Ttarget>, state: Partial<RouteState>={}) {
+  static of<Ttarget=unknown>(params: RouteParams<Ttarget>, state: Partial<RouteState>={}) {
     return new Route<Ttarget>(params, state);
   }
 
-  public map: MapFunction<Route<Ttarget>>;
+  public map: MapFunction<Route<any>>;
 
   protected _options: MatchOptions = {};
   protected _isDIrty = false;
@@ -141,7 +138,7 @@ export default class Route<Ttarget = Page> {
    * @since 1.0.0
    * @param {object} state
    */
-  setState(state: Partial<RouteState<Ttarget>>) {
+  setState(state: Partial<RouteState<any>>) {
     this._state = Object.assign(this._state, state);
   }
 
@@ -237,7 +234,7 @@ export default class Route<Ttarget = Page> {
    * @param {Router} router - Not the root router, the router which the route belongs to.
    * @return {Page} view = null - If the route has been built once, the previous view (page) is given. Otherwise it is null. If view is not null, returning the view back makes it singleton.
    */
-  build(router: Router<Ttarget>): Ttarget | null {
+  build(router: Router<any>): any | null {
     return this._build ? this._build(router, this) : null;
   }
 
@@ -263,7 +260,7 @@ export default class Route<Ttarget = Page> {
    * @param {Router} router
    * @return {boolean}
    */
-  routeShouldMatch(router: Router<Ttarget>) {
+  protected routeShouldMatch(router: Router<Ttarget>) {
     return this._routeShouldMatch ? this._routeShouldMatch(router, this) : true;
   }
 
