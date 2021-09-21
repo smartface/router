@@ -36,15 +36,22 @@ export default class IOSRenderer extends Renderer {
   /**
    * @override
    */
-  showWithTransition(fromPage: Page, toPage: Page, duration = 0, options = 0 << 20) {
+  showWithTransition(
+    fromPage: Page,
+    toPage: Page,
+    duration = 0,
+    options = 0 << 20
+  ) {
     new Animator(this._rootController)
       .onAnimate((container: any, from: any, to: any, params: any) => {
         this.addChild(to);
       })
-      .onFinish((finished: any, container: any, from: any, to: any, params: any) => {
-        to.nativeObject.didMoveToParentViewController(container.nativeObject);
-        this.removeChild(from);
-      })
+      .onFinish(
+        (finished: any, container: any, from: any, to: any, params: any) => {
+          to.nativeObject.didMoveToParentViewController(container.nativeObject);
+          this.removeChild(from);
+        }
+      )
       .once(true)
       .start(fromPage, toPage, duration, options);
   }
@@ -55,33 +62,37 @@ export default class IOSRenderer extends Renderer {
   pushChild(page: Page, animated = true) {
     /**
      * prevents to push existing view
-     * Note: This isn't supposed to work, since two object instances can never be equal? 
+     * Note: This isn't supposed to work, since two object instances can never be equal?
      */
-    //@ts-ignore
-    if (this._rootController.childControllers.some(p => p === page)) {
+    if (
+      this._rootController instanceof NavigationController &&
+      this._rootController.childControllers.some((p) => p === page)
+    ) {
       return;
     }
-    
+
     this.makeRootVisible();
-    //@ts-ignore
-    if(typeof this._rootController.push === 'function') {
-      //@ts-ignore
+    if (this._rootController instanceof NavigationController) {
+      // @ts-ignore
       this._rootController.push({ controller: page, animated });
     }
   }
-  
-  present(controller: ControllerType, animated: boolean, onComplete: (...args: any) => void) {
-    if(this._rootController instanceof Page) {}
-    else {
+
+  present(
+    controller: ControllerType,
+    animated: boolean,
+    onComplete: (...args: any) => void
+  ) {
+    if (this._rootController instanceof Page) {
+    } else if (this._rootController instanceof NavigationController) {
       /**
-      * Present method actually exists on BottomTabBarController. 
-      * Track the issue on Linear (TYPNG-15)
-      */
-      //@ts-ignore
+       * Present method actually exists on BottomTabBarController.
+       * Track the issue on Linear (TYPNG-15)
+       */
       this._rootController.present({
         controller,
         animated,
-        onComplete
+        onComplete,
       });
     }
   }
@@ -91,11 +102,11 @@ export default class IOSRenderer extends Renderer {
    */
   onNavigationControllerTransition(fn: (...args: any) => void) {
     if (this._rootController instanceof NavigationController) {
-      const controller = this._rootController
+      const controller = this._rootController;
       controller.onTransition = fn;
       //@ts-ignore
       return () => {
-        controller.onTransition = () => null
+        controller.onTransition = () => null;
       };
     }
     return () => {};

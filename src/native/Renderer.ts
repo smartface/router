@@ -1,13 +1,12 @@
 "use strict";
 
-import Page from '@smartface/native/ui/page';
-import Application from '@smartface/native/application';
-import NavigationController from '@smartface/native/ui/navigationcontroller';
-import BottomTabBarController from '@smartface/native/ui/bottomtabbarcontroller';
-import View from '@smartface/native/ui/view';
-import TabBarItem from '@smartface/native/ui/tabbaritem';
-import { ControllerType } from '../core/Controller';
-
+import Page from "@smartface/native/ui/page";
+import Application from "@smartface/native/application";
+import NavigationController from "@smartface/native/ui/navigationcontroller";
+import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller";
+import View from "@smartface/native/ui/view";
+import TabBarItem from "@smartface/native/ui/tabbaritem";
+import { ControllerType } from "../core/Controller";
 
 /**
  * Abstract Renderer Strategy
@@ -32,46 +31,53 @@ export default abstract class Renderer {
     /**
      * Wrong typing on @smartface/native, track the issue on Linear (TYPNG-14)
      */
-    Application.setRootController({
-      //@ts-ignore
+     rootController && Application.setRootController({
+      //  @ts-ignore
       controller: rootController,
       animated: true
     });
   }
 
   makeRootVisible() {
-    //@ts-ignore
-    var sfWindow = SF.requireClass("UIApplication").sharedApplication()
-      .keyWindow;
+    var sfWindow =
+      //@ts-ignore
+      SF.requireClass("UIApplication").sharedApplication().keyWindow;
     sfWindow.makeKeyAndVisible();
   }
-  
-  showTab(){
-    //@ts-ignore
+
+  showTab() {
+    // @ts-ignore
     this._rootController.show();
   }
 
-  present(controller: ControllerType, animated: boolean, onComplete: (...args: any) => void) {
+  present(
+    controller: ControllerType,
+    animated: boolean,
+    onComplete: (...args: any) => void
+  ) {
     setTimeout(() => {
       /**
-       * Present method actually exists on BottomTabBarController. 
+       * Present method actually exists on BottomTabBarController.
        * Track the issue on Linear (TYPNG-15)
        */
-      //@ts-ignore
-      this._rootController.present({
-        controller,
-        animated,
-        onComplete
-      });
+      if (this._rootController instanceof NavigationController) {
+        this._rootController.present({
+          controller,
+          animated,
+          onComplete,
+        });
+      }
     }, 1);
   }
 
   dismiss(onComplete: (...args: any) => void, animated: boolean) {
-      /**
+    /**
+     * dismiss method actually exists on BottomTabBarController.
        * dismiss method actually exists on BottomTabBarController. 
-       * Track the issue on Linear (TYPNG-15)
-       */
-      //@ts-ignore
+     * dismiss method actually exists on BottomTabBarController.
+     * Track the issue on Linear (TYPNG-15)
+     */
+    //@ts-ignore
     this._rootController.dismiss({ onComplete, animated });
   }
 
@@ -79,15 +85,18 @@ export default abstract class Renderer {
    * Template method sets specified controller as root controller
    * @param {BottomTabBarController|Page|NavigationController} controller
    */
-    setRootController(controller: ControllerType) {
-      this._rootController = controller;
-    }
-  
-  replaceChild(view: View | ControllerType, index: number){
-    if(this._rootController instanceof Page || !this._rootController?.childControllers?.length) {
+  setRootController(controller: ControllerType) {
+    this._rootController = controller;
+  }
+
+  replaceChild(view: View | ControllerType, index: number) {
+    if (
+      this._rootController instanceof Page ||
+      !this._rootController?.childControllers?.length
+    ) {
       return;
     }
-    
+
     index = index || this._rootController.childControllers.length - 1;
     const controllers = this._rootController.childControllers;
     /**
@@ -115,7 +124,9 @@ export default abstract class Renderer {
    * Template method sets specified controller as root controller
    * @param {BottomTabBarController|Page|NavigationController} controller
    */
-  seController(controller: BottomTabBarController|Page|NavigationController) {
+  seController(
+    controller: BottomTabBarController | Page | NavigationController
+  ) {
     this._rootController = controller;
   }
 
@@ -136,8 +147,8 @@ export default abstract class Renderer {
    * @param {Array<TabBarItem>} items
    */
   setTabBarItems(items: (TabBarItem | Partial<TabBarItem>)[]) {
-    if(this._rootController instanceof BottomTabBarController) {
-      this._rootController.tabBar.items = items;
+    if (this._rootController instanceof BottomTabBarController) {
+      this._rootController.tabBar.items = items as TabBarItem[];
     }
   }
 
@@ -147,8 +158,8 @@ export default abstract class Renderer {
    * @param {nummer} index
    */
   setSelectedIndex(index: number) {
-    if(this._rootController instanceof BottomTabBarController) {
-      if(this._rootController.selectedIndex !== index) {
+    if (this._rootController instanceof BottomTabBarController) {
+      if (this._rootController.selectedIndex !== index) {
         this._rootController.selectedIndex = index;
       }
     }
@@ -204,12 +215,15 @@ export default abstract class Renderer {
   popChild(animated = true) {
     throw new Error("popChild must be overridden");
   }
-  
+
   /**
    */
   popTo(n: number) {
-    if(this._rootController instanceof NavigationController) {
-      this._rootController.popTo({ controller: this._rootController.childControllers[n], animated: true });
+    if (this._rootController instanceof NavigationController) {
+      this._rootController.popTo({
+        controller: this._rootController.childControllers[n],
+        animated: true,
+      });
     }
   }
 
@@ -223,4 +237,3 @@ export default abstract class Renderer {
     throw new Error("show must be overridden");
   }
 }
-

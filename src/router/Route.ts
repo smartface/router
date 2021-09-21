@@ -6,7 +6,6 @@ import { RoutePath } from "./RoutePath";
 import { RouteState } from "./RouteState";
 import { RouteParams } from "./RouteParams";
 import { OnHistoryChange } from '../core/OnHistoryChange';
-import NativeStackRouter from 'native/NativeStackRouter';
 
 /**
  * Route implementation
@@ -36,9 +35,9 @@ export default class Route<Ttarget = unknown> {
   protected _path: RoutePath;
   protected _routes: Route[] = [];
   protected _to: RouteParams<Ttarget>['to'];
-  protected _routeShouldMatch: RouteParams<Ttarget>['routeShouldMatch'];
-  protected _routeDidEnter: RouteParams<Ttarget>['routeDidEnter'];
-  protected _routeDidExit: RouteParams<Ttarget>['routeDidExit'];
+  private doRouteShouldMatch: RouteParams<Ttarget>['routeShouldMatch'];
+  private doRouteDidEnter: RouteParams<Ttarget>['routeDidEnter'];
+  private doRouteDidExit: RouteParams<Ttarget>['routeDidExit'];
   protected _modal: boolean = false;
   protected _state: RouteState;
   protected _exact = false;
@@ -92,9 +91,9 @@ export default class Route<Ttarget = unknown> {
     this._routes = routes;
     this.map = mapComposer<Route<any>>(this._routes)
     this._to = to;
-    this._routeShouldMatch = routeShouldMatch;
-    this._routeDidEnter = routeDidEnter;
-    this._routeDidExit = routeDidExit;
+    this.doRouteShouldMatch = routeShouldMatch;
+    this.doRouteDidEnter = routeDidEnter;
+    this.doRouteDidExit = routeDidExit;
     this._modal = modal;
     this._options = {
       exact,
@@ -261,8 +260,8 @@ export default class Route<Ttarget = unknown> {
    * @param {Router} router
    * @return {boolean}
    */
-  protected routeShouldMatch(router: Router<any>) {
-    return this._routeShouldMatch ? this._routeShouldMatch(router, this) : true;
+  protected routeShouldMatch(router: Router<any>): boolean {
+    return this.doRouteShouldMatch ? this.doRouteShouldMatch(router, this) : true;
   }
 
   /**
@@ -281,8 +280,8 @@ export default class Route<Ttarget = unknown> {
    * @event
    * @param {Router} router
    */
-  routeDidEnter(router: Router<Ttarget>) {
-    return this._routeDidEnter ? this._routeDidEnter(router, this) : true;
+  protected routeDidEnter(router: Router<Ttarget>) {
+    return this.doRouteDidEnter ? this.doRouteDidEnter(router, this) : true;
   }
 
   /**
@@ -301,8 +300,8 @@ export default class Route<Ttarget = unknown> {
    * @event
    * @param {Router} router
    */
-  routeDidExit(router: Router<Ttarget>) {
-    return this._routeDidExit ? this._routeDidExit(router, this) : true;
+   protected routeDidExit(router: Router<Ttarget>) {
+    return this.doRouteDidExit ? this.doRouteDidExit(router, this) : true;
   }
 
   /**
@@ -355,9 +354,9 @@ export default class Route<Ttarget = unknown> {
       {
         to: this._to,
         modal: this._modal,
-        routeDidExit: this._routeDidExit,
-        routeShouldMatch: this._routeShouldMatch,
-        routeDidEnter: this._routeDidEnter,
+        routeDidExit: this.doRouteDidExit,
+        routeShouldMatch: this.doRouteShouldMatch,
+        routeDidEnter: this.doRouteDidEnter,
         exact: this._exact,
         strict: this._strict,
         path: this._path.clone(),

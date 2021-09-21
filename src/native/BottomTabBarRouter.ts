@@ -221,10 +221,8 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
   initialize(parentHistory: unknown, onHistoryChange: OnHistoryChange, pushHomes: (path: string) => void) {
     super.initialize(parentHistory, onHistoryChange, pushHomes);
     this.initializeRenderer();
-    // Initilaze BottomTabBarController's child controllers
     this._renderer?.setChildControllers(
-      //@ts-ignore
-      this._routes.map(route => route.build(this, route))
+      this._routes.map(route => route.build(this))
     );
 
     this._renderer?.setTabBarItems(

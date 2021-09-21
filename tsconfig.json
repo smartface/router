@@ -15,6 +15,7 @@
     "lib": ["ES2015"]
   },
   "include": ["src"],
+  "files": ["./node_modules/@smartface/native/"],
   "exclude": [
     "node_modules",
     "lib",
