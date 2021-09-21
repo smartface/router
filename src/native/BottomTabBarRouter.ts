@@ -36,7 +36,7 @@ type BottomTabBarRouterParams<Ttarget> = RouteParams<Ttarget> & {
   isRoot?: boolean;
   items: (Partial<TabBarItem> | TabBarItem)[];
   onTabChangedByUser: (...args: any) => void;
-  tabbarParams: any;
+  tabbarParams?: () => Partial<BottomTabBarController['tabBar']>;
 };
 
 /**
@@ -52,6 +52,40 @@ const userTabStatus = {
   WAITING: 1,
   DONE: 2,
 };
+
+/**
+ * @typedef {object<string,string|object>} BottomTabBarItem Represents {@link TabBarItem} params
+ * @property {Image} icon
+ * @property {string} title
+ */
+/**
+ * @typedef {RouterParams} BottomTabBarRouterParams
+ * @property {function(router: Router, event: ChangeEvent)} onTabChangedByUser Tab is changed handler
+ * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
+ * @property {object} tabbarParams See {@link BottomTabbarController}
+ */
+/**
+ * @typedef {object} ChangeEvent
+ * @property {number} prevTabIndex Previous tab index
+ * @property {number} tabIndex Changed tab index
+ */
+
+/**
+ * @typedef {object<string,string|object>} BottomTabBarItem Represents {@link TabBarItem} params
+ * @property {Image} icon
+ * @property {string} title
+ */
+/**
+ * @typedef {RouterParams} BottomTabBarRouterParams
+ * @property {function(router: Router, event: ChangeEvent)} onTabChangedByUser Tab is changed handler
+ * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
+ * @property {object} tabbarParams See {@link BottomTabbarController}
+ */
+/**
+ * @typedef {object} ChangeEvent
+ * @property {number} prevTabIndex Previous tab index
+ * @property {number} tabIndex Changed tab index
+ */
 
 /**
  * It creates {@link BottomTabbarController} and manages its behavours and routes.
@@ -113,22 +147,7 @@ export default class BottomTabBarRouter<
     length: number;
     [key: number]: { url: string; action: HistoryActionType };
   } = { length: 0 };
-  /**
-   * @typedef {object<string,string|object>} BottomTabBarItem Represents {@link TabBarItem} params
-   * @property {Image} icon
-   * @property {string} title
-   */
-  /**
-   * @typedef {RouterParams} BottomTabBarRouterParams
-   * @property {function(router: Router, event: ChangeEvent)} onTabChangedByUser Tab is changed handler
-   * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
-   * @property {object} tabbarParams See {@link BottomTabbarController}
-   */
-  /**
-   * @typedef {object} ChangeEvent
-   * @property {number} prevTabIndex Previous tab index
-   * @property {number} tabIndex Changed tab index
-   */
+  private _tabbarParams: () => Partial<BottomTabBarController['tabBar']>;
 
   /**
    * Helper method
@@ -149,7 +168,7 @@ export default class BottomTabBarRouter<
     exact = false,
     renderer,
     to = null,
-    tabbarParams = {},
+    tabbarParams,
     items = [],
     isRoot = false,
     onTabChangedByUser,
@@ -174,6 +193,7 @@ export default class BottomTabBarRouter<
     this._onTabChangedByUser = onTabChangedByUser;
     this._fromUser = true;
     this._items = items;
+    this._tabbarParams = tabbarParams || (() => ({}));
   }
 
   initializeRenderer() {
@@ -222,7 +242,7 @@ export default class BottomTabBarRouter<
        * Smartface Native says its' read only
        */
       //@ts-ignore
-      this._renderer._rootController.tabBar = tabbarParams();
+      this._renderer._rootController.tabBar = this._tabbarParams();
     }
   }
 

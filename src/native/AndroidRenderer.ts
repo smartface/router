@@ -15,6 +15,8 @@ let timeout = 0;
  * @extends {Renderer}
  */
 export default class AndroidRenderer extends Renderer {
+  dispose(): void {
+  }
   protected _activePage?: Page; 
   /**
    * @constructor

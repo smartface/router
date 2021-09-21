@@ -14,6 +14,9 @@ import NavigationController from "@smartface/native/ui/navigationcontroller";
  * @extends {Renderer}
  */
 export default class IOSRenderer extends Renderer {
+  dispose(): void {
+
+  }
   protected _currentPage?: Page;
   /**
    * @constructor

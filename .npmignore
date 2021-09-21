@@ -12,3 +12,4 @@ Makefile
 .travis.yml
 .jsdoc.json
 .npmrc
+__test__

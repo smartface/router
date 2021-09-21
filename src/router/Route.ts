@@ -260,8 +260,8 @@ export default class Route<Ttarget = unknown> {
    * @param {Router} router
    * @return {boolean}
    */
-  protected routeShouldMatch(router: Router<any>): boolean {
-    return this.doRouteShouldMatch ? this.doRouteShouldMatch(router, this) : true;
+  protected routeShouldMatch(router: Router<any>) {
+    this.doRouteShouldMatch && this.doRouteShouldMatch(router, this);
   }
 
   /**

@@ -15,10 +15,10 @@
     "lib": ["ES2015"]
   },
   "include": ["src"],
-  "files": ["./node_modules/@smartface/native/"],
+  "files": ["./node_modules/@smartface/native/.types/typings.d.ts"],
   "exclude": [
     "node_modules",
     "lib",
-    "test"
+    "__test__"
   ],
 }
