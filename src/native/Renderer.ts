@@ -38,6 +38,8 @@ export default abstract class Renderer {
     });
   }
 
+  abstract dispose():void;
+
   makeRootVisible() {
     var sfWindow =
       //@ts-ignore

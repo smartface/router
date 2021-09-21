@@ -12,27 +12,32 @@
  * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
  * @property {object} tabbarParams See {@link BottomTabbarController}
  */
- 
- /**
+
+/**
  * @typedef {object} ChangeEvent
  * @property {number} prevTabIndex Previous tab index
  * @property {number} tabIndex Changed tab index
  */
-import System from '@smartface/native/device/system';
+import System from "@smartface/native/device/system";
 import NativeRouterBase from "./NativeRouterBase";
-import BottomTabBarController from '@smartface/native/ui/bottomtabbarcontroller';
+import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller";
 import createRenderer from "./createRenderer";
-import TabBarItem from '@smartface/native/ui/tabbaritem';
+import TabBarItem from "@smartface/native/ui/tabbaritem";
 import functionMaybe from "../utils/funcorVal";
 import Router from "../router/Router";
-import { RouteParams } from '../router/RouteParams';
-import { OnHistoryChange } from '../core/OnHistoryChange';
-import { matchRoutes } from '../common';
-import { Location } from '../common/Location';
-import Page from '@smartface/native/ui/Page';
-import { HistoryActionType } from 'common/HistoryActions';
+import { RouteParams } from "../router/RouteParams";
+import { OnHistoryChange } from "../core/OnHistoryChange";
+import { matchRoutes } from "../common";
+import { Location } from "../common/Location";
+import Page from "@smartface/native/ui/Page";
+import { HistoryActionType } from "common/HistoryActions";
 
-type BottomTabBarRouterParams<Ttarget> = RouteParams<Ttarget> & { isRoot?: boolean; items: (Partial<TabBarItem> | TabBarItem)[]; onTabChangedByUser: (...args: any) => void; tabbarParams: any; }
+type BottomTabBarRouterParams<Ttarget> = RouteParams<Ttarget> & {
+  isRoot?: boolean;
+  items: (Partial<TabBarItem> | TabBarItem)[];
+  onTabChangedByUser: (...args: any) => void;
+  tabbarParams: any;
+};
 
 /**
  * @private
@@ -45,7 +50,7 @@ function createTabBarItem(item: TabBarItem) {
 const userTabStatus = {
   IDLE: 0,
   WAITING: 1,
-  DONE: 2
+  DONE: 2,
 };
 
 /**
@@ -96,35 +101,40 @@ const userTabStatus = {
  *
  * @since 1.0.0
  */
-export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase<Ttarget> {
+export default class BottomTabBarRouter<
+  Ttarget = Page
+> extends NativeRouterBase<Ttarget> {
   private _onTabChangedByUser: any;
   private _fromUser: boolean;
   private _items: any;
-  private _tabStatus = 0
+  private _tabStatus = 0;
   private _currentIndex = 0;
-  private _visitedIndexes: { length: number; url: string | Location; }[] = [];
-    /**
-     * @typedef {object<string,string|object>} BottomTabBarItem Represents {@link TabBarItem} params
-     * @property {Image} icon
-     * @property {string} title
-     */
-    /**
-     * @typedef {RouterParams} BottomTabBarRouterParams
-     * @property {function(router: Router, event: ChangeEvent)} onTabChangedByUser Tab is changed handler
-     * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
-     * @property {object} tabbarParams See {@link BottomTabbarController}
-     */
-    /**
-    * @typedef {object} ChangeEvent
-    * @property {number} prevTabIndex Previous tab index
-    * @property {number} tabIndex Changed tab index
-    */
+  private _visitedIndexes: {
+    length: number;
+    [key: number]: { url: string; action: HistoryActionType };
+  } = { length: 0 };
+  /**
+   * @typedef {object<string,string|object>} BottomTabBarItem Represents {@link TabBarItem} params
+   * @property {Image} icon
+   * @property {string} title
+   */
+  /**
+   * @typedef {RouterParams} BottomTabBarRouterParams
+   * @property {function(router: Router, event: ChangeEvent)} onTabChangedByUser Tab is changed handler
+   * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
+   * @property {object} tabbarParams See {@link BottomTabbarController}
+   */
+  /**
+   * @typedef {object} ChangeEvent
+   * @property {number} prevTabIndex Previous tab index
+   * @property {number} tabIndex Changed tab index
+   */
 
   /**
    * Helper method
    * @param {BottomTabBarRouterParams} param
    */
-  static of<Ttarget=Page>(params: BottomTabBarRouterParams<Ttarget>) {
+  static of<Ttarget = Page>(params: BottomTabBarRouterParams<Ttarget>) {
     params.renderer = createRenderer();
     return new BottomTabBarRouter<Ttarget>(params);
   }
@@ -137,9 +147,7 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
     path = "",
     routes = [],
     exact = false,
-    //@ts-ignore
-    renderer = null,
-    //@ts-ignore
+    renderer,
     to = null,
     tabbarParams = {},
     items = [],
@@ -148,7 +156,7 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
     routerDidEnter,
     routerDidExit,
     routeShouldMatch,
-    routeWillEnter
+    routeWillEnter,
   }: BottomTabBarRouterParams<Ttarget>) {
     super({
       path,
@@ -159,7 +167,7 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
       routerDidEnter,
       routerDidExit,
       routeShouldMatch,
-      routeWillEnter
+      routeWillEnter,
     });
 
     this._renderer = renderer;
@@ -169,16 +177,14 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
   }
 
   initializeRenderer() {
-    //@ts-ignore
-    this._renderer?.setRootController(new BottomTabBarController(tabbarParams));
+    this._renderer?.setRootController(new BottomTabBarController());
     /**
      * This should be array???
      */
-    //@ts-ignore
     this._visitedIndexes = { length: 0 };
     this._tabStatus = userTabStatus.IDLE;
 
-    if(this._renderer?._rootController instanceof BottomTabBarController) {
+    if (this._renderer?._rootController instanceof BottomTabBarController) {
       this._renderer._rootController.shouldSelectByIndex = ({ index }) => {
         // TabbarItem should be changed
         return this.shouldSelectByIndex(index);
@@ -192,20 +198,22 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
           if (!this.isVisited(index)) {
             // then push route object
             this.pushRoute(this._routes[index]);
-          }
-          else {
+          } else {
             // Notification of the route changing
             // must always dispatch a PUSH action.
             // Because when visited tabbar is revisited,
-            // POP and Replace actions come from visisted cache are 
+            // POP and Replace actions come from visisted cache are
             // reproduced in BottomTabbarRouter.
-            if(typeof this.dispatch === 'function') {
-              //@ts-ignore
-              this.dispatch({ url: this._visitedIndexes[index].url }, "PUSH", this);
+            if (typeof this.dispatch === "function") {
+              this.dispatch(
+                { url: this._visitedIndexes[index].url },
+                "PUSH",
+                this
+              );
             }
           }
         }
-        
+
         this._currentIndex = index;
       };
 
@@ -218,11 +226,15 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
     }
   }
 
-  initialize(parentHistory: unknown, onHistoryChange: OnHistoryChange, pushHomes: (path: string) => void) {
+  initialize(
+    parentHistory: unknown,
+    onHistoryChange: OnHistoryChange,
+    pushHomes: (path: string) => void
+  ) {
     super.initialize(parentHistory, onHistoryChange, pushHomes);
     this.initializeRenderer();
     this._renderer?.setChildControllers(
-      this._routes.map(route => route.build(this))
+      this._routes.map((route) => route.build(this))
     );
 
     this._renderer?.setTabBarItems(
@@ -230,7 +242,6 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
     );
     this._renderer?.showTab();
     // Overrides build method
-    //@ts-ignore
     this.build = () => this._renderer?._rootController;
   }
 
@@ -257,17 +268,25 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
       })
       .catch(e => alert(e.message + " " + e.stack, "Error"));*/
 
-   if(this._fromUser === true){
+    if (this._fromUser === true) {
       this._fromRouter = false;
       const current = this._currentIndex;
       setTimeout(() => {
-        this._onTabChangedByUser && this._onTabChangedByUser(this, {prevTabIndex: current, tabIndex: index });
+        this._onTabChangedByUser &&
+          this._onTabChangedByUser(this, {
+            prevTabIndex: current,
+            tabIndex: index,
+          });
       }, 0);
     }
-    
+
     this._fromUser = true;
 
-    return Router._lock ? false : System.OS === "iOS" ? this._currentIndex != index : true;
+    return Router._lock
+      ? false
+      : System.OS === "iOS"
+      ? this._currentIndex != index
+      : true;
   }
 
   /**
@@ -277,9 +296,8 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
    * @param {number} index
    * @param {{url:string, action:string}} route
    */
-  setVisited(index: number, route: {url: string, action: string}) {
+  setVisited(index: number, route: { url: string; action: HistoryActionType }) {
     if (index < 0) return;
-    //@ts-ignore
     this._visitedIndexes[index] = route;
     this._visitedIndexes.length++;
   }
@@ -303,7 +321,7 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
    */
   resolveIndex(path: string) {
     return this._routes.findIndex(
-      route => route.getUrlPath() === path || route.getRedirectto() === path
+      (route) => route.getUrlPath() === path || route.getRedirectto() === path
     );
   }
 
@@ -328,16 +346,15 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
     super.dispose();
     this._unlistener();
     if (this._renderer?._rootController instanceof BottomTabBarController) {
-      //@ts-ignore
       this._renderer?.dispose();
       this._renderer._rootController.didSelectByIndex = () => null;
     }
     this._items = null;
     this._renderer = undefined;
   }
-  
+
   private _unlistener() {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
 
   push(path: string, routeData = {}) {
@@ -355,22 +372,26 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
   /**
    * @override
    */
-  renderMatches(matches: ReturnType<typeof matchRoutes>, location: Location, action: HistoryActionType, target: Router, fromRouter: boolean) {
+  renderMatches(
+    matches: ReturnType<typeof matchRoutes>,
+    location: Location,
+    action: HistoryActionType,
+    target: Router,
+    fromRouter: boolean
+  ) {
     super.renderMatches(matches, location, action, target, fromRouter);
 
     // this._fromRouter = true;
     if (matches.length > 0) {
       const currentIndex = this._currentIndex;
-      //@ts-ignore
       const { match: next } = matches[matches.length - 1];
       // current url match
-      //@ts-ignore
       const { match } = matches[1] || matches[0];
       // const lastIndex = this.resolveIndex(next.path);
       // get index of the current url
       const index = this.resolveIndex(match.path);
 
-      if(!this._visitedIndexes[index] || this._currentIndex != index) {
+      if (!this._visitedIndexes[index] || this._currentIndex != index) {
         this._fromUser = false;
         // sets target tabbar item as visited.
         // selects target tabbaritem by index
@@ -381,7 +402,7 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
         // either requests come from user and router. And IOS only triggers if request comes from the user.
         this._renderer?.setSelectedIndex(index);
         this._renderer?.showTab();
-        
+
         this._fromUser = true;
       }
       this.setVisited(index, { url: location.url, action });
@@ -389,6 +410,5 @@ export default class BottomTabBarRouter<Ttarget = Page> extends NativeRouterBase
       // if(System.OS === "Android"){
       // }
     }
-    
   }
 }
