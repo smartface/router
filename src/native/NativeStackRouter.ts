@@ -161,14 +161,7 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
     //@ts-ignore
     this._renderer?.setRootController(new NavigationController());
     this.addNavigatorChangeListener();
-    this.build = () => {
-      if(this._renderer?._rootController instanceof Page) {
-        return this._renderer?._rootController
-      }
-      else {
-        return null;
-      }
-    };
+    this.build = () => this._renderer?._rootController || null;
     /**
      * Headerbar is be read-only
      */

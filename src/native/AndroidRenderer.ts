@@ -40,7 +40,7 @@ export default class AndroidRenderer extends Renderer {
    * @override
    */
   setChildControllers(controllers: NavigationController[]) {
-    if(this._rootController instanceof NavigationController) {
+    if(!(this._rootController instanceof Page)) {
       this._rootController.childControllers = controllers;
     }
   }
@@ -109,8 +109,11 @@ export default class AndroidRenderer extends Renderer {
     if (this._rootController instanceof NavigationController) {
       if (this._rootController.onTransition) {
         this._rootController.onTransition = fn;
-        //@ts-ignore
-        return () => (this._rootController.onTransition = () => null);
+        return () => {
+          if (this._rootController instanceof NavigationController) {
+            return this._rootController.onTransition = () => null
+          }
+        }
       }
     }
     return () => null;

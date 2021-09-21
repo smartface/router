@@ -25,9 +25,6 @@ export default abstract class Renderer {
    * @param {BottomTabBarController|Page} rootController
    */
   static setasRoot(rootController?: ControllerType | null) {
-    if (rootController instanceof NavigationController) {
-      return;
-    }
     /**
      * Wrong typing on @smartface/native, track the issue on Linear (TYPNG-14)
      */
@@ -41,14 +38,16 @@ export default abstract class Renderer {
   abstract dispose():void;
 
   makeRootVisible() {
-    var sfWindow =
-      //@ts-ignore
-      SF.requireClass("UIApplication").sharedApplication().keyWindow;
+    //@ts-ignore
+    const sfWindow = SF.requireClass("UIApplication").sharedApplication().keyWindow;
     sfWindow.makeKeyAndVisible();
   }
 
   showTab() {
-    // @ts-ignore
+    /**
+     * Wrong typing, show should exist on BottomTabbarController
+     */
+    //@ts-ignore
     this._rootController.show();
   }
 
@@ -62,13 +61,12 @@ export default abstract class Renderer {
        * Present method actually exists on BottomTabBarController.
        * Track the issue on Linear (TYPNG-15)
        */
-      if (this._rootController instanceof NavigationController) {
-        this._rootController.present({
-          controller,
-          animated,
-          onComplete,
-        });
-      }
+      //@ts-ignore
+      this._rootController.present({
+        controller,
+        animated,
+        onComplete,
+      });
     }, 1);
   }
 
@@ -98,19 +96,15 @@ export default abstract class Renderer {
     ) {
       return;
     }
-
     index = index || this._rootController.childControllers.length - 1;
     const controllers = this._rootController.childControllers;
-    /**
-     * It shouldn't take view as paramater. It should only take Controller.
-     */
     //@ts-ignore
     controllers[index] = view;
     this._rootController.childControllers = controllers;
   }
 
   /**
-   * Only use if rootpage is Page instancea
+   * Only use if rootpage is Page instance
    *
    * @protected
    * @param {Page} fromPage
@@ -120,16 +114,6 @@ export default abstract class Renderer {
    */
   showWithTransition(fromPage: Page, toPage: Page, duration = 0, options = 0) {
     throw new Error("onNavigatorChange method must be overridden");
-  }
-
-  /**
-   * Template method sets specified controller as root controller
-   * @param {BottomTabBarController|Page|NavigationController} controller
-   */
-  seController(
-    controller: BottomTabBarController | Page | NavigationController
-  ) {
-    this._rootController = controller;
   }
 
   /**
@@ -149,9 +133,17 @@ export default abstract class Renderer {
    * @param {Array<TabBarItem>} items
    */
   setTabBarItems(items: (TabBarItem | Partial<TabBarItem>)[]) {
+    // console.info("setTabbarItems: ", {
+    //   test: "Test",
+    //   items: items.map(item => item.constructor.name),
+    //   rootController: this._rootController.tabBar.constructor.name,
+    //   rootControllerITems: this._rootController.tabBar.items.constructor.name
+    // })
+    console.info(this._rootController?.constructor.name);
     if (this._rootController instanceof BottomTabBarController) {
       this._rootController.tabBar.items = items as TabBarItem[];
     }
+    console.info("after setTabbarItems");
   }
 
   /**
