@@ -133,17 +133,9 @@ export default abstract class Renderer {
    * @param {Array<TabBarItem>} items
    */
   setTabBarItems(items: (TabBarItem | Partial<TabBarItem>)[]) {
-    // console.info("setTabbarItems: ", {
-    //   test: "Test",
-    //   items: items.map(item => item.constructor.name),
-    //   rootController: this._rootController.tabBar.constructor.name,
-    //   rootControllerITems: this._rootController.tabBar.items.constructor.name
-    // })
-    console.info(this._rootController?.constructor.name);
     if (this._rootController instanceof BottomTabBarController) {
       this._rootController.tabBar.items = items as TabBarItem[];
     }
-    console.info("after setTabbarItems");
   }
 
   /**
