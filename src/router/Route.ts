@@ -280,8 +280,8 @@ export default class Route<Ttarget = unknown> {
    * @event
    * @param {Router} router
    */
-  protected routeDidEnter(router: Router<Ttarget>) {
-    return this.doRouteDidEnter ? this.doRouteDidEnter(router, this) : true;
+  routeDidEnter(router: Router<Ttarget>) {
+    this.doRouteDidEnter && this.doRouteDidEnter(router, this);
   }
 
   /**

@@ -521,13 +521,3 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
     this._historyController?.clear();
   }
 }
-
-
-const route = Router.of({
-  routes: [
-    NativeStackRouter.of({
-      isRoot: false,
-
-    })
-  ]
-})
