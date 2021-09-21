@@ -301,7 +301,7 @@ export default class Route<Ttarget = unknown> {
    * @param {Router} router
    */
    protected routeDidExit(router: Router<Ttarget>) {
-    return this.doRouteDidExit ? this.doRouteDidExit(router, this) : true;
+    this.doRouteDidExit ? this.doRouteDidExit(router, this) : true;
   }
 
   /**

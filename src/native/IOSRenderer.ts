@@ -32,8 +32,9 @@ export default class IOSRenderer extends Renderer {
     /**
      * Doesn't exist on page and instanceof didn't work
      */
-    //@ts-ignore
-    this._rootController.childControllers = controllers;
+    if (!(this._rootController instanceof Page)) {
+      this._rootController.childControllers = controllers
+    }
   }
 
   /**

@@ -188,7 +188,6 @@ export default class BottomTabBarRouter<
       routeShouldMatch,
       routeWillEnter,
     });
-
     this._renderer = renderer;
     this._onTabChangedByUser = onTabChangedByUser;
     this._fromUser = true;
@@ -198,10 +197,6 @@ export default class BottomTabBarRouter<
 
   initializeRenderer() {
     this._renderer?.setRootController(new BottomTabBarController());
-    /**
-     * This should be array???
-     */
-    this._visitedIndexes = { length: 0 };
     this._tabStatus = userTabStatus.IDLE;
 
     if (this._renderer?._rootController instanceof BottomTabBarController) {
@@ -253,10 +248,7 @@ export default class BottomTabBarRouter<
   ) {
     super.initialize(parentHistory, onHistoryChange, pushHomes);
     this.initializeRenderer();
-    this._renderer?.setChildControllers(
-      this._routes.map((route) => route.build(this))
-    );
-
+    this._renderer?.setChildControllers(this._routes.map((route) => route.build(this)));
     this._renderer?.setTabBarItems(
       functionMaybe(this._items).map(createTabBarItem)
     );
