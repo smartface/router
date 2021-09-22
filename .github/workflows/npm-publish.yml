@@ -13,7 +13,6 @@ jobs:
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org/
-
       - name: Install Dependencies
         run: yarn
       - name: Compile Project
