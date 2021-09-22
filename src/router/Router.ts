@@ -569,10 +569,10 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
     
     if (!location) throw new Error("Location cannot be empty.");
     if (this._isRoot) {
+
       this._matches = matchRoutes(
         this.getStore(),
-        //@ts-ignore
-        [this].concat(this._routes),
+        [this, ...this._routes],
         location.url
       );
       // console.log('onHistoryChange : ', location, action);
