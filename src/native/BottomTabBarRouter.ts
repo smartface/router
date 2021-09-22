@@ -35,7 +35,7 @@ import { HistoryActionType } from "common/HistoryActions";
 type BottomTabBarRouterParams<Ttarget> = RouteParams<Ttarget> & {
   isRoot?: boolean;
   items: (Partial<TabBarItem> | TabBarItem)[];
-  onTabChangedByUser: (...args: any) => void;
+  onTabChangedByUser?: (...args: any) => void;
   tabbarParams?: () => Partial<BottomTabBarController['tabBar']>;
 };
 

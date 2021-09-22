@@ -17,6 +17,8 @@ jobs:
         run: yarn
       - name: Compile Project
         run: yarn run build
+      - name: Run Tests
+        run: yarn run test
       - name: Publish Package
         run: yarn publish
         env:
