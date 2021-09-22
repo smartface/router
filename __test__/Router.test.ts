@@ -10,15 +10,17 @@ describe("Router", () => {
     const router = new Router<any>({
       isRoot: true,
       routes: [
-        new Route<any>({path: "/path/to/:name"}),
-        new Route<any>({path: "/path/to/:id"}),
-        new Route<any>({path: "/path/to"})
-      ]
+        new Route<any>({ path: "/path/to/:name" }),
+        new Route<any>({ path: "/path/to/:id" }),
+        new Route<any>({ path: "/path/to" }),
+      ],
     });
     let routes = [];
-    routes = router.map ? router.map(route => {
-      return route;
-    })! : [];
+    routes = router.map
+      ? router.map((route) => {
+          return route;
+        })!
+      : [];
     expect(routes.length).toBe(3);
   });
 
@@ -31,17 +33,20 @@ describe("Router", () => {
         new Route<any>({
           path: "/path/to/:name",
           build: (router, route) => ({
-            type: "target1"
-          })
+            type: "target1",
+          }),
         }),
         new Route<any>({
           path: "/path/to/:id",
           build: (router, route) => ({
-            type: "target2"
-          })
+            type: "target2",
+          }),
         }),
-        new Route<any>({ path: "*", build: (props, match) => ({ type: "target3" }) })
-      ]
+        new Route<any>({
+          path: "*",
+          build: (props, match) => ({ type: "target3" }),
+        }),
+      ],
     });
     // let matches = matchRoutes([router], "/path/to/1").map(
     //   ({ match, route }) => ({ match, route: route!.toObject(), view: route!.build() })
@@ -72,16 +77,16 @@ describe("Router", () => {
                     _router1 = router;
                     lastUrl = route!.getState()?.match?.url;
                     return { type: "target2" };
-                  }
-                })
-              ]
-            })
-          ]
+                  },
+                }),
+              ],
+            }),
+          ],
         }),
         new Router<any>({
           path: "/path2",
           build: (router, route) => ({
-            type: "target1"
+            type: "target1",
           }),
           routes: [
             new Route<any>({
@@ -90,12 +95,15 @@ describe("Router", () => {
                 lastUrl = route!.getState()?.match?.url;
                 _router2 = router;
                 return { type: "target2" };
-              }
-            })
-          ]
+              },
+            }),
+          ],
         }),
-        new Route<any>({ path: "*", build: (props, match) => ({ type: "target3" }) })
-      ]
+        new Route<any>({
+          path: "*",
+          build: (props, match) => ({ type: "target3" }),
+        }),
+      ],
     });
     // let matches = matchRoutes([router], "/path/to/1").map(
     //   ({ match, route }) => ({ match, route: route!.toObject(), view: route!.build() })
@@ -112,7 +120,7 @@ describe("Router", () => {
     expect(router!.getHistoryasArray()).toEqual([
       "/path/to/the/1",
       "/path2/to/1",
-      "/path/to/the/3"
+      "/path/to/the/3",
     ]);
 
     _router1!.goBack();
@@ -122,11 +130,11 @@ describe("Router", () => {
     expect(router!.getHistoryasArray()).toEqual([
       "/path/to/the/1",
       "/path2/to/1",
-      "/path/to/the/3"
+      "/path/to/the/3",
     ]);
     expect(_router1!.getHistoryasArray()).toEqual([
       "/path/to/the/1",
-      "/path/to/the/3"
+      "/path/to/the/3",
     ]);
     expect(_router2!.getHistoryasArray()).toEqual(["/path2/to/1"]);
   });
@@ -140,7 +148,7 @@ describe("Router", () => {
         new Router<any>({
           path: "/path2",
           build: (router, route) => ({
-            type: "target1"
+            type: "target1",
           }),
           routes: [
             new Route<any>({
@@ -149,11 +157,11 @@ describe("Router", () => {
                 lastUrl = route!.getState()?.match?.url;
                 router1 = router;
                 return { type: "target2" };
-              }
-            })
-          ]
-        })
-      ]
+              },
+            }),
+          ],
+        }),
+      ],
     });
 
     router!.push("/path2/to/0");
@@ -186,11 +194,11 @@ describe("Router", () => {
                     _router1 = router;
                     lastUrl = route!.getState()?.match?.url;
                     return { type: "target2" };
-                  }
-                })
-              ]
-            })
-          ]
+                  },
+                }),
+              ],
+            }),
+          ],
         }),
         new Router<any>({
           path: "/path2",
@@ -201,15 +209,15 @@ describe("Router", () => {
                 lastUrl = route!.getState()?.match?.url;
                 _router2 = router;
                 return { type: "target2" };
-              }
-            })
-          ]
+              },
+            }),
+          ],
         }),
         new Route<any>({
           path: "*",
-          build: (props, match) => ({ type: "target3" })
-        })
-      ]
+          build: (props, match) => ({ type: "target3" }),
+        }),
+      ],
     });
 
     router!.push("/");
@@ -228,14 +236,14 @@ describe("Router", () => {
     expect(router!.getHistoryasArray()).toEqual([
       "/path/to/the/1",
       "/path2/to/1",
-      "/path/to/the/2"
+      "/path/to/the/2",
     ]);
 
     _router1!.goBack();
     expect(lastUrl!).toBe("/path/to/the/2");
     expect(_router1!.getHistoryasArray()).toEqual([
       "/path/to/the/1",
-      "/path/to/the/2"
+      "/path/to/the/2",
     ]);
 
     _router2!.goBack();
@@ -244,13 +252,74 @@ describe("Router", () => {
     expect(router!.getHistoryasArray()).toEqual([
       "/path/to/the/1",
       "/path2/to/1",
-      "/path/to/the/2"
+      "/path/to/the/2",
     ]);
     expect(_router1!.getHistoryasArray()).toEqual([
       "/path/to/the/1",
-      "/path/to/the/2"
+      "/path/to/the/2",
     ]);
     expect(_router2!.getHistoryasArray()).toEqual(["/path2/to/1"]);
+  });
+  it("can't call build functions of not matched routes", () => {
+    let _router1: Router;
+    let _router2: Router;
+    let call = 0;
+    const router = new Router<any>({
+      path: "/",
+      to: "/path/to/the/1",
+      exact: false,
+      isRoot: true,
+      routes: [
+        new Router<any>({
+          path: "/path",
+          to: "/path/to/the/2",
+          routes: [
+            new Router<any>({
+              path: "/path/to",
+              routes: [
+                new Route<any>({
+                  path: "/path/to/the/:id",
+                  build: (router, route) => {
+                    call++;
+                    return { type: "target2" };
+                  },
+                }),
+              ],
+            }),
+          ],
+        }),
+        new Router<any>({
+          path: "/path2",
+          routes: [
+            new Route<any>({
+              path: "/path2/to/:id",
+              build: (router, route) => {
+                call++;
+                return { type: "target2" };
+              },
+            }),
+            new Route<any>({
+              path: "/path2/to/:id/get",
+              build: (router, route) => {
+                call++;
+                return { type: "target2" };
+              },
+            }),
+          ],
+        }),
+        new Route<any>({
+          path: "*",
+          build: (props, match) => {
+            call++;
+            return { type: "target3" };
+          },
+        }),
+      ],
+    });
+
+    router.push("/path");
+
+    expect(call).toBe(1);
   });
 
   it("finds target by url", () => {
@@ -262,135 +331,172 @@ describe("Router", () => {
         new Route<any>({
           path: "/path/to/:name",
           build: (props, match) => ({
-            type: "target1"
-          })
+            type: "target1",
+          }),
         }),
         new Route<any>({
           path: "/path/to/:id",
           build: (props, match) => ({
-            type: "target2"
-          })
+            type: "target2",
+          }),
         }),
-        new Route<any>({ path: "*", build: (props, match) => ({ type: "target3" }) })
-      ]
+        new Route<any>({
+          path: "*",
+          build: (props, match) => ({ type: "target3" }),
+        }),
+      ],
     });
     // let matches = matchRoutes([router], "/path/to/1").map(
     //   ({ match, route }) => ({ match, route: route!.toObject(), view: route!.build() })
     // );
     var matches = router
-      .push("/path/to/1")
+      .push("/path/to/1", { name: "name" })
       .matches.map(({ match, route }) => ({
         match,
         route: route!.toJSON(),
-        view: route!.build(router)
+        view: route!.build(router),
       }));
-
-    expect(matches).toEqual([{
-        match: { isExact: false, params: {}, path: "/", url: "/" },
-        route: {
-          match: {},
-          path: "/",
-          routeData: {},
-          routes: [
-            {
-              match: {},
-              path: "/path/to/:name",
-              routeData: {},
-              routes: [],
-              routingState: {},
-              state: {
-                action: "PUSH",
-                active: false,
-                match: {},
-                routeData: {},
-                routingState: {},
-                url: null,
-                view: undefined
-              },
-              type: "route"
-            },
-            {
-              match: {},
-              path: "/path/to/:id",
-              routeData: {},
-              routes: [],
-              routingState: {},
-              state: {
-                action: null,
-                active: false,
-                match: {},
-                routeData: {},
-                routingState: {},
-                url: null,
-                view: undefined
-              },
-              type: "route"
-            },
-            {
-              match: {},
-              path: "*",
-              routeData: {},
-              routes: [],
-              routingState: {},
-              state: {
-                action: null,
-                active: false,
-                match: {},
-                routeData: {},
-                routingState: {},
-                url: null,
-                view: undefined
-              },
-              type: "route"
-            }
-          ],
-          routingState: {},
-          state: {
-            action: "PUSH",
-            active: false,
-            match: { isExact: false, params: {}, path: "/", url: "/" },
-            routeData: {},
-            routingState: {},
-            url: null,
-            view: undefined
+    expect(JSON.stringify(matches)).toBe(
+      JSON.stringify([
+        {
+          match: {
+            path: "/",
+            url: "/",
+            isExact: false,
+            params: {},
           },
-          type: "route"
-        },
-        view: null
-      },
-      {
-        match: {
-          isExact: true,
-          params: { name: "1" },
-          path: "/path/to/:name",
-          url: "/path/to/1"
-        },
-        route: {
-          match: {},
-          path: "/path/to/:name",
-          routeData: {},
-          routes: [],
-          routingState: {},
-          state: {
-            action: "PUSH",
-            active: false,
-            match: {
-              isExact: true,
-              params: { name: "1" },
-              path: "/path/to/:name",
-              url: "/path/to/1"
-            },
+          route: {
+            type: "route",
+            match: {},
             routeData: {},
             routingState: {},
+            path: "/",
+            routes: [
+              {
+                type: "route",
+                match: {},
+                routeData: {},
+                routingState: {},
+                path: "/path/to/:name",
+                routes: [],
+                state: {
+                  match: {},
+                  query: {},
+                  rawQuery: "",
+                  hash: "",
+                  routeData: {},
+                  routingState: {},
+                  action: null,
+                  url: null,
+                  active: false,
+                },
+              },
+              {
+                type: "route",
+                match: {},
+                routeData: {},
+                routingState: {},
+                path: "/path/to/:id",
+                routes: [],
+                state: {
+                  match: {},
+                  query: {},
+                  rawQuery: "",
+                  hash: "",
+                  routeData: {},
+                  routingState: {},
+                  action: null,
+                  url: null,
+                  active: false,
+                },
+              },
+              {
+                type: "route",
+                match: {},
+                routeData: {},
+                routingState: {},
+                path: "*",
+                routes: [],
+                state: {
+                  match: {},
+                  query: {},
+                  rawQuery: "",
+                  hash: "",
+                  routeData: {},
+                  routingState: {},
+                  action: null,
+                  url: null,
+                  active: false,
+                },
+              },
+            ],
+            state: {
+              match: {
+                path: "/",
+                url: "/",
+                isExact: false,
+                params: {},
+              },
+              rawQuery: "",
+              hash: "",
+              routeData: {},
+              routingState: {},
+              action: "PUSH",
+              url: null,
+              active: false,
+            },
+          },
+          view: null,
+        },
+        {
+          match: {
+            path: "/path/to/:name",
             url: "/path/to/1",
-            view: "Object"
+            isExact: true,
+            params: {
+              name: "1",
+            },
           },
-          type: "route"
+          route: {
+            type: "route",
+            match: {
+              name: "name",
+            },
+            routeData: {
+              name: "name",
+            },
+            routingState: {},
+            path: "/path/to/:name",
+            routes: [],
+            state: {
+              match: {
+                path: "/path/to/:name",
+                url: "/path/to/1",
+                isExact: true,
+                params: {
+                  name: "1",
+                },
+              },
+              hash: "",
+              routeData: {
+                name: "name",
+              },
+              view: "Object",
+              routingState: {},
+              action: "PUSH",
+              url: "/path/to/1",
+              active: false,
+              prevUrl: "/path/to/1",
+            },
+          },
+          view: {
+            type: "target1",
+          },
         },
-        view: { type: "target1" }
-      }
-    ]);
+      ])
+    );
   });
+
   it("return only root path if any route doesn't be matched", () => {
     const router = new Router<any>({
       path: "/",
@@ -400,16 +506,21 @@ describe("Router", () => {
           path: "/path/to/:name",
           build: () => {
             type: "target1";
-          }
+          },
         }),
         new Route<any>({
           path: "/path/to/:id",
           build: () => {
             type: "target2";
-          }
+          },
         }),
-        new Route<any>({ path: "*", build: () => { type: "target3" } })
-      ]
+        new Route<any>({
+          path: "*",
+          build: () => {
+            type: "target3";
+          },
+        }),
+      ],
     });
 
     let matches = router!.push("/path/to").matches;
@@ -418,8 +529,8 @@ describe("Router", () => {
         isExact: false,
         params: {},
         path: "/",
-        url: "/"
-      }
+        url: "/",
+      },
     ]);
   });
 
@@ -434,16 +545,21 @@ describe("Router", () => {
           build: (router, route) => {
             data = route!.getState();
             return { type: "target1" };
-          }
+          },
         }),
         new Route<any>({
           path: "/path/too/:name",
           build: () => {
             type: "target2";
-          }
+          },
         }),
-        new Route<any>({ path: "*", build: () => { type: "target3" } })
-      ]
+        new Route<any>({
+          path: "*",
+          build: () => {
+            type: "target3";
+          },
+        }),
+      ],
     });
     let matches = router!.push("/path/to/1", { name: "name" });
     expect(data!.match?.params).toEqual({ name: "1" });
@@ -452,7 +568,7 @@ describe("Router", () => {
   it("can get back in its history", () => {
     let data: any;
     let callCount = 0;
-    var component:any = {};
+    var component: any = {};
     const router = new Router<any>({
       path: "/",
       isRoot: true,
@@ -466,9 +582,9 @@ describe("Router", () => {
               },
               path: "/path/to/:name",
               build: (router, route) => {
-                data = route!.getState();
+                data = route.getState();
                 return { type: "target1" };
-              }
+              },
             }),
             new Route<any>({
               path: "/path/too/:name",
@@ -478,17 +594,22 @@ describe("Router", () => {
               build: (router, route) => {
                 component.router = router;
                 return component;
-              }
+              },
             }),
-            new Route<any>({ path: "*", build: ()=>{ type: "target3" } })
-          ]
-        })
-      ]
+            new Route<any>({
+              path: "*",
+              build: () => {
+                type: "target3";
+              },
+            }),
+          ],
+        }),
+      ],
     });
 
     router!.push("/path/to/1", { name: "name1" });
-    expect(data!.match?.params).toEqual({ name: "1" });
-    expect(data!.routeData).toEqual({ name: "name1" });
+    expect(data.match?.params).toEqual({ name: "1" });
+    expect(data.routeData).toEqual({ name: "name1" });
 
     router!.push("/path/too/dev", { name: "name2" });
     component.router!.goBack();
@@ -503,7 +624,7 @@ describe("Router", () => {
   it("calls back to parent if its history is empty", () => {
     let route: Route;
     let callCount = 0;
-    var component:any = {};
+    var component: any = {};
     let data: any;
     const router = new Router<any>({
       path: "/",
@@ -515,7 +636,7 @@ describe("Router", () => {
             route = _route;
             callCount++;
             return { type: "target1" };
-          }
+          },
         }),
         new Router<any>({
           path: "/path",
@@ -528,17 +649,17 @@ describe("Router", () => {
                 component.router = router;
                 data = route!.getState();
                 return component;
-              }
+              },
             }),
             new Route<any>({
               path: "*",
               build: (router, route) => {
                 type: "target3";
-              }
-            })
-          ]
-        })
-      ]
+              },
+            }),
+          ],
+        }),
+      ],
     });
 
     router!.push("/path2/to/1", { name: "name1" });
@@ -546,7 +667,10 @@ describe("Router", () => {
     expect(router!.getHistoryasArray()).toEqual(["/path2/to/1"]);
 
     router!.push("/path/to/dev", { name: "name2" });
-    expect(router!.getHistoryasArray()).toEqual(["/path2/to/1", "/path/to/dev"]);
+    expect(router!.getHistoryasArray()).toEqual([
+      "/path2/to/1",
+      "/path/to/dev",
+    ]);
     expect(route!.getState()?.routeData).toEqual({ name: "name2" });
 
     component.router!.goBack();
@@ -555,8 +679,8 @@ describe("Router", () => {
   it("can call a relative path", () => {
     let data;
     let callCount = 0;
-    var component1:any = {};
-    var component2:any = {};
+    var component1: any = {};
+    var component2: any = {};
 
     const router = new Router<any>({
       path: "/",
@@ -567,7 +691,7 @@ describe("Router", () => {
           build: (router, route) => {
             callCount++;
             return { type: "target1" };
-          }
+          },
         }),
         new Router<any>({
           path: "/path",
@@ -579,7 +703,7 @@ describe("Router", () => {
                 component1.router = router;
                 component1.params = match?.params;
                 return component1;
-              }
+              },
             }),
             new Route<any>({
               path: "/path/to/:id",
@@ -588,11 +712,11 @@ describe("Router", () => {
                 component2.router = router;
                 component2.params = match?.params;
                 return component2;
-              }
-            })
-          ]
-        })
-      ]
+              },
+            }),
+          ],
+        }),
+      ],
     });
 
     router!.push("/path/to/cenk", { name: "name" });
@@ -601,14 +725,14 @@ describe("Router", () => {
     // expect(component1.router === router).toBe(false);
     // expect(component1.params.name).toBe("cenk");
     expect(component2.params.id).toBe("1123");
-    expect(router!.getHistory()!.entries.map(entry => entry.url)).toEqual([
-      "/path/to/cenk"
+    expect(router!.getHistory()!.entries.map((entry) => entry.url)).toEqual([
+      "/path/to/cenk",
     ]);
   });
 
   it("can be blocked", () => {
     let callCount = 0;
-    var component1:any = {};
+    var component1: any = {};
     const router = new Router<any>({
       path: "/",
       isRoot: true,
@@ -619,15 +743,15 @@ describe("Router", () => {
             component1.router = router;
             component1.params = route!.matchPath;
             return component1;
-          }
+          },
         }),
         new Route<any>({
           path: "/path/to/:id",
           build: (router, route) => {
             return component1;
-          }
-        })
-      ]
+          },
+        }),
+      ],
     });
 
     const unlisten = router!.addRouteBlocker(
@@ -649,7 +773,7 @@ describe("Router", () => {
 
   it("can redirect to specified route with route-data when route has 'to' attribute", () => {
     let callCount = 0;
-    let component1 :any= {};
+    let component1: any = {};
     let activeRoute: Route;
 
     const router = new Router<any>({
@@ -664,16 +788,16 @@ describe("Router", () => {
             component1.router = router;
             component1.params = match?.params;
             return component1;
-          }
+          },
         }),
         new Route<any>({
           path: "/path2/to/:id",
           build: (router, route) => {
             activeRoute = route;
             return component1;
-          }
-        })
-      ]
+          },
+        }),
+      ],
     });
 
     router!.push("/path", { name: "name" });
@@ -682,8 +806,8 @@ describe("Router", () => {
   });
   it("can call child Routers", () => {
     let callCount = 0;
-    var component1:any = {};
-    var component2:any = {};
+    var component1: any = {};
+    var component2: any = {};
 
     var router1 = Router.of({
       path: "/stack1",
@@ -696,15 +820,15 @@ describe("Router", () => {
             component1.router = router;
             component1.params = match?.params;
             return component1;
-          }
+          },
         }),
         new Route<any>({
           path: "/stack1/to/:id",
           build: () => {
             return component1;
-          }
-        })
-      ]
+          },
+        }),
+      ],
     });
 
     var router2 = Router.of({
@@ -718,21 +842,21 @@ describe("Router", () => {
             component2.router = router;
             component2.params = match?.params;
             return component2;
-          }
+          },
         }),
         new Route<any>({
           path: "/stack2/to/:id",
           build: (router, route) => {
             return component1;
-          }
-        })
-      ]
+          },
+        }),
+      ],
     });
 
     const router = new Router<any>({
       path: "/",
       isRoot: true,
-      routes: [router1, router2]
+      routes: [router1, router2],
     });
 
     router!.push("/stack1", { name: "name" });
@@ -743,8 +867,8 @@ describe("Router", () => {
 
   it("should be routed from child Routers", () => {
     let callCount = 0;
-    let component1:any = {};
-    let component2:any = {};
+    let component1: any = {};
+    let component2: any = {};
 
     let router1 = Router.of({
       name: "router1",
@@ -757,17 +881,16 @@ describe("Router", () => {
             component1.router = router;
             component1.params = route!.getState()?.match?.params;
             return component1;
-          }
+          },
         }),
         new Route<any>({
           path: "/stack1/to/:id",
           build: (router, rotue) => {
             return component1;
-          }
-        })
-      ]
+          },
+        }),
+      ],
     });
-
 
     let router2 = Router.of({
       path: "/stack2",
@@ -780,22 +903,22 @@ describe("Router", () => {
             component2.router = router;
             component2.params = route!.getState()?.match?.params;
             return component2;
-          }
+          },
         }),
         new Route<any>({
           path: "/stack2/to/:id",
           build: (router, route) => {
             component2.url = route!.getState()?.match?.url;
             return component2;
-          }
-        })
-      ]
+          },
+        }),
+      ],
     });
 
     const router = new Router<any>({
       path: "/",
       isRoot: true,
-      routes: [router1, router2]
+      routes: [router1, router2],
     });
 
     router!.push("/stack1", { name: "name" });
