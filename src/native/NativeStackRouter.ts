@@ -32,10 +32,9 @@ import NativeRouterBase from "./NativeRouterBase";
 import Router, { RouterParams } from "../router/Router";
 import NavigationController from '@smartface/native/ui/navigationcontroller';
 import createRenderer from "./createRenderer";
-import { RouteParams } from "../router/RouteParams";
-import { RouteState } from "../router/RouteState";
 import Page from "@smartface/native/ui/page";
 import HeaderBar from "@smartface/native/ui/headerbar";
+import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller";
 
 type NativeStackRouterParams<Ttarget = Page> = RouterParams<Ttarget>
 
@@ -165,7 +164,7 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
     /**
      * Headerbar is be read-only
      */
-    if (this._renderer?._rootController instanceof Page && typeof this._headerBarParams === 'function') {
+    if (this._renderer?._rootController instanceof NavigationController && typeof this._headerBarParams === 'function') {
       //@ts-ignore
       this._renderer._rootController.headerBar = this._headerBarParams();
     }
@@ -178,13 +177,8 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
    * @param {HeaderBarParams} params
    */
   setHeaderBarParams(params: Partial<HeaderBar>) {
-    if(this._renderer?._rootController instanceof Page) {
-      /**
-       * Headerbar is be read-only
-       */
-      //@ts-ignore
-      this._renderer._rootController.headerBar = params;
-    } 
+    //@ts-ignore
+    this._renderer._rootController.headerBar = params;
   }
 
   /**
@@ -193,8 +187,10 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
    * @return {object}
    */
   get headerBar() {
-    if (this._renderer?._rootController instanceof Page) {
-      return this._renderer?._rootController.headerBar;
+    if (this._renderer?._rootController instanceof BottomTabBarController) {
+    }
+    else if (this._renderer?._rootController) {
+      return this._renderer._rootController.headerBar;
     }
   }
 

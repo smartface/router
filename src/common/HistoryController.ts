@@ -77,7 +77,7 @@ export class HistoryController {
     }
 
     getHistoryasArray() {
-      return this._history.entries.map(item => item.url);
+      return this._history.entries.map(item => item.url) || [];
     }
 
     /**

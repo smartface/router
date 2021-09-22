@@ -29,7 +29,7 @@ import { RouteParams } from "../router/RouteParams";
 import { OnHistoryChange } from "../core/OnHistoryChange";
 import { matchRoutes } from "../common";
 import { Location } from "../common/Location";
-import Page from "@smartface/native/ui/Page";
+import Page from "@smartface/native/ui/page";
 import { HistoryActionType } from "common/HistoryActions";
 
 type BottomTabBarRouterParams<Ttarget> = RouteParams<Ttarget> & {
