@@ -1,5 +1,6 @@
 __test__
 node_modules
+.eslintc
 .babelrc
 .git
 .github
