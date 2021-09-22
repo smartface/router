@@ -285,111 +285,111 @@ describe("Router", () => {
         view: route!.build(router)
       }));
 
-    // expect(matches).toEqual([{
-    //     match: { isExact: false, params: {}, path: "/", url: "/" },
-    //     route: {
-    //       match: {},
-    //       path: "/",
-    //       routeData: {},
-    //       routes: [
-    //         {
-    //           match: {},
-    //           path: "/path/to/:name",
-    //           routeData: {},
-    //           routes: [],
-    //           routingState: {},
-    //           state: {
-    //             action: "PUSH",
-    //             active: false,
-    //             match: {},
-    //             routeData: {},
-    //             routingState: {},
-    //             url: null,
-    //             view: undefined
-    //           },
-    //           type: "route"
-    //         },
-    //         {
-    //           match: {},
-    //           path: "/path/to/:id",
-    //           routeData: {},
-    //           routes: [],
-    //           routingState: {},
-    //           state: {
-    //             action: null,
-    //             active: false,
-    //             match: {},
-    //             routeData: {},
-    //             routingState: {},
-    //             url: null,
-    //             view: undefined
-    //           },
-    //           type: "route"
-    //         },
-    //         {
-    //           match: {},
-    //           path: "*",
-    //           routeData: {},
-    //           routes: [],
-    //           routingState: {},
-    //           state: {
-    //             action: null,
-    //             active: false,
-    //             match: {},
-    //             routeData: {},
-    //             routingState: {},
-    //             url: null,
-    //             view: undefined
-    //           },
-    //           type: "route"
-    //         }
-    //       ],
-    //       routingState: {},
-    //       state: {
-    //         action: "PUSH",
-    //         active: false,
-    //         match: { isExact: false, params: {}, path: "/", url: "/" },
-    //         routeData: {},
-    //         routingState: {},
-    //         url: null,
-    //         view: undefined
-    //       },
-    //       type: "route"
-    //     },
-    //     view: null
-    //   },
-    //   {
-    //     match: {
-    //       isExact: true,
-    //       params: { name: "1" },
-    //       path: "/path/to/:name",
-    //       url: "/path/to/1"
-    //     },
-    //     route: {
-    //       match: {},
-    //       path: "/path/to/:name",
-    //       routeData: {},
-    //       routes: [],
-    //       routingState: {},
-    //       state: {
-    //         action: "PUSH",
-    //         active: false,
-    //         match: {
-    //           isExact: true,
-    //           params: { name: "1" },
-    //           path: "/path/to/:name",
-    //           url: "/path/to/1"
-    //         },
-    //         routeData: {},
-    //         routingState: {},
-    //         url: "/path/to/1",
-    //         view: "Object"
-    //       },
-    //       type: "route"
-    //     },
-    //     view: { type: "target1" }
-    //   }
-    // ]);
+    expect(matches).toEqual([{
+        match: { isExact: false, params: {}, path: "/", url: "/" },
+        route: {
+          match: {},
+          path: "/",
+          routeData: {},
+          routes: [
+            {
+              match: {},
+              path: "/path/to/:name",
+              routeData: {},
+              routes: [],
+              routingState: {},
+              state: {
+                action: "PUSH",
+                active: false,
+                match: {},
+                routeData: {},
+                routingState: {},
+                url: null,
+                view: undefined
+              },
+              type: "route"
+            },
+            {
+              match: {},
+              path: "/path/to/:id",
+              routeData: {},
+              routes: [],
+              routingState: {},
+              state: {
+                action: null,
+                active: false,
+                match: {},
+                routeData: {},
+                routingState: {},
+                url: null,
+                view: undefined
+              },
+              type: "route"
+            },
+            {
+              match: {},
+              path: "*",
+              routeData: {},
+              routes: [],
+              routingState: {},
+              state: {
+                action: null,
+                active: false,
+                match: {},
+                routeData: {},
+                routingState: {},
+                url: null,
+                view: undefined
+              },
+              type: "route"
+            }
+          ],
+          routingState: {},
+          state: {
+            action: "PUSH",
+            active: false,
+            match: { isExact: false, params: {}, path: "/", url: "/" },
+            routeData: {},
+            routingState: {},
+            url: null,
+            view: undefined
+          },
+          type: "route"
+        },
+        view: null
+      },
+      {
+        match: {
+          isExact: true,
+          params: { name: "1" },
+          path: "/path/to/:name",
+          url: "/path/to/1"
+        },
+        route: {
+          match: {},
+          path: "/path/to/:name",
+          routeData: {},
+          routes: [],
+          routingState: {},
+          state: {
+            action: "PUSH",
+            active: false,
+            match: {
+              isExact: true,
+              params: { name: "1" },
+              path: "/path/to/:name",
+              url: "/path/to/1"
+            },
+            routeData: {},
+            routingState: {},
+            url: "/path/to/1",
+            view: "Object"
+          },
+          type: "route"
+        },
+        view: { type: "target1" }
+      }
+    ]);
   });
   it("return only root path if any route doesn't be matched", () => {
     const router = new Router<any>({
