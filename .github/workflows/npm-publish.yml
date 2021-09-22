@@ -1,0 +1,26 @@
+name: Publish NPM
+on:
+  push:
+    branches:
+      - master
+      - feature/typescript
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install Dependencies
+        run: yarn
+      - name: Compile Project
+        run: yarn run build
+      - name: Run Tests
+        run: yarn run test
+      - name: Publish Package
+        run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH }}
