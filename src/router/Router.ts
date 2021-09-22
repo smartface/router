@@ -1078,7 +1078,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    * @return {Array<string>}
    */
   getHistoryasArray() {
-    return this._historyController?.getHistoryasArray();
+    return this._historyController?.getHistoryasArray() || [];
   }
 
   /**
