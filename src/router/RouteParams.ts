@@ -22,7 +22,7 @@ import HeaderBar from "@smartface/native/ui/headerbar";
 export type RouteParams<Ttarget = unknown> = {
   name?: string;
   path?: string | null | RoutePath;
-  to?: string | null;
+  to?: (() => {}) | string;
   routes?: Route[];
   build?: (router: Router<any>, route: Route<any>) => any;
   exact?: boolean;
@@ -30,24 +30,19 @@ export type RouteParams<Ttarget = unknown> = {
   modal?: boolean;
   strict?: boolean;
   routeShouldMatch?: RouteShouldMatchHandler<any>;
-  routeDidEnter?: RouteLifeCycleHandler<any>;
-  routeDidExit?: RouteLifeCycleHandler<any>;
-  // No idea why these are two different entities
-  routerDidEnter?: RouteLifeCycleHandler<any>;
-  routerDidExit?: RouteLifeCycleHandler<any, string>;
-  // No idea why these are two different entities
-  routeWillEnter?: RouteLifeCycleHandler<any>;
+  routeDidEnter?: RouteLifeCycleHandler;
+  routeDidExit?: RouteLifeCycleHandler;
+  routeWillEnter?: RouteLifeCycleHandler;
   props?: any;
   renderer?: Renderer;
   isRoot?: boolean;
-  rootWillChange?: RouteLifeCycleHandler<any>;
+  rootWillChange?: RouteLifeCycleHandler;
   headerBarParams?: () => Partial<HeaderBar>;
 };
 
 export type RouteLifeCycleHandler<
-  Ttarget,
-  TProps extends Route<Ttarget> | string = Route<Ttarget>
-> = (Router: Router<Ttarget>, route: TProps) => void;
+  T extends Route<any> = Route<any>
+> = (parent: T, route: T) => void;
 
 /**
  * @typedef {function(route: Route, nextState: RouteState)} RouteShouldMatchHandler

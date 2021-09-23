@@ -288,7 +288,7 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
   /**
    * @override
    */
-  routeWillEnter(route: any, requestedUrl: string) {
+  onRouteWillEnter(route: any, requestedUrl: string) {
     const {
       view,
       match: { isExact: exact},
@@ -403,7 +403,7 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
     }
 
     this._currentRouteUrl = url;
-    super.routeWillEnter(route, '');
+    super.onRouteWillEnter(route, '');
   }
 
   /**

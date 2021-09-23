@@ -1,4 +1,5 @@
 /** @ts-ignore */
+import { HistoryActionType } from 'common/HistoryActions';
 import { RouteMatch } from './RouteMatch';
 /**
  * @typedef {object} RouteState
@@ -17,7 +18,7 @@ import { RouteMatch } from './RouteMatch';
 
 export type RouteState<Ttarget = any> = {
   routeData?: object;
-  action: string | null;
+  action: HistoryActionType | null;
   query?: { [key: string]: any };
   rawQuery?: string;
   active: boolean;

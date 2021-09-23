@@ -13,10 +13,13 @@ import { HistoryActionType } from "common/HistoryActions";
 import { RouteMatch } from "./RouteMatch";
 import NativeStackRouter from "../native/NativeStackRouter";
 import parseUrl from "../common/parseUrl";
+import { ControllerType } from "core/Controller";
 
 export type RouterParams<Ttarget = unknown> = RouteParams<Ttarget> & {
   homeRoute?: number;
   isRoot?: boolean;
+  routerDidEnter?: RouteLifeCycleHandler;
+  routerDidExit?: (router: Router, action: HistoryActionType) => void;
 };
 
 let tasks: any[] = [];
@@ -25,7 +28,6 @@ let historyController: HistoryController;
 
 let _lastRoute: Route<any>;
 let _backUrl: string | Location | null;
-let _activeRouter: Router;
 
 const listeners = new Set<Function>();
 const history: any[] = [];
@@ -40,21 +42,21 @@ const dispatch = (location: Location, action: string) => {
 };
 
 function handleRouteUrl(
-  controller: HistoryController,
+  controller: HistoryController | undefined,
   prevUrl: string | null | undefined,
-  url: string,
+  url: string | undefined,
   routeData: object,
   action: HistoryActionType
 ) {
   if (url === prevUrl) return;
 
-  controller.preventDefault();
+  controller?.preventDefault();
   switch (action) {
     case "PUSH":
-      controller.push(url, routeData);
+      url && controller?.push(url, routeData);
       break;
     case "POP":
-      controller.goBack();
+      controller?.goBack();
       break;
   }
 }
@@ -231,8 +233,8 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
 
   _handlers: {
     routerDidEnter?: RouteLifeCycleHandler<any>;
-    routerDidExit?: RouteLifeCycleHandler<any, string>;
-    routeWillEnter?: RouteLifeCycleHandler<any>;
+    routerDidExit?: RouterParams['routerDidExit'];
+    routeWillEnter?: (router: Router, route: Route, view?: any) => void;
   };
   static getGlobalRouter() {
     return historyController;
@@ -276,7 +278,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
   }
 
   static getActiveRouter() {
-    return _activeRouter;
+    return Router._activeRouter;
   }
 
   static get _backUrl(): string | Location | null {
@@ -312,7 +314,9 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    * @constructor
    * @param {RouterParams} param
    */
-  constructor(params: RouterParams<Ttarget> = {}) {
+  constructor(
+    params: RouterParams<Ttarget> = {}
+  ) {
     super(params, {});
     this._homeRoute = params.homeRoute;
     this._pushHomes = () => {};
@@ -566,10 +570,8 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
     target: Router,
     fromRouter = true
   ) {
-    
     if (!location) throw new Error("Location cannot be empty.");
     if (this._isRoot) {
-
       this._matches = matchRoutes(
         this.getStore(),
         [this, ...this._routes],
@@ -635,20 +637,17 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
           action,
           match,
         });
-        const self: Router<Ttarget> = this;
-        // @ts-ignore
-        const isSelf = route === self;
-        if (!isSelf && match?.isExact !== true && route instanceof Router) {
+
+        if (
+          match?.isExact !== true &&
+          route instanceof Router &&
+          route !== this
+        ) {
           // route.initializeWaiting && route.initializeWaiting();
-          tasks.push((url: string, action: string) => {
-            if (typeof this.routeWillEnter === "function") {
-              /**
-               * Argument count
-               */
-              //@ts-ignore
-              this.routeWillEnter(route, url, action, false, target);
+          tasks.push((url: string, action: HistoryActionType) => {
+            if (typeof this.onRouteWillEnter === "function") {
+              this.onRouteWillEnter(route, url, action, false, target);
             }
-            // handleRouteUrl(this, url, routeData, action);
           }); // add new router display logic from root to children
 
           route.setUrl(location.url);
@@ -664,8 +663,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
 
           return true;
         } else if (match?.isExact === true) {
-          const to = route.getRedirectto();
-          const redirection = !!to && funcorVal(to, [this, route]);
+          const redirection = funcorVal(route.getRedirectto(), [this, route]);
 
           if (redirection && redirection !== match?.url) {
             tasks = []; // reset tasks
@@ -673,24 +671,20 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
             //  because real path can be owned by different router.
             // -----
             // And then trigger redirection path.
-            //@ts-ignore
             target.redirectRoute(route, routeData, action, target);
             return false;
           }
 
-          // @ts-ignore
           Router._activeRouter = this;
-          // @ts-ignore
-          const routingState =
-            // @ts-ignore
-            (route.getRoutingState &&
-              // @ts-ignore
-              route.getRoutingState(route._state, {
-                match,
-                action,
-                routeData,
-              })) ||
-            {};
+          const routingState = {};
+          // TODO: Ask user for last routing state
+          // (route.getState() &&
+          //   route.getRoutingState(route._state, {
+          //     match,
+          //     action,
+          //     routeData,
+          //   })) ||
+          // {};
           // change route state to move data to callbacks
           route.setState({
             rawQuery: location.search,
@@ -698,6 +692,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
             match,
             action,
             routeData,
+            // TODO: it's not clean why this exists
             routingState,
           });
           route.setUrl(location.url);
@@ -705,34 +700,29 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
           // If route owned by current child router which is different from target router
           // then push or pop route to child router's history.
           // Because current router isn't aware of the route.
-          // @ts-ignore
           if (target != this) {
-            //@ts-ignore
-            this._historyController && match && match.url &&
-              handleRouteUrl(
-                this._historyController,
-                this.state.prevUrl,
-                match.url,
-                routeData,
-                action
-              );
+            handleRouteUrl(
+              this._historyController,
+              this.state.prevUrl,
+              match.url,
+              routeData,
+              action
+            );
           }
 
           // Views' tasks must be end of the matches rendering,
           // because there must not be rendered any view before route blocking.
           // An another reason is that we build views from child to parent
           // but we need to build from parent to child.
-          tasks.push((url: string, action: string) => {
-            if (typeof this.routeWillEnter === "function") {
-              //@ts-ignore
-              this.routeWillEnter(route, url, action, true, target);
+          tasks.push((url: string, action: HistoryActionType) => {
+            if (typeof this.onRouteWillEnter === "function") {
+              this.onRouteWillEnter(route, url, action, true, target);
             }
           });
 
           if (_lastRoute) {
             // notify current route to exit
             _lastRoute.setState({ action });
-            // @ts-ignore
             _lastRoute.routeDidExit(this);
           }
 
@@ -767,17 +757,18 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    * @param {Router} router
    * @param {string} action
    */
-  routeWillEnter(route: Router | Route, action: string) {
-    //@ts-ignore
+  protected onRouteWillEnter(
+    route: Router | Route,
+    url: string,
+    action?: HistoryActionType,
+    fromRouter?: boolean,
+    target?: Router
+  ) {
     const viewConroller =
       route instanceof Router
         ? route.renderer?._rootController
         : route.getState().view;
-    //@ts-ignore
-    if (typeof this._handlers?.routeWillEnter === "function") {
-      //@ts-ignore
-      this._handlers.routeWillEnter(this, route, viewConroller);
-    }
+    this.doRouteWillEnter?.(this, route);
   }
 
   /**
@@ -787,7 +778,11 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    * @param {string} action
    */
   isUrlCurrent(url?: string, action?: string | null) {
-    const res = action && this._currentUrl && this._currentUrl === url && this._currentAction === action;
+    const res =
+      action &&
+      this._currentUrl &&
+      this._currentUrl === url &&
+      this._currentAction === action;
     return res;
   }
 
@@ -818,9 +813,9 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    * @protected
    * @param {string} action
    */
-  setasActiveRouter(action: string | null) {
-    // @ts-ignore
+  setasActiveRouter(action: HistoryActionType | null) {
     if (
+      Router.currentRouter &&
       this != Router.currentRouter &&
       typeof Router.currentRouter?.routerDidExit === "function"
     ) {
@@ -846,7 +841,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    * @emits routerDidExit
    * @param {string} action
    */
-  routerDidExit(action: string) {
+  routerDidExit(action: HistoryActionType) {
     this._handlers.routerDidExit && this._handlers.routerDidExit(this, action);
   }
 
@@ -858,7 +853,12 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    * @param {object} routeData
    * @param {string} action
    */
-  redirectRoute(route: Route, routeData: Record<string, any>, action: string) {
+  redirectRoute(
+    route: Route,
+    routeData: Record<string, any>,
+    action: string,
+    target: Router
+  ) {
     // redirection of a route
     //@ts-ignore
     this.push(funcorVal(route.getRedirectto(), [this, route]), routeData); // and add new route
@@ -924,8 +924,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
     }
     const to = route.getRedirectto();
     //@ts-ignore
-    const url =
-    to && funcorVal(to, [this, route]) || route.getUrlPath();
+    const url = (to && funcorVal(to, [this, route])) || route.getUrlPath();
     this.push(url);
   }
 
@@ -947,7 +946,10 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
 
     this._fromRouter = true;
     if (typeof path === "string" && path.charAt(0) !== "/") {
-      path = this._path.getPath() === "/" ? "/" + path : this._path.getPath() + "/" + path;
+      path =
+        this._path.getPath() === "/"
+          ? "/" + path
+          : this._path.getPath() + "/" + path;
     }
 
     if (Router.blocker) {
@@ -1002,9 +1004,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
       this._fromRouter = true;
       if (url) {
         this.dispatch?.(
-          typeof url === "string"
-            ? parseUrl(url)
-            : url,
+          typeof url === "string" ? parseUrl(url) : url,
           "POP",
           this,
           true
@@ -1100,13 +1100,9 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
     // if (this._isRoot) {
     this._historyController?.dispose();
     this._historyController = undefined;
-    // }
-    //@ts-ignore
     this._routes.forEach((route) => route.dispose());
-    //@ts-ignore
-    this._routes = null;
-    //@ts-ignore
-    this._historyUnlisten = null;
+    this._routes = [];
+    this._historyUnlisten = () => {};
     this._unblock && this._unblock();
     //@ts-ignore
     this._unblock = null;

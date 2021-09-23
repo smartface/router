@@ -324,7 +324,9 @@ export default function createMemoryHistory(props:HistoryProps = {}): History {
   };
 
   const rollback = () => {
+    console.log("before : ", history.entries);
     history.entries.pop();
+    console.log("after : ", history.entries);
     history.length = history.entries.length;
     history.index--;
     history.location = history.entries[history.index];

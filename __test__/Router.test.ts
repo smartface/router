@@ -776,11 +776,24 @@ describe("Router", () => {
     let component1: any = {};
     let activeRoute: Route | undefined;
     let redirectCount = 0;
+    const history: string[] = [];
 
     const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [
+        new Route<any>({
+          path: "/path1",
+          routeDidEnter: (router, route) => { 
+            history.push('/path1');
+            console.log("routeDidEnter : ", route.state.action);
+          },
+          build: (router, route) => {
+            redirectCount++;
+            activeRoute = route;
+            return component1;
+          },
+        }),
         Router.of({
           path: "/path",
           to: "/path/to/1",
@@ -797,8 +810,8 @@ describe("Router", () => {
             new Route<any>({
               path: "/path/to/:id",
               build: (router, route) => {
+                history.push('/path/to/1');
                 redirectCount++;
-                console.log(route)
                 activeRoute = route;
                 return component1;
               },
@@ -808,15 +821,16 @@ describe("Router", () => {
       ],
     });
 
-    router.listen((location, action) => {
-      console.log(location);
-    });
-    router.push("path", { name: "name" });
-    router.push("path", { name: "name" });
 
-    expect(redirectCount++).toEqual(2);
-    expect(router.getHistory()!.entries[0]?.url).toBe("/path/to/1");
-    expect(activeRoute?.getState()?.routeData).toEqual({ name: "name" });
+    // router.listen((location, action) => {
+    //   console.log(location);
+    // });
+    (Router.currentRouter || router).push("path1", { name: "name" });
+    Router.currentRouter.push("path", { name: "name" });
+    Router.currentRouter.goBack();
+    Router.currentRouter.push("path", { name: "name" });
+
+    expect(history).toEqual([ '/path1', '/path/to/1', '/path1', '/path/to/1' ]);
   });
   it("can call child Routers", () => {
     let callCount = 0;

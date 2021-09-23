@@ -6,6 +6,7 @@ import { RoutePath } from "./RoutePath";
 import { RouteState } from "./RouteState";
 import { RouteParams } from "./RouteParams";
 import { OnHistoryChange } from '../core/OnHistoryChange';
+import { HistoryActionType } from "common/HistoryActions";
 
 /**
  * Route implementation
@@ -34,10 +35,11 @@ export default class Route<Ttarget = unknown> {
   protected _strict = false;
   protected _path: RoutePath;
   protected _routes: Route[] = [];
-  protected _to: RouteParams<Ttarget>['to'];
+  protected _to: (() => {}) | string | undefined;
   private doRouteShouldMatch: RouteParams<Ttarget>['routeShouldMatch'];
   private doRouteDidEnter: RouteParams<Ttarget>['routeDidEnter'];
   private doRouteDidExit: RouteParams<Ttarget>['routeDidExit'];
+  protected doRouteWillEnter: RouteParams<Ttarget>['routeWillEnter'];
   protected _modal: boolean = false;
   protected _state: RouteState;
   protected _exact = false;
@@ -52,7 +54,7 @@ export default class Route<Ttarget = unknown> {
   constructor(
     {
       path = null,
-      to = null,
+      to,
       routes = [],
       build,
       exact = false,
@@ -91,6 +93,7 @@ export default class Route<Ttarget = unknown> {
     this._routes = routes;
     this.map = mapComposer<Route<any>>(this._routes)
     this._to = to;
+    this.doRouteWillEnter = routeWillEnter;
     this.doRouteShouldMatch = routeShouldMatch;
     this.doRouteDidEnter = routeDidEnter;
     this.doRouteDidExit = routeDidExit;
@@ -141,6 +144,10 @@ export default class Route<Ttarget = unknown> {
   setState(state: Partial<RouteState<any>>) {
     this._state = Object.assign(this._state, state);
   }
+
+  // routeWillEnter(parent: Route){
+  //   this.doRouteWillEnter(parent, this);
+  // }
 
   /**
    * Returns Route's current state
@@ -280,8 +287,8 @@ export default class Route<Ttarget = unknown> {
    * @event
    * @param {Router} router
    */
-  routeDidEnter(router: Router<Ttarget>) {
-    this.doRouteDidEnter && this.doRouteDidEnter(router, this);
+  routeDidEnter(route: Route<Ttarget>) {
+    this.doRouteDidEnter && this.doRouteDidEnter(route, this);
   }
 
   /**
@@ -300,8 +307,8 @@ export default class Route<Ttarget = unknown> {
    * @event
    * @param {Router} router
    */
-   protected routeDidExit(router: Router<Ttarget>) {
-    this.doRouteDidExit ? this.doRouteDidExit(router, this) : true;
+   routeDidExit(parent: Route<Ttarget>) {
+    this.doRouteDidExit ? this.doRouteDidExit(parent, this) : true;
   }
 
   /**
@@ -376,5 +383,8 @@ export default class Route<Ttarget = unknown> {
         state
       )
     );
+  }
+
+  dispose(){
   }
 }

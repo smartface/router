@@ -101,7 +101,7 @@ export default class NativeRouter<Ttarget = Page> extends NativeRouterBase<Ttarg
   /**
    * @override
    */
-  routeWillEnter(route: Router | Route, action: string) {
+  onRouteWillEnter(route: Router | Route, action: string) {
     // this._renderer.show(router._renderer._rootController);
     if (this._isRoot && this._route !== route) {
       //@ts-ignore
@@ -110,6 +110,6 @@ export default class NativeRouter<Ttarget = Page> extends NativeRouterBase<Ttarg
       this._route = route;
     }
     
-    super.routeWillEnter(route, action);
+    super.onRouteWillEnter(route, action);
   }
 }
