@@ -4,7 +4,6 @@ import { HistoryController } from "../common/HistoryController";
 import funcorVal from "../utils/funcorVal";
 import createRouteStore from "./routeStore";
 import type { Location } from "../common/Location";
-import type { HistoryActions } from "../common";
 import { RouteLifeCycleHandler, RouteParams } from "./RouteParams";
 import { HistoryListenHandler } from "../common/history";
 import { RouteBlockHandler } from "../core/RouteBlockHandler";
@@ -13,6 +12,7 @@ import Renderer from "native/Renderer";
 import { HistoryActionType } from "common/HistoryActions";
 import { RouteMatch } from "./RouteMatch";
 import NativeStackRouter from "../native/NativeStackRouter";
+import parseUrl from "../common/parseUrl";
 
 export type RouterParams<Ttarget = unknown> = RouteParams<Ttarget> & {
   homeRoute?: number;
@@ -665,7 +665,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
           return true;
         } else if (match?.isExact === true) {
           const to = route.getRedirectto();
-          const redirection = to && funcorVal(to, [this, route]);
+          const redirection = !!to && funcorVal(to, [this, route]);
 
           if (redirection && redirection !== match?.url) {
             tasks = []; // reset tasks
@@ -947,7 +947,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
 
     this._fromRouter = true;
     if (typeof path === "string" && path.charAt(0) !== "/") {
-      path = this._path.getPath() + "/" + path;
+      path = this._path.getPath() === "/" ? "/" + path : this._path.getPath() + path;
     }
 
     if (Router.blocker) {
@@ -961,22 +961,6 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
     }
     try {
       this._pushHomes(path);
-      //   typeof path === "string"
-      //     ? path
-      //     : path.url +
-      //         path.hash +
-      //         (path.rawQuery ||
-      //           (path.query &&
-      //             "?" +
-      //               Object.keys(path.query)
-      //                 .map(
-      //                   (key) =>
-      //                     `${key}=${
-      //                       path && (path as Location).query![key].tostring()
-      //                     }`
-      //                 )
-      //                 ?.join("&")))
-      // );
     } catch (e) {
       throw e;
     }
@@ -1017,11 +1001,9 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
       Router._nextAnimated = animated;
       this._fromRouter = true;
       if (url) {
-        //@ts-ignore
-        this.dispatch(
-          //@ts-ignore
+        this.dispatch?.(
           typeof url === "string"
-            ? { url, hash: "", search: "", state: {} }
+            ? parseUrl(url)
             : url,
           "POP",
           this,

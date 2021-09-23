@@ -774,35 +774,49 @@ describe("Router", () => {
   it("can redirect to specified route with route-data when route has 'to' attribute", () => {
     let callCount = 0;
     let component1: any = {};
-    let activeRoute: Route;
+    let activeRoute: Route | undefined;
+    let redirectCount = 0;
 
     const router = new Router<any>({
       path: "/",
       isRoot: true,
       routes: [
-        new Route<any>({
+        Router.of({
           path: "/path",
-          to: "/path2/to/1",
-          build: (router, route) => {
-            const { match } = route!.getState();
-            component1.router = router;
-            component1.params = match?.params;
-            return component1;
-          },
-        }),
-        new Route<any>({
-          path: "/path2/to/:id",
-          build: (router, route) => {
-            activeRoute = route;
-            return component1;
-          },
-        }),
+          to: "/path/to/1",
+          routes: [
+            new Route<any>({
+              path: "/path/2",
+              build: (router, route) => {
+                const { match,  } = route!.getState();
+                component1.router = router;
+                component1.params = match?.params;
+                return component1;
+              },
+            }),
+            new Route<any>({
+              path: "/path/to/:id",
+              build: (router, route) => {
+                redirectCount++;
+                console.log(route)
+                activeRoute = route;
+                return component1;
+              },
+            }),
+          ]
+        })
       ],
     });
 
-    router!.push("/path", { name: "name" });
-    expect(router!.getHistory()!.entries[0]?.url).toBe("/path2/to/1");
-    expect(activeRoute!.getState()?.routeData).toEqual({ name: "name" });
+    router.listen((location, action) => {
+      console.log(location);
+    });
+    router.push("path", { name: "name" });
+    router.push("path", { name: "name" });
+
+    expect(redirectCount++).toEqual(2);
+    expect(router.getHistory()!.entries[0]?.url).toBe("/path/to/1");
+    expect(activeRoute?.getState()?.routeData).toEqual({ name: "name" });
   });
   it("can call child Routers", () => {
     let callCount = 0;
