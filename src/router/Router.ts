@@ -268,7 +268,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
       router: Router,
       path: string,
       routeData: object,
-      action: HistoryActions,
+      action: HistoryActionType,
       doneFn: Function
     ) => {
       fn(path, routeData, action, (ok: boolean) => ok && doneFn());
@@ -942,63 +942,44 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    * @param {!boolean} [animated={}] routeData - Routing data
    * @return {Router}
    */
-  push(path: Location | string, routeData = {}, animated = true) {
-    // console.log('PUSH : ', path, ' ', this._state.url);
+  push(path: string, routeData = {}, animated = true) {
     Router._nextAnimated = animated;
-    // if (path === this._state.url) {
-    //   Object.assign(this._historyController.history.location.state, {
-    //     routeData
-    //   });
-    //   this.dispatch(
-    //     this._historyController.history.location,
-    //     "PUSH",
-    //     this,
-    //     true
-    //   );
-
-    //   return this;
-    // }
 
     this._fromRouter = true;
-    // if (!this.isValidPath(path)) throw new TypeError(`[${path}] Pat h is invalid`);
     if (typeof path === "string" && path.charAt(0) !== "/") {
       path = this._path.getPath() + "/" + path;
     }
 
     if (Router.blocker) {
-      //@ts-ignore
       Router.blocker(this, path, routeData, "PUSH", () => {
-        //@ts-ignore
         this._pushHomes(path);
-        //@ts-ignore
-        this._historyController.push(path, routeData);
+        this._historyController?.push(path, routeData);
         this._fromRouter = false;
       });
 
       return this;
     }
     try {
-      this._pushHomes(
-        typeof path === "string"
-          ? path
-          : path.url +
-              path.hash +
-              (path.rawQuery ||
-                (path.query &&
-                  "?" +
-                    Object.keys(path.query)
-                      .map(
-                        (key) =>
-                          `${key}=${
-                            path && (path as Location).query![key].tostring()
-                          }`
-                      )
-                      ?.join("&")))
-      );
+      this._pushHomes(path);
+      //   typeof path === "string"
+      //     ? path
+      //     : path.url +
+      //         path.hash +
+      //         (path.rawQuery ||
+      //           (path.query &&
+      //             "?" +
+      //               Object.keys(path.query)
+      //                 .map(
+      //                   (key) =>
+      //                     `${key}=${
+      //                       path && (path as Location).query![key].tostring()
+      //                     }`
+      //                 )
+      //                 ?.join("&")))
+      // );
     } catch (e) {
       throw e;
     }
-    //@ts-ignore
     this._historyController?.push(path, routeData);
     this._fromRouter = false;
     return this;
