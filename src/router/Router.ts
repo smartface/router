@@ -947,7 +947,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
 
     this._fromRouter = true;
     if (typeof path === "string" && path.charAt(0) !== "/") {
-      path = this._path.getPath() === "/" ? "/" + path : this._path.getPath() + path;
+      path = this._path.getPath() === "/" ? "/" + path : this._path.getPath() + "/" + path;
     }
 
     if (Router.blocker) {
