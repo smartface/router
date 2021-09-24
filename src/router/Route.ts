@@ -40,11 +40,11 @@ export default class Route<Ttarget = unknown> {
   private emitRouteDidEnter: RouteParams<Ttarget>['routeDidEnter'];
   private emitRouteDidExit: RouteParams<Ttarget>['routeDidExit'];
   protected emitRouteWillEnter: RouteParams<Ttarget>['routeWillEnter'];
-  protected _modal: boolean = false;
   protected _state: RouteState;
   protected _exact = false;
   protected _build: RouteParams<Ttarget>['build'];
   protected _props: any;
+
   _isRouter = false;
   /**
    * @constructor
@@ -60,7 +60,6 @@ export default class Route<Ttarget = unknown> {
       exact = false,
       sensitive = false,
       strict = false,
-      modal = false,
       routeDidEnter,
       routeDidExit,
       routeWillEnter
@@ -95,7 +94,6 @@ export default class Route<Ttarget = unknown> {
     this.emitRouteWillEnter = routeWillEnter;
     this.emitRouteDidEnter = routeDidEnter;
     this.emitRouteDidExit = routeDidExit;
-    this._modal = modal;
     this._options = {
       exact,
       path: this._path.getPath(),
@@ -123,14 +121,6 @@ export default class Route<Ttarget = unknown> {
 
   initialize(parentHistory: unknown, onHistoryChange: OnHistoryChange, pushHomes: (path: string) => void) {
     return; //Child class uses it.
-  }
-
-
-  /**
-   * @deprecated
-   */
-  isModal() {
-    return this._modal;
   }
 
   /**
@@ -332,7 +322,6 @@ export default class Route<Ttarget = unknown> {
     return Route.of<Ttarget>(
       {
         to: this._to,
-        modal: this._modal,
         routeDidExit: this.emitRouteDidExit,
         routeShouldMatch: this.emitRouteShouldMatch,
         routeDidEnter: this.emitRouteDidEnter,

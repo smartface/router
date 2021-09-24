@@ -6,5 +6,7 @@ import HeaderBar from "@smartface/native/ui/headerbar";
 export type ControllerType = (
   | (Omit<Page, "headerBar"> & { childControllers: undefined })
   | (Omit<NavigationController, "headerBar" | 'childControllers'> & {childControllers: ControllerType[] })
-  | (Omit<BottomTabBarController,  'childControllers'> & {childControllers: ControllerType[] })
-) & { headerBar?: Partial<HeaderBar>};
+  | (Omit<BottomTabBarController,  "headerBar" | 'childControllers'> & {childControllers: ControllerType[] })
+) & { headerBar?: Partial<HeaderBar>, nativeObject: any};
+
+export type HeaderBartype = ControllerType['headerBar']

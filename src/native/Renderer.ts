@@ -7,6 +7,7 @@ import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller"
 import View from "@smartface/native/ui/view";
 import TabBarItem from "@smartface/native/ui/tabbaritem";
 import { ControllerType } from "../core/Controller";
+import { runInThisContext } from "vm";
 
 /**
  * Abstract Renderer Strategy
@@ -16,8 +17,7 @@ import { ControllerType } from "../core/Controller";
  * @abstract
  */
 export default abstract class Renderer {
-  //@ts-ignore This is set within a function. Anti-pattern on Typescript classes.
-  _rootController: ControllerType;
+  _rootController?: ControllerType;
   /**
    * Helper method sets statically rootController of the Application by DeviceOS
    *
@@ -36,6 +36,10 @@ export default abstract class Renderer {
   }
 
   abstract dispose():void;
+
+  constructor(controller?: ControllerType){
+    this._rootController = controller;
+  }
 
   makeRootVisible() {
     //@ts-ignore

@@ -22,9 +22,6 @@ export default class AndroidRenderer extends Renderer {
   /**
    * @constructor
    */
-  constructor() {
-    super();
-  }
   
   // present(controller, animated, onComplete) {
   //   // alert('present');
@@ -41,7 +38,7 @@ export default class AndroidRenderer extends Renderer {
    * @override
    */
   setChildControllers(controllers: ControllerType[]) {
-    if(!(this._rootController instanceof Page)) {
+    if(this._rootController && !(this._rootController instanceof Page)) {
       this._rootController.childControllers = controllers;
     }
   }

@@ -27,7 +27,6 @@ export type RouteParams<Ttarget = unknown> = {
   build?: (router: Router<any>, route: Route<any>) => any;
   exact?: boolean;
   sensitive?: boolean;
-  modal?: boolean;
   strict?: boolean;
   routeShouldMatch?: RouteShouldMatchHandler<any>;
   routeDidEnter?: RouteLifeCycleHandler;

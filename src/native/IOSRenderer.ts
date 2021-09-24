@@ -18,13 +18,7 @@ export default class IOSRenderer extends Renderer {
 
   }
   protected _currentPage?: Page;
-  /**
-   * @constructor
-   */
-  constructor() {
-    super();
-  }
-
+ 
   /**
    * @override
    */
@@ -32,7 +26,7 @@ export default class IOSRenderer extends Renderer {
     /**
      * Doesn't exist on page and instanceof didn't work
      */
-    if (!(this._rootController instanceof Page)) {
+    if (this._rootController && !(this._rootController instanceof Page)) {
       this._rootController.childControllers = controllers
     }
   }
@@ -46,6 +40,7 @@ export default class IOSRenderer extends Renderer {
     duration = 0,
     options = 0 << 20
   ) {
+    this._rootController &&
     new Animator(this._rootController)
       .onAnimate((container: any, from: any, to: any, params: any) => {
         this.addChild(to);
@@ -121,8 +116,7 @@ export default class IOSRenderer extends Renderer {
    */
   popChild(animated = true) {
     this.makeRootVisible();
-    //@ts-ignore
-    if (this._rootController.nativeObject.viewControllers.length > 1) {
+    if (this._rootController?.nativeObject.viewControllers.length > 1) {
       //@ts-ignore
       this._rootController.pop({ animated });
     }
