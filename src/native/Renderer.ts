@@ -89,18 +89,18 @@ export default abstract class Renderer {
     this._rootController = controller;
   }
 
-  replaceChild(view: View | ControllerType, index: number) {
+  replaceChild(view: ControllerType, index?: number) {
     if (
-      this._rootController instanceof Page ||
-      !this._rootController?.childControllers?.length
+      this._rootController?.childControllers === undefined ||
+      !this._rootController?.childControllers.length
     ) {
       return;
     }
-    index = index || this._rootController.childControllers.length - 1;
-    const controllers = this._rootController.childControllers;
-    //@ts-ignore
+    const len = this._rootController.childControllers.length;
+    index = index !== undefined ? index : len === 0 ? 0 : len - 1;
+    const controllers: ControllerType[] = this._rootController.childControllers;
     controllers[index] = view;
-    this._rootController.childControllers = controllers;
+    (this._rootController.childControllers as ControllerType[]) = controllers;
   }
 
   /**
@@ -157,7 +157,7 @@ export default abstract class Renderer {
    *
    * @params {Array<NavigationController>} children
    */
-  setChildControllers(children: NavigationController[]) {
+  setChildControllers(children: ControllerType[]) {
     throw new Error("addChildViewControllers method must be overridden");
   }
 

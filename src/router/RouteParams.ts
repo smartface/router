@@ -21,7 +21,7 @@ import HeaderBar from "@smartface/native/ui/headerbar";
  */
 export type RouteParams<Ttarget = unknown> = {
   name?: string;
-  path?: string | null | RoutePath;
+  path?: string | RoutePath;
   to?: (() => {}) | string;
   routes?: Route[];
   build?: (router: Router<any>, route: Route<any>) => any;
@@ -36,7 +36,6 @@ export type RouteParams<Ttarget = unknown> = {
   props?: any;
   renderer?: Renderer;
   isRoot?: boolean;
-  rootWillChange?: RouteLifeCycleHandler;
   headerBarParams?: () => Partial<HeaderBar>;
 };
 

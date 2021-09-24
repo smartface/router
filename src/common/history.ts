@@ -7,7 +7,11 @@ import { Location } from "./Location";
 
 import warning from "./warning";
 import { HistoryActions } from "common";
-const createPath = (location: { url: string, search: string, hash: string }) => {
+const createPath = (location: {
+  url: string;
+  search: string;
+  hash: string;
+}) => {
   const { url, search, hash } = location;
 
   let path = url || "/";
@@ -23,8 +27,11 @@ const createPath = (location: { url: string, search: string, hash: string }) => 
 /**
  * @typedef {function(location: RouteLocation, action: string)} HistoryListener
  */
-export type HistoryListenHandler = (location: Location, action: HistoryActions) => void;
-export type BlockHandler = (prompt?: Function|null) => Function;
+export type HistoryListenHandler = (
+  location: Location,
+  action: HistoryActions
+) => void;
+export type BlockHandler = (prompt?: Function | null) => Function;
 /**
  * History implementation
  *
@@ -48,32 +55,46 @@ export type BlockHandler = (prompt?: Function|null) => Function;
  *
  */
 export type History = {
-  length: number,
-  action: string,
-  index: number,
-  entries: Location[],
-  createHref: typeof createPath,
-  push(path: string|Location, data: object): void,
-  replace(path: string, data: object): void,
-  rollback(): void,
-  go(index: number): void,
-  clear(): void,
-  goBack(): void,
-  goForward():void,
-  canGo(index: number): boolean, 
-  block: BlockHandler,
-  listen(fn: HistoryListenHandler): Function
-}
+  length: number;
+  action: string;
+  location: Location;
+  index: number;
+  entries: Location[];
+  silencePush: (path: string | Location, state: any) => void;
+  createHref: typeof createPath;
+  push(path: string | Location, data: object): void;
+  replace(path: string, data: object): void;
+  rollback(): void;
+  go(index: number): void;
+  clear(): void;
+  goBack(): void;
+  goForward(): void;
+  canGo(index: number): boolean;
+  block: BlockHandler;
+  listen(fn: HistoryListenHandler): Function;
+  dispatchLast: Function;
+  confirmTransitionTo: (
+    path: string,
+    action: string,
+    state: any,
+    getUserConfirmation: Function,
+    handler: (location: Location, ok: boolean) => void,
+    key: string
+  ) => void;
+};
 
-
-function createLocation(path: string|Location, state?: any, key?: string, currentLocation?: any): Location {
+function createLocation(
+  path: string | Location,
+  state?: any,
+  key?: string,
+  currentLocation?: any
+): Location {
   let location: Location;
   if (typeof path === "string") {
     // Two-arg form: push(path, state)
     location = parseUrl(path);
     location.state = state;
-  }
-  else {
+  } else {
     // One-arg form: push(location)
     location = Object.assign({}, path);
 
@@ -82,15 +103,13 @@ function createLocation(path: string|Location, state?: any, key?: string, curren
     if (location.rawQuery) {
       if (location.rawQuery.charAt(0) !== "?")
         location.rawQuery = "?" + location.rawQuery;
-    }
-    else {
+    } else {
       location.rawQuery = "";
     }
 
     if (location.hash) {
       if (location.hash.charAt(0) !== "#") location.hash = "#" + location.hash;
-    }
-    else {
+    } else {
       location.hash = "";
     }
 
@@ -100,17 +119,15 @@ function createLocation(path: string|Location, state?: any, key?: string, curren
 
   try {
     location.url = decodeURI(location.url);
-  }
-  catch (e) {
+  } catch (e) {
     if (e instanceof URIError) {
       throw new URIError(
         'Pathname "' +
-        location.url +
-        '" could not be decoded. ' +
-        "This is likely caused by an invalid percent-encoding."
+          location.url +
+          '" could not be decoded. ' +
+          "This is likely caused by an invalid percent-encoding."
       );
-    }
-    else {
+    } else {
       throw e;
     }
   }
@@ -121,15 +138,10 @@ function createLocation(path: string|Location, state?: any, key?: string, curren
     // Resolve incomplete/relative pathname relative to current location.
     if (!location.url) {
       location.url = currentLocation.url;
+    } else if (location.url.charAt(0) !== "/") {
+      location.url = resolvePathname(location.url, currentLocation.url);
     }
-    else if (location.url.charAt(0) !== "/") {
-      location.url = resolvePathname(
-        location.url,
-        currentLocation.url
-      );
-    }
-  }
-  else {
+  } else {
     // When there is no prior location and pathname is empty, set it to /
     if (!location.url) {
       location.url = "/";
@@ -137,26 +149,26 @@ function createLocation(path: string|Location, state?: any, key?: string, curren
   }
 
   return location;
-};
+}
 
 export type HistoryProps = {
-  getUserConfirmation?: any,
-  initialEntries?: any[],
-  initialIndex?:number,
-  keyLength?: number
-}
+  getUserConfirmation?: any;
+  initialEntries?: any[];
+  initialIndex?: number;
+  keyLength?: number;
+};
 
 /**
  * Creates a history object that stores locations in memory.
  * @ignore
  * @return {History}
  */
-export default function createMemoryHistory(props:HistoryProps = {}): History {
+export default function createMemoryHistory(props: HistoryProps = {}): History {
   const {
     getUserConfirmation,
     initialEntries = [],
     initialIndex = 0,
-    keyLength = 6
+    keyLength = 6,
   } = props;
 
   const transitionManager = createTransitionManager();
@@ -168,17 +180,13 @@ export default function createMemoryHistory(props:HistoryProps = {}): History {
     transitionManager.notifyListeners(history.location, history.action);
   };
 
-  const createKey = () =>
-    Math.random()
-    .toString(36)
-    .substr(2, keyLength);
+  const createKey = () => Math.random().toString(36).substr(2, keyLength);
 
   const index = clamp(initialIndex, 0, initialEntries.length - 1);
-  const entries = initialEntries.map(
-    entry =>
-    typeof entry === "string" ?
-    createLocation(entry, undefined, createKey()) :
-    createLocation(entry, undefined, entry.key || createKey())
+  const entries = initialEntries.map((entry) =>
+    typeof entry === "string"
+      ? createLocation(entry, undefined, createKey())
+      : createLocation(entry, undefined, entry.key || createKey())
   );
 
   // Public interface
@@ -207,15 +215,16 @@ export default function createMemoryHistory(props:HistoryProps = {}): History {
     );
   };
   let lastPath;
-  const push = (path: Location|string, state: any) => {
+  const push = (path: Location | string, state: any) => {
     lastPath = path;
-    warning(!(
+    warning(
+      !(
         typeof path === "object" &&
         path.state !== undefined &&
         state !== undefined
       ),
       "You should avoid providing a 2nd state argument to push when the 1st " +
-      "argument is a location-like object that already has state; it is ignored"
+        "argument is a location-like object that already has state; it is ignored"
     );
 
     const action = "PUSH";
@@ -238,8 +247,7 @@ export default function createMemoryHistory(props:HistoryProps = {}): History {
             nextEntries.length - nextIndex,
             location
           );
-        }
-        else {
+        } else {
           nextEntries.push(location);
         }
 
@@ -247,20 +255,21 @@ export default function createMemoryHistory(props:HistoryProps = {}): History {
           action,
           location,
           index: nextIndex,
-          entries: nextEntries
+          entries: nextEntries,
         });
       }
     );
   };
 
-  const replace = (path: string|Location, state: any) => {
-    warning(!(
+  const replace = (path: string | Location, state: any) => {
+    warning(
+      !(
         typeof path === "object" &&
         path.state !== undefined &&
         state !== undefined
       ),
       "You should avoid providing a 2nd state argument to replace when the 1st " +
-      "argument is a location-like object that already has state; it is ignored"
+        "argument is a location-like object that already has state; it is ignored"
     );
 
     const action = "REPLACE";
@@ -280,8 +289,7 @@ export default function createMemoryHistory(props:HistoryProps = {}): History {
     );
   };
 
-
-  const go = (n:number) => {
+  const go = (n: number) => {
     const nextIndex = clamp(history.index + n, 0, history.entries.length - 1);
 
     const action = "POP";
@@ -296,10 +304,9 @@ export default function createMemoryHistory(props:HistoryProps = {}): History {
           setState({
             action,
             location,
-            index: nextIndex
+            index: nextIndex,
           });
-        }
-        else {
+        } else {
           // Mimic the behavior of DOM histories by
           // causing a render after a cancelled POP.
           setState();
@@ -333,7 +340,7 @@ export default function createMemoryHistory(props:HistoryProps = {}): History {
     setState();
   };
 
-  const silencePush = (path: string|Location, state: any) => {
+  const silencePush = (path: string | Location, state: any) => {
     const action = "PUSH";
     const location = createLocation(path, state, createKey(), history.location);
     history.entries.push(location);
@@ -347,14 +354,16 @@ export default function createMemoryHistory(props:HistoryProps = {}): History {
     return nextIndex >= 0 && nextIndex < history.entries.length;
   };
 
-  const block: BlockHandler = (prompt: Function|boolean|null = false) => transitionManager.setPrompt(prompt);
+  const block: BlockHandler = (prompt: Function | boolean | null = false) =>
+    transitionManager.setPrompt(prompt);
 
-  const listen = (listener: Function) => transitionManager.appendListener(listener);
+  const listen = (listener: Function) =>
+    transitionManager.appendListener(listener);
 
   /**
    * @type History
    */
-  const history = {
+  const history: History = {
     length: entries.length,
     action: "POP",
     location: entries[index],
@@ -374,8 +383,8 @@ export default function createMemoryHistory(props:HistoryProps = {}): History {
     listen,
     dispatchLast: () =>
       transitionManager.notifyListeners(history.location, history.action),
-    confirmTransitionTo
+    confirmTransitionTo,
   };
 
   return history;
-};
+}

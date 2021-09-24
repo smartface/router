@@ -36,10 +36,10 @@ export default class Route<Ttarget = unknown> {
   protected _path: RoutePath;
   protected _routes: Route[] = [];
   protected _to: (() => {}) | string | undefined;
-  private doRouteShouldMatch: RouteParams<Ttarget>['routeShouldMatch'];
-  private doRouteDidEnter: RouteParams<Ttarget>['routeDidEnter'];
-  private doRouteDidExit: RouteParams<Ttarget>['routeDidExit'];
-  protected doRouteWillEnter: RouteParams<Ttarget>['routeWillEnter'];
+  private emitRouteShouldMatch: RouteParams<Ttarget>['routeShouldMatch'];
+  private emitRouteDidEnter: RouteParams<Ttarget>['routeDidEnter'];
+  private emitRouteDidExit: RouteParams<Ttarget>['routeDidExit'];
+  protected emitRouteWillEnter: RouteParams<Ttarget>['routeWillEnter'];
   protected _modal: boolean = false;
   protected _state: RouteState;
   protected _exact = false;
@@ -61,7 +61,6 @@ export default class Route<Ttarget = unknown> {
       sensitive = false,
       strict = false,
       modal = false,
-      routeShouldMatch,
       routeDidEnter,
       routeDidExit,
       routeWillEnter
@@ -71,7 +70,7 @@ export default class Route<Ttarget = unknown> {
       routeData = {},
       view = null,
       routingState = {},
-      action = null,
+      action,
       url = null,
       active = false,
       query = {},
@@ -93,10 +92,9 @@ export default class Route<Ttarget = unknown> {
     this._routes = routes;
     this.map = mapComposer<Route<any>>(this._routes)
     this._to = to;
-    this.doRouteWillEnter = routeWillEnter;
-    this.doRouteShouldMatch = routeShouldMatch;
-    this.doRouteDidEnter = routeDidEnter;
-    this.doRouteDidExit = routeDidExit;
+    this.emitRouteWillEnter = routeWillEnter;
+    this.emitRouteDidEnter = routeDidEnter;
+    this.emitRouteDidExit = routeDidExit;
     this._modal = modal;
     this._options = {
       exact,
@@ -246,32 +244,6 @@ export default class Route<Ttarget = unknown> {
   }
 
   /**
-   * Triggered before when an exact match happends.
-   * If the routeShouldMatch eventhandler is set
-   * and routeShouldMatch returns 'true' then match happends
-   * or routeShouldMatch returns 'false' then match is blocked
-   * @example
-   * ....
-   * Route.of({
-   *  routeShouldMatch: (router, route) => {
-   *    return true;
-   *  }
-   * })
-   *
-   * ...
-   *
-   * @protected
-   * @since 1.0.0
-   * @event
-   * @emits routeShouldMatch(router: Router, route: Route)
-   * @param {Router} router
-   * @return {boolean}
-   */
-  protected routeShouldMatch(router: Router<any>) {
-    this.doRouteShouldMatch && this.doRouteShouldMatch(router, this);
-  }
-
-  /**
    * Handles route is matched and displayed
    *
    * @example
@@ -288,7 +260,7 @@ export default class Route<Ttarget = unknown> {
    * @param {Router} router
    */
   routeDidEnter(route: Route<Ttarget>) {
-    this.doRouteDidEnter && this.doRouteDidEnter(route, this);
+    this.emitRouteDidEnter && this.emitRouteDidEnter(route, this);
   }
 
   /**
@@ -308,7 +280,7 @@ export default class Route<Ttarget = unknown> {
    * @param {Router} router
    */
    routeDidExit(parent: Route<Ttarget>) {
-    this.doRouteDidExit ? this.doRouteDidExit(parent, this) : true;
+    this.emitRouteDidExit ? this.emitRouteDidExit(parent, this) : true;
   }
 
   /**
@@ -361,9 +333,9 @@ export default class Route<Ttarget = unknown> {
       {
         to: this._to,
         modal: this._modal,
-        routeDidExit: this.doRouteDidExit,
-        routeShouldMatch: this.doRouteShouldMatch,
-        routeDidEnter: this.doRouteDidEnter,
+        routeDidExit: this.emitRouteDidExit,
+        routeShouldMatch: this.emitRouteShouldMatch,
+        routeDidEnter: this.emitRouteDidEnter,
         exact: this._exact,
         strict: this._strict,
         path: this._path.clone(),

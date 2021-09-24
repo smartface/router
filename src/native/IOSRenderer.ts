@@ -94,7 +94,7 @@ export default class IOSRenderer extends Renderer {
        * Track the issue on Linear (TYPNG-15)
        */
       this._rootController.present({
-        controller,
+        controller: controller as any,
         animated,
         onComplete,
       });

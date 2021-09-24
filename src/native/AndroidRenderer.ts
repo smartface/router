@@ -3,6 +3,7 @@ import Application from '@smartface/native/application';
 import NavigationController from "@smartface/native/ui/navigationcontroller";
 import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller";
 import Page from "@smartface/native/ui/page";
+import { ControllerType } from "core/Controller";
 
 let stack = [];
 let timeout = 0;
@@ -39,7 +40,7 @@ export default class AndroidRenderer extends Renderer {
   /**
    * @override
    */
-  setChildControllers(controllers: NavigationController[]) {
+  setChildControllers(controllers: ControllerType[]) {
     if(!(this._rootController instanceof Page)) {
       this._rootController.childControllers = controllers;
     }

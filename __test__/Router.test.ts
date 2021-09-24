@@ -386,7 +386,6 @@ describe("Router", () => {
                   hash: "",
                   routeData: {},
                   routingState: {},
-                  action: null,
                   url: null,
                   active: false,
                 },
@@ -405,7 +404,6 @@ describe("Router", () => {
                   hash: "",
                   routeData: {},
                   routingState: {},
-                  action: null,
                   url: null,
                   active: false,
                 },
@@ -424,7 +422,6 @@ describe("Router", () => {
                   hash: "",
                   routeData: {},
                   routingState: {},
-                  action: null,
                   url: null,
                   active: false,
                 },
@@ -825,7 +822,7 @@ describe("Router", () => {
     // router.listen((location, action) => {
     //   console.log(location);
     // });
-    (Router.currentRouter || router).push("path1", { name: "name" });
+    router.push("path1", { name: "name" });
     Router.currentRouter.push("path", { name: "name" });
     Router.currentRouter.goBack();
     Router.currentRouter.push("path", { name: "name" });

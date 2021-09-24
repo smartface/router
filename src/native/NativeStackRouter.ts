@@ -30,14 +30,15 @@
 
 import NativeRouterBase from "./NativeRouterBase";
 import Router, { RouterParams } from "../router/Router";
-import NavigationController from '@smartface/native/ui/navigationcontroller';
+import NavigationController from "@smartface/native/ui/navigationcontroller";
 import createRenderer from "./createRenderer";
 import Page from "@smartface/native/ui/page";
 import HeaderBar from "@smartface/native/ui/headerbar";
 import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller";
+import Route from "router/Route";
 
-type NativeStackRouterParams<Ttarget = Page> = RouterParams<Ttarget>
-
+type NativeStackRouterParams<Ttarget = Page> = RouterParams<Ttarget>;
+type DismissHook = { before?: () => void; after?: () => void };
 /**
  * Creates {@link NavigationController} and manages its behavours and routes.
  *
@@ -110,9 +111,8 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
   _currentRouteUrl?: string;
   private _presented: boolean = false;
   private _unlistener: () => void = () => {};
-  private _dismiss: any;
-  private _headerBarParams?: () => Partial<HeaderBar>
-  private _nextAnimated:boolean;
+  _dismiss?: null | ((hook: DismissHook, animated: boolean) => void);
+  private _headerBarParams?: () => Partial<HeaderBar>;
   /**
    * Builds OS specific NaitveRouter
    *
@@ -127,11 +127,11 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
   /**
    * @constructor
    * @param {NativeStackRouterParams} param0
-    * @typedef {RouterParams} NativeStackRouterParams
-    * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
-    * @property {function():HeaderBarParams} modal
-    * @property {function():HeaderBarParams} headerBarParams Properties of NavigationController's headerbar. See {@link NavigationController}.
-    */
+   * @typedef {RouterParams} NativeStackRouterParams
+   * @property {Array<BottomTabBarItem>} items BottomTabBarItem collection
+   * @property {function():HeaderBarParams} modal
+   * @property {function():HeaderBarParams} headerBarParams Properties of NavigationController's headerbar. See {@link NavigationController}.
+   */
   /**
    * @typedef {object} HeaderBarParams For more info {@link NavigationController}
    * @property {{ transulent: boolean,
@@ -153,7 +153,6 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
    */
   constructor(params: NativeStackRouterParams<Page>) {
     super(params);
-    this._nextAnimated = true;
     this._homeRoute = params.homeRoute || undefined;
     this._headerBarParams = params.headerBarParams;
     this._renderer = params.renderer || undefined;
@@ -164,7 +163,10 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
     /**
      * Headerbar is be read-only
      */
-    if (this._renderer?._rootController instanceof NavigationController && typeof this._headerBarParams === 'function') {
+    if (
+      this._renderer?._rootController instanceof NavigationController &&
+      typeof this._headerBarParams === "function"
+    ) {
       //@ts-ignore
       this._renderer._rootController.headerBar = this._headerBarParams();
     }
@@ -177,8 +179,8 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
    * @param {HeaderBarParams} params
    */
   setHeaderBarParams(params: Partial<HeaderBar>) {
-    //@ts-ignore
-    this._renderer._rootController.headerBar = params;
+    if (this._renderer?._rootController?.headerBar)
+      this._renderer._rootController.headerBar = params;
   }
 
   /**
@@ -186,54 +188,37 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
    *
    * @return {object}
    */
-  get headerBar() {
-    if (this._renderer?._rootController instanceof BottomTabBarController) {
-    }
-    else if (this._renderer?._rootController) {
-      return this._renderer._rootController.headerBar;
-    }
-  }
-
-  /**
-   * @ignore
-   * @param {RouteState} prevState
-   * @param {RouteState} nextState
-   */
-  routeShouldMatch(router: Router<Page>) {
-    if (this.isUrlCurrent(router?.getState().match?.url, this.getState().action)) {
-      return false;
-    }
-    /**
-     * RouteState and Router does not match
-     */
-    return super.routeShouldMatch(router);
+  get headerBarParams() {
+    return this._renderer?._rootController.headerBar;
   }
 
   /**
    * Closes StackRouter's View if it is opened as modal.
    * @since 1.0.0
    *
-   * @param {function | {before: function, after: function}} hooks - Before and after hooks. If Hooks paramter is a function then it is used as before hook. 
+   * @param {function | {before: function, after: function}} hooks - Before and after hooks. If Hooks paramter is a function then it is used as before hook.
    * @param {boolean} [animated=true] - Callback is called before dismissing to trigger another action like routing to an another page.
    */
-  dismiss(hooks = {}, animated = true) {
-    if(typeof this._dismiss === 'function') {
-      this._dismiss(typeof hooks === "function" ? { after: hooks } : hooks, animated);
+  dismiss(hooks: DismissHook | (() => void), animated = true) {
+    if (typeof this._dismiss === "function") {
+      this._dismiss(
+        typeof hooks === "function" ? { after: hooks } : hooks,
+        animated
+      );
     }
   }
 
   /**
    * To Listen page changes are handled by device.
    * @since 1.0.0
-   * 
+   *
    * @private
    */
-  addNavigatorChangeListener() {
-    this._unlistener = this._renderer?.onNavigationControllerTransition(
-      action => {
-        // if user presses backbutton or uses gesture to back
+  private addNavigatorChangeListener() {
+    this._unlistener =
+      this._renderer?.onNavigationControllerTransition((action) => {
+        // if user pressed backbutton or uses gesture to back
         if (
-          //@ts-ignore
           action.operation === NavigationController.OperationType.POP &&
           !this._fromRouter
         ) {
@@ -241,92 +226,90 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
             // set Router to skip next history change
             this._historyController?.preventDefault();
             this._historyController?.goBack();
-            if(typeof this.dispatch === 'function') {
-              this.dispatch(
-                //@ts-ignore
-                this._historyController?.history.location,
-                "POP",
-                /**
-                 * RouteState and Router does not match
-                 */
-                //@ts-ignore
-                this,
-                false
-              );
+            if (typeof this.dispatch === "function") {
+              this._historyController?.history &&
+                this.dispatch(
+                  this._historyController.history.location,
+                  "POP",
+                  this,
+                  false
+                );
             }
-          }
-          catch (e) {
+          } catch (e) {
             throw e;
           }
-          finally {}
         }
-      }
-    ) || (() => {});
+      }) || (() => {});
   }
 
   /**
-   * @protected
+   * For internal use
+   *
    * @ignore
-   * @param {string} path
+   * @param path
    */
-  pushHomeBefore(path: string) {
+  pushHomeRouteBefore(path: string) {
     if (
       this.hasHome() &&
-      this._renderer?._rootController instanceof NavigationController &&
-      this._renderer?._rootController.childControllers.length === 0
+      this._renderer?._rootController &&
+      this._renderer?._rootController instanceof NavigationController
     ) {
+      this._renderer?._rootController.childControllers;
       const indexRoute = this._routes[this._homeRoute || 0];
 
       if (path !== indexRoute.getUrlPath()) {
         this._historyController?.push(indexRoute.getUrlPath());
       }
     }
-
-    return true;
   }
 
   /**
    * @override
    */
-  onRouteWillEnter(route: any, requestedUrl: string) {
-    const {
-      view,
-      match: { isExact: exact},
-      url,
-      action
-    } = route.getState();
+  onRouteEnter(route: Route, requestedUrl: string) {
+    const { view, match, url, action } = route.getState();
+    const exact = !!match?.isExact;
 
     const active = url === this._currentRouteUrl;
     switch (action) {
       case "REPLACE":
         if (this._fromRouter) {
           this._renderer?.replaceChild(
-            (route._renderer && route._renderer._rootController) || view, 0
+            (route instanceof Router &&
+              route.renderer &&
+              route.renderer._rootController) ||
+              view,
+            0
           );
         }
         break;
       case "PUSH":
         if (this._fromRouter) {
-          if (route.isModal() && !this._presented && !active) {
+          if (
+            route instanceof NativeStackRouter &&
+            !this._presented &&
+            !active
+          ) {
             const _backUrl = Router._backUrl;
             Router._backUrl = null;
             if (this._historyController?.lastLocationUrl !== url) {
               this._historyController?.preventDefault();
-              this._historyController?.push(url);
+              url && this._historyController?.push(url);
             }
-            // Router.getGlobalRouter().history.push(url);
             const lastLocationIndex = Router.getGlobalRouter().history.index;
-            const lastLocation = Router.getGlobalRouter().history.entries[lastLocationIndex];
             // TODO: change lock logic because of when call nested url from another tab then the tab is blocked.
             Router._lock = true;
+
             this._renderer?.present(
-              (route._renderer && route._renderer._rootController) || view,
+              route instanceof Router && route.renderer
+                ? route.renderer._rootController
+                : view,
               this.isAnimated(),
-              () => Router._lock = false
+              () => (Router._lock = false)
             );
             let disposed = false;
 
-            route._dismiss = ({ before = () => {}, after = () => {} }, animated = true) => {
+            route._dismiss = (hooks, animated = true) => {
               if (disposed) return;
               let diff =
                 Router.getGlobalRouter().history.index - lastLocationIndex;
@@ -334,18 +317,27 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
               // Because routers in the tree are not aware of modal router will be dismissed.
               // And if they are notified and then their current-urls will be outdated.
               while (diff-- > 1) {
+                // clear modal's history
                 Router.getGlobalRouter().history.rollback();
               }
 
               // simulate a pop request to inform all routers
               // regarding route changing
               this._historyController?.rollback();
-              if(typeof before === 'function' && typeof this.dispatch === 'function' && this._historyController?.lastLocation) {
-                //@ts-ignore
-                this.dispatch(this._historyController?.lastLocation, "POP", this, false);
-                before();
+              if (
+                hooks.before &&
+                typeof this.dispatch === "function" &&
+                this._historyController?.lastLocation
+              ) {
+                this.dispatch(
+                  this._historyController?.lastLocation,
+                  "POP",
+                  this,
+                  false
+                );
+                hooks.before();
               }
-              route._renderer.dismiss(() => {
+              route.renderer?.dismiss(() => {
                 disposed = true;
 
                 route._dismiss = null;
@@ -354,36 +346,44 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
                 this._presented = false;
                 route.setState({ active: false });
                 route.resetView();
-                
-                if(_backUrl && !after && !before && typeof this.dispatch === 'function') {
-                  //@ts-ignore
-                  this.dispatch(_backUrl, "PUSH", this, true)
-                }
-                else {
-                  if (!before) {
-                    //@ts-ignore
-                    this.dispatch(this._historyController?.lastLocation, "POP", this, false);
+
+                if (
+                  _backUrl &&
+                  !hooks.after &&
+                  !hooks.before &&
+                  typeof this.dispatch === "function"
+                ) {
+                  this.dispatch(_backUrl, "PUSH", this, true);
+                } else {
+                  if (!hooks.before && this._historyController?.lastLocation) {
+                    this.dispatch?.(
+                      this._historyController?.lastLocation,
+                      "POP",
+                      this,
+                      false
+                    );
                   }
                 }
-                after && after();
+                hooks.after && hooks.after();
               }, animated);
             };
 
             this._presented = true;
             route.setState({ active: true });
-          }
-          else if (!route.isModal() && !active) {
-            this._currentRouteUrl = url;
+          } else if (
+            !(route instanceof NativeStackRouter) &&
+            route instanceof NativeRouterBase &&
+            !active
+          ) {
+            this._currentRouteUrl = url || undefined;
             try {
               this._renderer?.pushChild(
-                (route._renderer && route._renderer._rootController) || view,
+                (route.renderer && route.renderer._rootController) || view,
                 this.isAnimated()
               );
-            }
-            catch (e) {
+            } catch (e) {
               throw `Error when ${route} is pushed. ${e}`;
-            }
-            finally {
+            } finally {
               route.setState({ active: true });
             }
           }
@@ -393,7 +393,7 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
       case "POP":
         // TODO: Add dismiss logic
         if (this._fromRouter) {
-          if (!route._dismiss && exact && !route.isModal()) {
+          if (!(route instanceof NativeStackRouter) && exact) {
             this._renderer?.popChild();
           }
         }
@@ -402,8 +402,8 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
         break;
     }
 
-    this._currentRouteUrl = url;
-    super.onRouteWillEnter(route, '');
+    this._currentRouteUrl = url || undefined;
+    super.onRouteEnter(route, "");
   }
 
   /**
@@ -474,16 +474,16 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
 
   /**
    * Returns length of the history steps to be needed to receive from current to specified url
-   * 
+   *
    * @since 1.1.0
    * @param {string} url
    * @return {number}
    */
   getStepLengthFromCurrent(url: string) {
     const lastIndex = (this._historyController?.getLength() || 0) - 1;
-    const index = this._historyController?.findIndex(
-      location => location.url === url
-    ) || 0;
+    const index =
+      this._historyController?.findIndex((location) => location.url === url) ||
+      0;
 
     return index - lastIndex;
   }

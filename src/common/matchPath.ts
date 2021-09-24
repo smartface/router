@@ -1,11 +1,11 @@
 /* from react-router */
 
 import pathToRegexp from "path-to-regexp";
-import type {Key, RegExpOptions} from "path-to-regexp";
+import type { Key, RegExpOptions } from "path-to-regexp";
 import parseUrl from "./parseUrl";
 import { MatchOptions } from "./MatchOptions";
 
-const patternCache: {[key: string]: any} = {};
+const patternCache: { [key: string]: any } = {};
 const cacheLimit = 10000;
 let cacheCount = 0;
 
@@ -24,7 +24,7 @@ export const compilePath = (pattern: string, options: RegExpOptions) => {
   const re = pathToRegexp(pattern, keys, options);
   const compiledPattern = {
     re,
-    keys
+    keys,
   };
 
   if (cacheCount < cacheLimit) {
@@ -41,24 +41,31 @@ type Pathname = string;
  * Public API for matching a URL pathname to a path pattern.
  * @ignore
  */
-export const matchPath = (pathname: string, options:MatchOptions|Pathname = {}, parent: string) => {
+export const matchPath = (
+  pathname: string,
+  options: MatchOptions | Pathname = {},
+  parent?: string
+) => {
   let _options: MatchOptions;
   if (typeof options === "string")
     _options = {
-      path: options
+      path: options,
     };
-  else
-    _options = options;
-    
-  
-  const { path, exact = false, strict = false, sensitive = false } = _options;
+  else _options = options;
+
+  const {
+    path = null,
+    exact = false,
+    strict = false,
+    sensitive = false,
+  } = _options;
 
   if (path == null) return parent;
 
   const { re, keys } = compilePath(path, {
     end: exact,
     strict,
-    sensitive
+    sensitive,
   });
   const match = re.exec(pathname);
 
@@ -78,7 +85,7 @@ export const matchPath = (pathname: string, options:MatchOptions|Pathname = {}, 
     params: keys.reduce((memo: any, key: any, index: number) => {
       memo[key.name] = values[index];
       return memo;
-    }, {})
+    }, {}),
   };
 };
 
@@ -89,8 +96,6 @@ export const matchPath = (pathname: string, options:MatchOptions|Pathname = {}, 
  * @return {RouteMatch}
  */
 export const matchUrl = (url: string, options: MatchOptions) => {
-  // Parent parameter should be provided.
-  //@ts-ignore
   const res = matchPath(parseUrl(url).url, options);
   return res;
 };

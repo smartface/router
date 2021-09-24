@@ -5,8 +5,9 @@ import createRenderer from "./createRenderer";
 import { RouteParams } from "../router/RouteParams";
 import Renderer from "./Renderer";
 import type Route from "../router/Route";
-import Router from "../router/Router";
+import Router, { RouterParams } from "../router/Router";
 import Page from "@smartface/native/ui/page";
+import { HistoryActionType } from "common/HistoryActions";
 
 /**
  * It creates a root fragment Rotuer adds and removes child routers and pages as application root.
@@ -41,8 +42,9 @@ import Page from "@smartface/native/ui/page";
  *
  * @since 1.0.0
  */
-export default class NativeRouter<Ttarget = Page> extends NativeRouterBase<Ttarget> {
-  protected _rootWillChange: boolean;
+export default class NativeRouter<
+  Ttarget = Page
+> extends NativeRouterBase<Ttarget> {
   protected _route?: Route;
   /**
    * Create OS specific NativeRouter instance
@@ -50,66 +52,40 @@ export default class NativeRouter<Ttarget = Page> extends NativeRouterBase<Ttarg
    * @param {RouterParams} options
    * @returns {NativeRouter}
    */
-  static of<Ttarget = Page>(options: any) {
-    options.renderer = createRenderer();
-    return new NativeRouter<Ttarget>(options);
+  static of<Ttarget = Page>(params: RouterParams<Ttarget>) {
+    params.renderer = createRenderer();
+    return new NativeRouter<Ttarget>(params);
   }
 
   /**
    * @constructor
    * @param {RouterParams} param
    */
-  constructor({
-    path = "",
-    build = undefined,
-    routes = [],
-    exact = false,
-    renderer = undefined,
-    to = undefined,
-    routerDidEnter,
-    routerDidExit,
-    routeShouldMatch,
-    routeWillEnter,
-    rootWillChange,
-  }: RouteParams<Ttarget>) {
-    super({
-      path,
-      build,
-      routes,
-      exact,
-      isRoot: true,
-      to,
-      routeWillEnter,
-      routerDidEnter,
-      routerDidExit,
-      routeShouldMatch
-    });
-    
-    this._rootWillChange = !!rootWillChange;
+  constructor(params: RouteParams<Ttarget>) {
+    super(params);
 
     if (!this._isRoot) {
       throw new Error("[NativeRouter] Please only use as root");
     }
-
-    this._renderer = renderer;
   }
-  
-  canGoBack(){
+
+  canGoBack() {
     return false;
   }
 
   /**
    * @override
    */
-  onRouteWillEnter(route: Router | Route, action: string) {
-    // this._renderer.show(router._renderer._rootController);
+  onRouteEnter(route: Router | Route, action: HistoryActionType) {
     if (this._isRoot && this._route !== route) {
-      //@ts-ignore
-      const root = route instanceof Router && route._renderer?._rootController ? route._renderer._rootController : route.getState().view;
+      const root =
+        route instanceof Router && route.renderer?._rootController
+          ? route.renderer._rootController
+          : route.getState().view;
       Renderer.setasRoot(root);
       this._route = route;
     }
-    
-    super.onRouteWillEnter(route, action);
+
+    super.onRouteEnter(route, action);
   }
 }

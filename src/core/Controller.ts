@@ -1,6 +1,10 @@
+import Page from "@smartface/native/ui/page";
+import NavigationController from "@smartface/native/ui/navigationcontroller";
+import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller";
+import HeaderBar from "@smartface/native/ui/headerbar";
 
-import Page from '@smartface/native/ui/page';
-import NavigationController from '@smartface/native/ui/navigationcontroller';
-import BottomTabBarController from '@smartface/native/ui/bottomtabbarcontroller';
-
-export type ControllerType = Page | NavigationController | BottomTabBarController;
+export type ControllerType = (
+  | (Omit<Page, "headerBar"> & { childControllers: undefined })
+  | (Omit<NavigationController, "headerBar" | 'childControllers'> & {childControllers: ControllerType[] })
+  | (Omit<BottomTabBarController,  'childControllers'> & {childControllers: ControllerType[] })
+) & { headerBar?: Partial<HeaderBar>};

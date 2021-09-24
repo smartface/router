@@ -24,15 +24,16 @@ import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller"
 import createRenderer from "./createRenderer";
 import TabBarItem from "@smartface/native/ui/tabbaritem";
 import functionMaybe from "../utils/funcorVal";
-import Router from "../router/Router";
-import { RouteParams } from "../router/RouteParams";
+import Router, { RouterParams } from "../router/Router";
 import { OnHistoryChange } from "../core/OnHistoryChange";
 import { matchRoutes } from "../common";
 import { Location } from "../common/Location";
 import Page from "@smartface/native/ui/page";
 import { HistoryActionType } from "common/HistoryActions";
+import { ControllerType } from "core/Controller";
+import { HistoryController } from "common/HistoryController";
 
-type BottomTabBarRouterParams<Ttarget> = RouteParams<Ttarget> & {
+type BottomTabBarRouterParams<Ttarget> = RouterParams<Ttarget> & {
   isRoot?: boolean;
   items: (Partial<TabBarItem> | TabBarItem)[];
   onTabChangedByUser?: (...args: any) => void;
@@ -167,7 +168,7 @@ export default class BottomTabBarRouter<
     routes = [],
     exact = false,
     renderer,
-    to = null,
+    to,
     tabbarParams,
     items = [],
     isRoot = false,
@@ -196,7 +197,7 @@ export default class BottomTabBarRouter<
   }
 
   initializeRenderer() {
-    this._renderer?.setRootController(new BottomTabBarController());
+    this._renderer?.setRootController(new BottomTabBarController() as ControllerType);
     this._tabStatus = userTabStatus.IDLE;
 
     if (this._renderer?._rootController instanceof BottomTabBarController) {
@@ -242,7 +243,7 @@ export default class BottomTabBarRouter<
   }
 
   initialize(
-    parentHistory: unknown,
+    parentHistory: HistoryController,
     onHistoryChange: OnHistoryChange,
     pushHomes: (path: string) => void
   ) {

@@ -16,7 +16,7 @@ type MatchObject = {isExact: boolean,params: object,path: string,url: string};
  * @param {Array} [branch=[]] not public API
  * @return {Array<{match: RouteMatch, route: Route}>}
  */
-const matchRoutes = (store: RouteStore, routes: (Route|Router)[], pathname: string, branch: any[] = []): MatchReturn => {
+const matchRoutes = (store: RouteStore, routes: Route[], pathname: string, branch: any[] = []): MatchReturn => {
   routes.some(route => {
     const match = route.hasPath()
       ? route.matchPath(pathname)

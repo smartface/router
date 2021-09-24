@@ -4,7 +4,7 @@ import { matchUrl } from "./matchPath";
 import { Location } from "./Location";
 import { HistoryActions } from "common";
 
-type HistoryParams = HistoryProps & {exact: boolean, sensitive: boolean, strict: boolean, path: string };
+type HistoryControllerParams = HistoryProps & {exact: boolean, sensitive: boolean, strict: boolean, path: string};
 
 /**
  * History service wrapper
@@ -26,7 +26,7 @@ export class HistoryController {
    * @param {?History} _history
    */
   constructor(
-    private _options: Partial<HistoryParams>,  
+    private _options: Partial<HistoryControllerParams>,  
     private _history: History = createMemoryHistory({
     initialEntries: _options.initialEntries || [], // The initial URLs in the history stack
     initialIndex: _options.initialIndex || 0, // The starting index in the history stack
@@ -84,7 +84,7 @@ export class HistoryController {
      * @param {object} [={}] props Node properties
      * @return {HistoryController}
      */
-    createNode(props: Partial<HistoryParams> = {}) {
+    createNode(props: Partial<HistoryControllerParams> = {}) {
       const node = new HistoryController(props);
       this._nodes.add(node);
       // bubbles history goback to root until go back could be possible.
