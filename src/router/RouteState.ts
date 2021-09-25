@@ -17,7 +17,7 @@ import { RouteMatch } from './RouteMatch';
  */
 
 export type RouteState<Ttarget = any> = {
-  routeData?: object;
+  routeData?: any;
   action?: HistoryActionType;
   query?: { [key: string]: any };
   rawQuery?: string;

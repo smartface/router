@@ -781,9 +781,8 @@ describe("Router", () => {
       routes: [
         new Route<any>({
           path: "/path1",
-          routeDidEnter: (router, route) => { 
-            history.push('/path1');
-            console.log("routeDidEnter : ", route.state.action);
+          routeDidEnter(router, route){
+            history.push('/path1 - '+route.getState().routeData.name);
           },
           build: (router, route) => {
             redirectCount++;
@@ -793,10 +792,13 @@ describe("Router", () => {
         }),
         Router.of({
           path: "/path",
-          to: "/path/to/1",
+          to: "/path/1",
           routes: [
             new Route<any>({
-              path: "/path/2",
+              path: "/path/1",
+              routeDidEnter(router, route){
+                history.push('/path/1 - '+route.getState().routeData.name);
+              },
               build: (router, route) => {
                 const { match,  } = route!.getState();
                 component1.router = router;
@@ -805,9 +807,23 @@ describe("Router", () => {
               },
             }),
             new Route<any>({
-              path: "/path/to/:id",
+              path: "/path/2",
+              routeDidEnter(router, route){
+                history.push('/path/2 - '+route.getState().routeData.name);
+              },
               build: (router, route) => {
-                history.push('/path/to/1');
+                const { match,  } = route!.getState();
+                component1.router = router;
+                component1.params = match?.params;
+                return component1;
+              },
+            }),
+            new Route<any>({
+              path: "/path/3",
+              routeDidEnter(router, route){
+                history.push('/path/3 - '+route.getState().routeData.name);
+              },
+              build: (router, route) => {
                 redirectCount++;
                 activeRoute = route;
                 return component1;
@@ -822,12 +838,26 @@ describe("Router", () => {
     // router.listen((location, action) => {
     //   console.log(location);
     // });
-    router.push("path1", { name: "name" });
-    Router.currentRouter.push("path", { name: "name" });
+    router.push("/path1", { name: "path1" });
+    Router.currentRouter.push("/path/1", { name: "path/1" });
+    Router.currentRouter.push("2", { name: "path/2" });
+    Router.currentRouter.push("3", { name: "path/3" });
     Router.currentRouter.goBack();
-    Router.currentRouter.push("path", { name: "name" });
+    Router.currentRouter.goBack();
+    Router.currentRouter.goBack();
+    // Router.currentRouter.goBack();
+    // Router.currentRouter.push("path", { name: "name" });
+    console.log(history);
 
-    expect(history).toEqual([ '/path1', '/path/to/1', '/path1', '/path/to/1' ]);
+    expect(history).toEqual([
+      '/path1 - path1',
+      '/path/1 - path/1',
+      '/path/2 - path/2',
+      '/path/3 - path/3',
+      '/path/2 - path/2',
+      '/path/1 - path/1',
+      '/path1 - path1'
+    ]);
   });
   it("can call child Routers", () => {
     let callCount = 0;

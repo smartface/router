@@ -441,7 +441,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
   }
 
   hasHome() {
-    return this._homeRoute !== null;
+    return !!this._homeRoute;
   }
 
   /**
@@ -888,7 +888,6 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
       throw new TypeError(`route must be instance of Route`);
     }
     const to = route.getRedirectto();
-    //@ts-ignore
     const url = (to && funcorVal(to, [this, route])) || route.getUrlPath();
     this.push(url);
   }
@@ -1001,7 +1000,6 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    * @return {RouteLocation}
    */
   getLocation() {
-    //@ts-ignore
     return this._historyController?.history.location;
   }
 

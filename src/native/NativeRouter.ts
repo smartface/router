@@ -1,5 +1,3 @@
-"use strict";
-
 import NativeRouterBase from "./NativeRouterBase";
 import createRenderer from "./createRenderer";
 import { RouteParams } from "../router/RouteParams";
@@ -8,8 +6,6 @@ import type Route from "../router/Route";
 import Router, { RouterParams } from "../router/Router";
 import Page from "@smartface/native/ui/page";
 import { HistoryActionType } from "common/HistoryActions";
-import { ControllerType } from "core/Controller";
-import NavigationController from "@smartface/native/ui/navigationcontroller";
 
 /**
  * It creates a root fragment Rotuer adds and removes child routers and pages as application root.

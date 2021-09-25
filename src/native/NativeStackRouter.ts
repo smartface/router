@@ -385,6 +385,7 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
               };
             } catch (error) {
               console.log(error);
+              throw error;
             }
 
             this._presented = true;
