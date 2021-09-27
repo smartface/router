@@ -4,6 +4,7 @@ node_modules
 .babelrc
 .git
 .github
+yarn*
 npm-debug.log
 tsconfig*
 jest.config.js

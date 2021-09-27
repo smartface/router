@@ -10,7 +10,8 @@
     "dev:sync": "mkdir -p ../scripts/node_modules/@smartface/router && cp -r -t ../scripts/node_modules/@smartface/router src index.js package.json ",
     "pretty": "prettier --write src/**/**",
     "build": "tsc",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "docs": "rm -rf docs && node typedoc.js"
   },
   "repository": {
     "type": "git",
@@ -40,7 +41,9 @@
     "npm-bump": "0.0.30",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.5",
-    "typescript": "4.2.4"
+    "typescript": "4.2.4",
+    "typedoc": "beta",
+    "gh-pages": "^3.2.3"
   },
   "peerDependencies": {
     "@smartface/native": "^4.3.4 || ^4.3.5-beta || ^4.3.5.alpha"
