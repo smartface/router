@@ -94,6 +94,7 @@ const userTabStatus = {
  * @class
  * @extends {Router}
  * @example
+ * ```
  * const {BottommTabBarRouter, Route} = require('@smartface/router')
  * import Image from '@smartface/native/ui/image';
  * import Color from '@smartface/native/ui/color';
@@ -133,7 +134,7 @@ const userTabStatus = {
  *      ]
  *    )]
  * })
- *
+ * ```
  * @since 1.0.0
  */
 export default class BottomTabBarRouter<

@@ -5,9 +5,6 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "jest",
-    "dev:link": "npm run dev:remove && npm run dev:sync",
-    "dev:remove": "rm -R -f ../scripts/node_modules/@smartface/router",
-    "dev:sync": "mkdir -p ../scripts/node_modules/@smartface/router && cp -r -t ../scripts/node_modules/@smartface/router src index.js package.json ",
     "pretty": "prettier --write src/**/**",
     "build": "tsc",
     "watch": "tsc -w",

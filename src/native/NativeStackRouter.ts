@@ -47,6 +47,7 @@ type DismissHook = { before?: () => void; after?: () => void };
  * @class
  * @extends {Router}
  * @example
+ * ```
  * import { NativeStackRouter, Route } from '@smartface/router';
  * import Image from '@smartface/native/ui/image';
  * import Color from '@smartface/native/ui/color';
@@ -83,29 +84,26 @@ type DismissHook = { before?: () => void; after?: () => void };
  *      ]
  *    )]
  * });
- *
+ *```
  * @example
- * const extend = require("js-base/core/extend");
+ * ```
  * import System from '@smartface/native/device/system';
  * import Application from '@smartface/native/application';
  * import AlertView from '@smartface/native/ui/alertview';
- * const {NativeStackRouter} = require('@smartface/router');
+ * import { NativeStackRouter } from '@smartface/router';
  *
- * // Get generated UI code
- * const Page1Design = require("ui/ui_page1");
+ * import Page1Design from 'generated/page1';
  *
- * const Page1 = extend(Page1Design)(
- *   // Constructor
- *   function(_super, data, router) {
- *       // Initalizes super class for this page scope
- *       _super(this);
- *       this._router = router;
- *       if(router instanceof NativeStackRouter)
- *         router.setHeaderBarParams({visible: false});
- *
- *       ...
- *   });
- *
+ * export default class Page1 {
+ *  constructor(data, router) {
+ *    super();
+ *    this._router = router;
+ *    if (router instanceof NativeStackRouter) {
+ *      router.setHeaderBarParams({visible: false});
+ *    }
+ *  }
+ * }
+ *```
  *
  * @since 1.0.0
  */
@@ -436,9 +434,9 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
   /**
    * Go back to index
    * @example
-   * ...
+   * ```
    * router.goBackto(-2)
-   * ...
+   * ```
    * @since 1.1.0
    * @param {number} n Amount of back as negative value. If stack length shorter than specified number then the active router does nothing.
    */
@@ -462,9 +460,9 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
    * Go back until the url
    *
    * @example
-   * ...
+   * ```
    * router.goBacktoUrl('/back/to/url');
-   * ...
+   * ```
    * @since 1.1.0
    * @param {string} url - An url will be matched in the same stack
    */
@@ -476,9 +474,9 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
    * Go back to first page in the same stack
    *
    * @example
-   * ...
+   * ```
    * router.goBackHome();
-   * ...
+   * ```
    * @since 1.1.0
    */
   goBackHome() {

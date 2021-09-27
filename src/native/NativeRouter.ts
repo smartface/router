@@ -12,6 +12,7 @@ import { HistoryActionType } from "common/HistoryActions";
  *
  * @class
  * @example
+ * ```
  * const {NativeRouter: Router, Route} = require('@smartface/router')
  * import Image from '@smartface/native/ui/image';
  * import Color from '@smartface/native/ui/color';
@@ -37,7 +38,7 @@ import { HistoryActionType } from "common/HistoryActions";
  *      });
  *    ]
  * })
- *
+ *```
  * @since 1.0.0
  */
 export default class NativeRouter<

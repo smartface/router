@@ -85,7 +85,8 @@ function handleRouteUrl(
  * @class
  *
  * @example
- *  const router = Router.of({
+ * ``` 
+ * const router = Router.of({
  *   path: "/",
  *   to: "/pages/page2",
  *   isRoot: true,
@@ -173,11 +174,12 @@ function handleRouteUrl(
  *       })
  *   ]
  * });
- *
+ *```
  * @example
+ * ```
  * // Homeroute setting
  *
- * ...
+ * //...
  *      StackRouter.of({
  *           path: "/stack",
  *           to: "/stack/path1",
@@ -204,7 +206,7 @@ function handleRouteUrl(
  *               })
  *           ]
  *       })
- * ...
+ * ```
  *
  * @since 1.0.0
  * @extends {Route}
@@ -474,9 +476,9 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
   /**
    * it tests that Whether router can go back as n
    * @example
-   * ...
+   * ```
    * router.canGoBack(-3) ? router.goBackto(-3) : // if not, do anything else
-   *
+   *```
    * @since 1.1.0
    * @param {number} n Amount of back as negative value
    * return {boolean}
@@ -488,10 +490,11 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
   /**
    * Adds eventlisteners to listen history changes
    * @example
+   * ```
    * const unlisten = router.listen((location, action) => {
    *     console.log(`new route location: ${location.url} action : ${action}`);
    * });
-   *
+   *```
    * @since 1.0.0
    * @param {HistoryListener} fn
    */
@@ -505,7 +508,8 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    * Adds route block handler to history. When history is changed in anywhere
    * then the handler intercepts before history is changed.
    * @example
-   * var unload = router.addRouteBlocker((path, routeData, action, ok) => {
+   * ```
+   * const unload = router.addRouteBlocker((path, routeData, action, ok) => {
    * alert({
    *  message: "Would you like to answer?",
    *  title: "Question", //optional
@@ -526,7 +530,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    *  ]
    *  });
    * });
-   *
+   *```
    * @since 1.0.0
    * @param {RouterBlockHandler} fn
    */
@@ -774,13 +778,13 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
   /**
    * Life-cycle handler emits when Router is activated
    * @example
-   * ....
+   * ```
    * Router.of({
    *  routerDidEnter: (router, route) => {
    *    ...
    *  }
    * })
-   *
+   *```
    * @since 1.0.0
    * @emits routerDidEnter
    * @protected
@@ -814,14 +818,13 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    *
    * @since 1.0.0
    * @example
-   * ....
+   * ```
    * Router.of({
    *  routerDidExit: (router, action) => {
    *    ...
    *  }
    * })
-   *
-   * ...
+   *```
    * @emits routerDidExit
    * @param {string} action
    */

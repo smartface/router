@@ -237,14 +237,13 @@ export default class Route<Ttarget = unknown> {
    * Handles route is matched and displayed
    *
    * @example
-   * ....
+   * ```
    * Route.of({
    *  routeDidEnter: (router, route) => {
-   *    ...
+   *    //...
    *  }
    * })
-   *
-   * ...
+   * ```
    * @emits routeDidEnter
    * @event
    * @param {Router} router
@@ -256,14 +255,13 @@ export default class Route<Ttarget = unknown> {
   /**
    * Handles that route is removed by router
    * @example
-   * ....
+   * ```
    * Route.of({
    *  routeDidExit: (router, route) => {
-   *    ...
+   *    //...
    *  }
    * })
-   *
-   * ...
+   * ```
    * @since 1.0.0
    * @emits routeDidExit
    * @event
