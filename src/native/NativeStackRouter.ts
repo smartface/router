@@ -42,7 +42,7 @@ type NativeStackRouterParams<Ttarget = Page> = RouterParams<Ttarget> & {
 };
 type DismissHook = { before?: () => void; after?: () => void };
 /**
- * Creates {@link NavigationController} and manages its behavours and routes.
+ * Creates NavigationController and manages its behavours and routes.
  *
  * @class
  * @extends {Router}
