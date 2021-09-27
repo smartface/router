@@ -13,7 +13,6 @@ import { HistoryActionType } from "common/HistoryActions";
 import { RouteMatch } from "./RouteMatch";
 import NativeStackRouter from "../native/NativeStackRouter";
 import parseUrl from "../common/parseUrl";
-import { ControllerType } from "core/Controller";
 
 export type RouterParams<Ttarget = unknown> = RouteParams<Ttarget> & {
   homeRoute?: number;

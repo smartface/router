@@ -847,7 +847,6 @@ describe("Router", () => {
     Router.currentRouter.goBack();
     // Router.currentRouter.goBack();
     // Router.currentRouter.push("path", { name: "name" });
-    console.log(history);
 
     expect(history).toEqual([
       '/path1 - path1',
