@@ -1,6 +1,6 @@
 {
   "name": "@smartface/router",
-  "version": "2.0.0-rc.8",
+  "version": "2.0.0-rc.9",
   "description": "Smmartface Router",
   "main": "lib/index.js",
   "scripts": {
@@ -33,14 +33,14 @@
     "esdoc-standard-plugin": "^1.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
+    "gh-pages": "^3.2.3",
     "jest": "^27.1.0",
     "jsdoc-to-markdown": "^6.0.1",
     "npm-bump": "0.0.30",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.5",
-    "typescript": "4.2.4",
     "typedoc": "beta",
-    "gh-pages": "^3.2.3"
+    "typescript": "4.2.4"
   },
   "peerDependencies": {
     "@smartface/native": "^4.3.4 || ^4.3.5-beta || ^4.3.5.alpha"
