@@ -4,6 +4,7 @@ on:
     branches:
       - master
       - feature/typescript
+      - feature/ts-fix
 jobs:
   publish:
     runs-on: ubuntu-latest

@@ -203,7 +203,7 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
    * @param {function | {before: function, after: function}} hooks - Before and after hooks. If Hooks paramter is a function then it is used as before hook.
    * @param {boolean} [animated=true] - Callback is called before dismissing to trigger another action like routing to an another page.
    */
-  dismiss(hooks: DismissHook | (() => void), animated = true) {
+  dismiss(hooks?: DismissHook | (() => void), animated = true) {
     if (typeof this._dismiss === "function") {
       this._dismiss(
         typeof hooks === "function" ? { after: hooks } : hooks,
