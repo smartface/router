@@ -89,13 +89,13 @@ const userTabStatus = {
  */
 
 /**
- * It creates {@link BottomTabbarController} and manages its behavours and routes.
+ * It creates BottomTabBarController and manages its behavours and routes.
  *
  * @class
  * @extends {Router}
  * @example
  * ```
- * const {BottommTabBarRouter, Route} = require('@smartface/router')
+ * import { BottommTabBarRouter, Route } from '@smartface/router';
  * import Image from '@smartface/native/ui/image';
  * import Color from '@smartface/native/ui/color';
  *

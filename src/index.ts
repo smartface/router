@@ -6,6 +6,9 @@ import NativeRouter from "./native/NativeRouter";
 
 export { Route };
 export { NativeRouter as Router };
+/**
+ * @ignore
+ */
 export { NativeRouter }; //Backward compatibility
 export { BottomTabBarRouter };
 export { Router as BaseRouter }; //Advanced Cases Only

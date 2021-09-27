@@ -45,6 +45,9 @@ export default class Route<Ttarget = unknown> {
   protected _build: RouteParams<Ttarget>['build'];
   protected _props: any;
 
+  /**
+   * @ignore
+   */
   _isRouter = false;
   /**
    * @constructor

@@ -108,10 +108,14 @@ type DismissHook = { before?: () => void; after?: () => void };
  * @since 1.0.0
  */
 export default class NativeStackRouter extends NativeRouterBase<Page> {
-  _currentRouteUrl?: string;
+  private _currentRouteUrl?: string;
   private _modal: boolean = false;
   private _presented: boolean = false;
   private _unlistener: () => void = () => {};
+
+  /**
+   * @ignore
+   */
   _dismiss?: null | ((hook?: DismissHook, animated?: boolean) => void);
   private _headerBarParams?: () => Partial<HeaderBar>;
   /**

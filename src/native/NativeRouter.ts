@@ -13,11 +13,11 @@ import { HistoryActionType } from "common/HistoryActions";
  * @class
  * @example
  * ```
- * const {NativeRouter: Router, Route} = require('@smartface/router')
+ * import { Router, Route } from '@smartface/router';
  * import Image from '@smartface/native/ui/image';
  * import Color from '@smartface/native/ui/color';
  *
- * var router = Router.of({
+ * const router = Router.of({
  *  path: "/",
  *  isRoot: true,
  *  to: '/page1',

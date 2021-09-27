@@ -212,12 +212,18 @@ function handleRouteUrl(
  * @extends {Route}
  */
 export default class Router<Ttarget = unknown> extends Route<Ttarget> {
+  /**
+   * @ignore
+   */
   _isRoot: boolean;
   protected _exact: boolean;
   protected _strict: boolean;
   protected _sensitive: boolean;
   protected _fromRouter = false;
   protected _pushHomes: (path: string) => void;
+  /**
+   * @ignore
+   */
   static _lock: boolean;
   dispatch?: (
     location: Location,
@@ -225,6 +231,9 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
     target: Router<any>,
     fromRouter?: boolean
   ) => void;
+  /**
+   * @ignore
+   */
   static _nextAnimated: any;
   static currentRouter: Router<any> | NativeStackRouter;
   protected _renderer?: Renderer;
@@ -282,13 +291,23 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
     return Router._activeRouter;
   }
 
+  /**
+   * @ignore
+   */
   static get _backUrl(): Location | null {
     return _backUrl;
   }
+
+  /**
+   * @ignore
+   */
   static set _backUrl(value: Location | null) {
     _backUrl = value;
   }
 
+  /**
+   * @ignore
+   */
   static _activeRouter: Router | null;
 
   static blocker: ReturnType<typeof Router.createBlocker> | null;
@@ -447,7 +466,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
 
   /**
    * Fast router's instance checking
-   *
+   * @ignore
    * @since 1.0.0
    * @return {boolean}
    */
