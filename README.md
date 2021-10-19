@@ -17,23 +17,24 @@ Router is a concept that decouples application's page-routing logic than view la
 
 There are 4 types of routers
 
-- [NativeRouter](https://smartface.github.io/router/class/src/native/NativeRouter.js~NativeRouter.html)
-- [NativeStackRouter](https://smartface.github.io/router/class/src/native/NativeStackRouter.js~NativeStackRouter.html)
-- [NativeBottomTabBarRouter](https://smartface.github.io/router/class/src/native/BottomTabBarRouter.js~BottomTabBarRouter.html)
+- [NativeRouter](https://smartface.github.io/router/class/src/native/NativeRouter.ts~NativeRouter.html)
+- [NativeStackRouter](https://smartface.github.io/router/class/src/native/NativeStackRouter.ts~NativeStackRouter.html)
+- [NativeBottomTabBarRouter](https://smartface.github.io/router/class/src/native/BottomTabBarRouter.ts~BottomTabBarRouter.html)
 - NativeTopTabBarRouter (in roadmap)
 
 ## ChangeLog
-
+- 2.0.0 
+  - Router module have been fully converted into TypeScript! 
 - 1.2.0
-
   - Added Replace action to recall current route's lifescycle-methods
     - You could find more in [Replace Example](https://github.com/smartface/router-test/blob/master/scripts/routes/replace.js)
   - Fix bug #25
 
 ## Installation
-
+Router already comes preinstalled in the Smartface Workspace. 
+If you have accidently deleted it or want to install at someplace else, use this commend
 ```
-(cd ~/workspace/scripts && npm i -S @smartface/router)
+yarn add @smartface/router
 ```
 
 ## Table of Contents
@@ -70,18 +71,18 @@ There are 4 types of routers
 - `Route` is a definition of a path
 - `BottomTabBarRouter` is to manage BottomTabBarController's
 
-#### Basic Usage of [push](https://smartface.github.io/router/class/src/router/Router.js~Router.html#instance-method-push) and [goBack](https://smartface.github.io/router/class/src/router/Router.js~Router.html#instance-method-goBack)
+#### Basic Usage of [push](https://smartface.github.io/router/class/src/router/Router.ts~Router.html#instance-method-push) and [goBack](https://smartface.github.io/router/class/src/router/Router.ts~Router.html#instance-method-goBack)
 
 ##### Push a new page
 
-```javascript
-const {
+```typescript
+import {
   NativeRouter: Router,
   Router: RouterBase,
   NativeStackRouter: StackRouter,
   BottomTabBarRouter,
   Route
-} = require("@smartface/router");
+} from "@smartface/router";
 
 const router = Router.of({
     path: "/",
@@ -115,7 +116,7 @@ goBack method is functional only if it's used on a StackRouter. And if provided,
 related page of the url parameter must be in the same stack history. Otherwise
 goBack does nothing.
 
-```js
+```typescript
 // Add essential require statements
 
 const router = Router.of({
@@ -128,28 +129,28 @@ const router = Router.of({
         Route.of({
           path: "/pages/page1",
           build: (router, route) => {
-            let Page = require("pages/page1");
+            const Page = require("pages/page1");
             return new Page({ label: 1 }, router, "/pages2/page2");
           }
         }),
         Route.of({
           path: "/pages/page2",
           build: (router, route) => {
-            let Page = require("pages/page1");
+            const Page = require("pages/page1");
             return new Page({ label: 2 }, router, "/pages2/page3");
           }
         }),
         Route.of({
           path: "/pages/page3",
           build: (router, route) => {
-            let Page = require("pages/page1");
+            const Page = require("pages/page1");
             return new Page({ label: 3 }, router, "/pages2/page4");
           }
         }),
         Route.of({
           path: "/pages/page4",
           build: (router, route) => {
-            let Page = require("pages/page2");
+            const Page = require("pages/page2");
             return new Page({}, router, -2);
           }
         })
@@ -163,21 +164,24 @@ router.push("/pages/page2");
 router.push("/pages/page3");
 router.push("/pages/page4");
 
-// page2.js
+// page2.ts
+import System from '@smartface/native/device/system';
+import Application from '@smartface/native/application';
+import AlertView from '@smartface/native/ui/alertview';
+import { NativeStackRouter } from '@smartface/router';
 
-const Page2 = extend(Page2Design)(
-  // Constructor
-  function(_super, data, router, back = -1) {
-    // Initalizes super class for this page scope
-    _super(this);
-    this.back - back;
-    this.router = router;
-    // Overrides super.onShow method
-    this.onShow = onShow.bind(this, this.onShow.bind(this));
-    // Overrides super.onLoad method
-    this.onLoad = onLoad.bind(this, this.onLoad.bind(this));
+import Page2Design from 'generated/page2';
+
+export default class Page2 {
+  router: any;
+  constructor(data, router) {
+    super();
+    this._router = router;
+    if (this.router instanceof NativeStackRouter) {
+      this.router.setHeaderBarParams({visible: false});
+    }
   }
-);
+}
 
 // Other stuff
 
@@ -203,18 +207,17 @@ function btn_onPress() {
 #### Replace active route's view using Replace action
 
 Replace action provides rerendering for opened route.
-You could find more in [Replace Example](https://github.com/smartface/router-test/blob/master/scripts/routes/replace.js)
 
 ### Working with StackRouter
 
-```js
-const {
+```ts
+import {
   NativeRouter: Router,
   Router: RouterBase,
   NativeStackRouter: StackRouter,
   BottomTabBarRouter,
   Route
-} = require("@smartface/router");
+} from "@smartface/router";
 
 const router = Router.of({
   path: "/",
@@ -252,8 +255,8 @@ router.push("/pages/page1");
 
 #### Present & dismiss StackRouter's view as modal
 
-```js
-module.exports = StackRouter.of({
+```typescript
+export = StackRouter.of({
   path: "/example/modal",
   to: "/example/modal/page1",
   routes: [
@@ -290,15 +293,15 @@ router.dismiss(() => router.push("/to/another/page"));
 
 ### Working with BottomTabBarRouter
 
-```js
-const {
+```ts
+import {
   NativeRouter: Router,
   Router: RouterBase,
   NativeStackRouter: StackRouter,
   BottomTabBarRouter,
   Route
-} = require("@smartface/router");
-const Color = require("sf-core/ui/color");
+} from "@smartface/router";
+import Color from '@smartface/native/ui/color';
 
 const router = Router.of({
   path: "/",
@@ -388,7 +391,7 @@ router.push("/pages/page1");
 
 ### Working with Pages
 
-```js
+```typescript
 // router
 const router = Router.of({
   path: "/",
@@ -417,21 +420,17 @@ const router = Router.of({
 router.push("/bottom/stack2/path1", { sort: "ASC" });
 
 // page1.js
+import Page2Design from 'generated/page2';
 
-const extend = require("js-base/core/extend");
-
-// Get generated UI code
-const Page1Design = require("ui/ui_page1");
-
-const Page1 = extend(Page1Design)(
-  // Constructor
-  function(_super, routeData, router) {
-    // Initalizes super class for this page scope
-    _super(this);
+export default class Page2 {
+  sort: any;
+  router: any;
+  constructor(data, router) {
+    super();
     this.sort = routeData.sort;
     this.router = router;
   }
-);
+}
 
 // Other stuff
 
@@ -448,7 +447,7 @@ function btnNext_onPress() {
 
 **homeRoute** property of StackRouter is the index of the first route in the stack.
 
-```js
+```typescript
 // Other stuff
 
 StackRouter.of({
@@ -476,7 +475,7 @@ StackRouter.of({
 
 ### Send and recevice query-string
 
-```js
+```typescript
 const route = Router.of({
     StackRouter.of({
         path: "/bottom/stack2",
@@ -487,7 +486,7 @@ const route = Router.of({
             Route.of({
                 path: "/bottom/stack2/path1",
                 build: (router, route) => {
-                    var sort = route.getState().query.sort;
+                    const sort = route.getState().query.sort;
                     return new Page1(route.getState().routeData, router, sort, "/bottom/stack/path2")
                 }
             }),
@@ -506,12 +505,12 @@ router.push('/bottom/stack2/path1?sort=ASC&groupby=user')
 
 ### Working with deeplinking
 
-```js
-const {
+```typescript
+import {
     Route,
     Router: RouterBase,
     NativeRouter: Router
-} = require("@smartface/router");
+} from "@smartface/router";
 
 const deeplinkRouter = new RouterBase({
     path: "/deeplink",
@@ -545,11 +544,11 @@ const router = Router.of({
 // Handle push notification
 Application.onReceivedNotification = function(e) {
     // assume that receivedUrl is equal to "http://yourdomain.com/product/12345"
-    var receivedUrl = e.remote.url;
+    const receivedUrl = e.remote.url;
     const domain = 'http://yourdomain.com';
 
     // url is now equal to "/deeplink/product/12345"
-    var url = receivedUrl.replace(domain, '/deeplink');
+    const url = receivedUrl.replace(domain, '/deeplink');
 
     deeplinkRouter.push(receivedUrl);
 
@@ -567,15 +566,14 @@ Routes have some life-cycle events :
 - `build` is a builder function to create view instance associated with specified router and route or not
 - `routeShouldMatch` is triggered when route is matched as exact and then route will be blocked or not by regarding the return value of the method
 
-```js
-///
+```typescript
 
 Route.of({
   path: "/bottom/page1",
   routeDidEnter: (router, route) => {
     // if view is singleton and visited before
     const { view } = route.getState();
-    view && view.onRouteEnter && view.onRouteEnter(router, route);
+    view?.onRouteEnter && view.onRouteEnter(router, route);
   },
   routeDidExit: (router, route) => {
     const { view } = route.getState();
@@ -603,8 +601,8 @@ Route.of({
 
 ### Blocking Routes
 
-```js
-var unload = router.addRouteBlocker((path, routeData, action, ok) => {
+```typescript
+const unload = router.addRouteBlocker((path, routeData, action, ok) => {
   alert({
     message: "Would you like to answer?",
     title: "Question",
@@ -639,7 +637,7 @@ Following cases cannot be handled by the blocker:
 
 ## Listening history changes
 
-```js
+```typescript
 const unlisten = router.listen((location, action) => {
   console.log(`new route action :  ${action} path : ${location.url}`);
 });
@@ -656,29 +654,26 @@ unlisten();
 
 # Contribute to Repository
 
-- Clone repository to root folder of the workspace
+- Clone the repository
+- Install dependencies by using `yarn` command
+- Compile the project by `yarn run build` or invoke it in watch mode by `yarn run watch`
+- Create a symlink in your Smartface Worksace path `scripts/node_modules/@smartface/router`.
+Example command(don't forget to delete the installed lib directory): `ln -s /path/to/your/smartface/workspace/scripts/node_modules@smartface/router/lib /path/to/your/router/installation/lib`
 
-```
-cd ~/workspace && git clone git@github.com:smartface/router.git
-```
+> You can also use NPM Workspaces feature to link two directories. However, this method will cause your `node_modules` files to merge and the development environment will increase in size dramatically.
 
-- TDD
-
+## Test Driven Development(TDD)
+Tests will run on before every publish and all of the test cases are required to pass before a new version can be published.
 ```
-cd ~/workspace/router
-npm test -- --watch
-```
-
-- Syncronize router to _scripts/node_modules/@smartface/router_
-
-```
-cd ~/workspace/router
-npm run dev:link
+yarn test -- --watch
 ```
 
-- Update documentation
+## Update Documentation
+
+Documentation will be updated every time when changes are pushed into the `master` branch. 
+To do it manually or oversee the documentation beforehand:
 
 ```
-cd ~/workspace/router
-npx esdoc
+yarn run docs
+open ./docs/index.html // Mac Only
 ```

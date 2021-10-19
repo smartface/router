@@ -2,9 +2,14 @@ node_modules
 package-lock.json
 npm-debug.log
 dist
+lib
 .tmp
 build/package.smartface.ui-editor.js
 .npmrc
+
+# Main compile output 
+index.d.ts
+index.js
 
 **/target
 **/.project
