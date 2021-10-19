@@ -1,21 +1,18 @@
 {
   "name": "@smartface/router",
-  "version": "1.6.2",
+  "version": "2.0.0-rc.10",
   "description": "Smmartface Router",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "jest",
-    "dev:link": "npm run dev:remove && npm run dev:sync",
-    "dev:remove": "rm -R -f ../scripts/node_modules/@smartface/router",
-    "dev:sync": "mkdir -p ../scripts/node_modules/@smartface/router && cp -r -t ../scripts/node_modules/@smartface/router src index.js package.json ",
-    "pretty": "prettier --write src/**/**"
+    "pretty": "prettier --write src/**/**",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "docs": "rm -rf docs && node typedoc.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/smartface/router.git"
-  },
-  "jest": {
-    "testEnvironment": "node"
   },
   "author": "Cenk Cetinkaya",
   "license": "MIT",
@@ -28,14 +25,24 @@
     "resolve-pathname": "^2.2.0"
   },
   "devDependencies": {
+    "@smartface/native": "^4.3.4 || ^4.3.5-beta || ^4.3.5.alpha",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.0.0",
     "esdoc": "^1.1.0",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-standard-plugin": "^1.0.0",
-    "eslint": "^5.6.1",
-    "eslint-config-prettier": "^3.0.1",
-    "jest": "^23.5.0",
-    "jsdoc-to-markdown": "^4.0.1",
-    "npm-bump": "0.0.25",
-    "prettier": "^1.14.2"
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "gh-pages": "^3.2.3",
+    "jest": "^27.1.0",
+    "jsdoc-to-markdown": "^6.0.1",
+    "npm-bump": "0.0.30",
+    "prettier": "^2.3.2",
+    "ts-jest": "^27.0.5",
+    "typedoc": "beta",
+    "typescript": "4.2.4"
+  },
+  "peerDependencies": {
+    "@smartface/native": "^4.3.4 || ^4.3.5-beta || ^4.3.5.alpha"
   }
 }

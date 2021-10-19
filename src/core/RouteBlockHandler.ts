@@ -1,0 +1,1 @@
+export type RouteBlockHandler = (path: string, routeData: object, action: string, okFn: (...args: any) => any) => void;
