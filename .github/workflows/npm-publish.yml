@@ -1,10 +1,8 @@
 name: Publish NPM
 on:
   push:
-    branches:
-      - master
-      - feature/typescript
-      - feature/ts-fix
+    tags:
+      - 'v2.*'
 jobs:
   publish:
     runs-on: ubuntu-latest
