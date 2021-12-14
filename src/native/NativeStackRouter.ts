@@ -36,8 +36,9 @@ import Page from "@smartface/native/ui/page";
 import HeaderBar from "@smartface/native/ui/headerbar";
 import Route from "router/Route";
 import { ControllerType } from "core/Controller";
+import { Location } from "common/Location";
 
-type NativeStackRouterParams<Ttarget = Page> = RouterParams<Ttarget> & {
+type NativeStackRouterParams<Ttarget = any> = RouterParams<Ttarget> & {
   modal?: boolean;
 };
 type DismissHook = { before?: () => void; after?: () => void };
@@ -107,7 +108,9 @@ type DismissHook = { before?: () => void; after?: () => void };
  *
  * @since 1.0.0
  */
-export default class NativeStackRouter extends NativeRouterBase<Page> {
+export default class NativeStackRouter<
+  Ttarget = Page
+> extends NativeRouterBase<Ttarget> {
   private _currentRouteUrl?: string;
   private _modal: boolean = false;
   private _presented: boolean = false;
@@ -212,6 +215,17 @@ export default class NativeStackRouter extends NativeRouterBase<Page> {
         animated
       );
     }
+  }
+
+  goBack(url?: string | Location, animated: boolean = true) {
+    const currentIndex = this._historyController?.currentIndex() || 0;
+    if (!url && currentIndex === 0) {
+      this._dismiss?.();
+    } else {
+      super.goBack(url, animated);
+    }
+
+    return this;
   }
 
   /**

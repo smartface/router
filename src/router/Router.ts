@@ -228,7 +228,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
   dispatch?: (
     location: Location,
     action: HistoryActionType,
-    target: Router<any>,
+    target: Router<Ttarget>,
     fromRouter?: boolean
   ) => void;
   /**
