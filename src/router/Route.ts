@@ -35,7 +35,7 @@ export default class Route<Ttarget = unknown> {
   protected _strict = false;
   protected _path: RoutePath;
   protected _routes: Route[] = [];
-  protected _to: (() => {}) | string | undefined;
+  protected _to: (() => string) | string | undefined;
   private emitRouteShouldMatch: RouteParams<Ttarget>['routeShouldMatch'];
   private emitRouteDidEnter: RouteParams<Ttarget>['routeDidEnter'];
   private emitRouteDidExit: RouteParams<Ttarget>['routeDidExit'];
