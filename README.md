@@ -17,17 +17,17 @@ Router is a concept that decouples application's page-routing logic than view la
 
 There are 4 types of routers
 
-- [NativeRouter](https://smartface.github.io/router/class/src/native/NativeRouter.ts~NativeRouter.html)
-- [NativeStackRouter](https://smartface.github.io/router/class/src/native/NativeStackRouter.ts~NativeStackRouter.html)
-- [NativeBottomTabBarRouter](https://smartface.github.io/router/class/src/native/BottomTabBarRouter.ts~BottomTabBarRouter.html)
+- [NativeRouter](https://smartface.github.io/router/classes/NativeRouter.html)
+- [NativeStackRouter](https://smartface.github.io/router/classes/NativeStackRouter.html)
+- [NativeBottomTabBarRouter](https://smartface.github.io/router/classes/BottomTabBarRouter.html)
 - NativeTopTabBarRouter (in roadmap)
 
 ## ChangeLog
 - 2.0.0 
   - Router module have been fully converted into TypeScript! 
 - 1.2.0
-  - Added Replace action to recall current route's lifescycle-methods
-    - You could find more in [Replace Example](https://github.com/smartface/router-test/blob/master/scripts/routes/replace.js)
+  - Added Replace action to recall current route's lifecycle-methods
+    - You could find more in [Replace Example](https://github.com/smartface/router-test/blob/master/scripts/routes/replace.ts)
   - Fix bug #25
 
 ## Installation
@@ -71,7 +71,7 @@ yarn add @smartface/router
 - `Route` is a definition of a path
 - `BottomTabBarRouter` is to manage BottomTabBarController's
 
-#### Basic Usage of [push](https://smartface.github.io/router/class/src/router/Router.ts~Router.html#instance-method-push) and [goBack](https://smartface.github.io/router/class/src/router/Router.ts~Router.html#instance-method-goBack)
+#### Basic Usage of [push](https://smartface.github.io/router/classes/Router.html#push) and [goBack](https://smartface.github.io/router/classes/Router.html#goBack)
 
 ##### Push a new page
 
