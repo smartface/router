@@ -31,7 +31,7 @@ There are 3 types of routers
 
 ## Installation
 Router already comes preinstalled in the Smartface Workspace. 
-If you have accidently deleted it or want to install at someplace else, use this commend
+If you have accidently deleted it or want to install at someplace else, use this command
 ```
 yarn add @smartface/router
 ```
