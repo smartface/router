@@ -15,12 +15,11 @@ Router is a concept that decouples application's page-routing logic than view la
 
 ## Types of Smartface Routers
 
-There are 4 types of routers
+There are 3 types of routers
 
 - [NativeRouter](https://smartface.github.io/router/classes/NativeRouter.html)
 - [NativeStackRouter](https://smartface.github.io/router/classes/NativeStackRouter.html)
 - [NativeBottomTabBarRouter](https://smartface.github.io/router/classes/BottomTabBarRouter.html)
-- NativeTopTabBarRouter (in roadmap)
 
 ## ChangeLog
 - 2.0.0 
