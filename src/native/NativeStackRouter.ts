@@ -37,10 +37,14 @@ import HeaderBar from "@smartface/native/ui/headerbar";
 import Route from "router/Route";
 import { ControllerType } from "core/Controller";
 import { Location } from "common/Location";
+import { ModalType } from "./ModalType";
+import { BottomSheetOptions } from "./BottomSheetOptions";
 
-type NativeStackRouterParams<Ttarget = any> = RouterParams<Ttarget> & {
-  modal?: boolean;
-};
+type NativeStackRouterParams<Ttarget = any> = RouterParams<Ttarget>
+& (
+| { modal?: true, modalType?: "bottom-sheet", bottomSheetOptions?: BottomSheetOptions }
+| { modal?: true, modalType?: "modal", modalOptions?: any }
+| { modal?: false });
 type DismissHook = { before?: () => void; after?: () => void };
 /**
  * Creates NavigationController and manages its behavours and routes.
@@ -111,16 +115,6 @@ type DismissHook = { before?: () => void; after?: () => void };
 export default class NativeStackRouter<
   Ttarget = Page
 > extends NativeRouterBase<Ttarget> {
-  private _currentRouteUrl?: string;
-  private _modal: boolean = false;
-  private _presented: boolean = false;
-  private _unlistener: () => void = () => {};
-
-  /**
-   * @ignore
-   */
-  _dismiss?: null | ((hook?: DismissHook, animated?: boolean) => void);
-  private _headerBarParams?: () => Partial<HeaderBar>;
   /**
    * Builds OS specific NaitveRouter
    *
@@ -133,6 +127,20 @@ export default class NativeStackRouter<
     );
     return new NativeStackRouter(params);
   }
+  
+  private _currentRouteUrl?: string;
+  private _modal: boolean = false;
+  private _presented: boolean = false;
+  private _unlistener: () => void = () => {};
+  private _modalType: ModalType = "modal";
+  private _bottomSheetOptions?: BottomSheetOptions;
+  private _modalOptions?: any;
+
+  /**
+   * @ignore
+   */
+  _dismiss?: null | ((hook?: DismissHook, animated?: boolean) => void);
+  private _headerBarParams?: () => Partial<HeaderBar>;
 
   /**
    * @constructor
@@ -164,6 +172,13 @@ export default class NativeStackRouter<
   constructor(params: NativeStackRouterParams<Page>) {
     super(params);
     this._modal = !!params.modal;
+    if(params.modal === true)
+      this._modalType = params.modalType || "modal";
+    if(params.modal && params.modalType === "bottom-sheet"){
+      this._bottomSheetOptions = params.bottomSheetOptions
+    } else if(params.modal && params.modalType === "modal"){
+      this._modalOptions = params.modalOptions;
+    }
     this._homeRoute = params.homeRoute || undefined;
     this._headerBarParams = params.headerBarParams;
     this._renderer = params.renderer;
@@ -320,25 +335,39 @@ export default class NativeStackRouter<
           ) {
             try {
               const _backUrl = Router._backUrl;
-              Router._backUrl = null;
-              if (this._historyController?.lastLocationUrl !== url) {
-                this._historyController?.preventDefault();
-                url && this._historyController?.push(url);
+              const onDismissComplete = (hooks?: DismissHook) => {
+                disposed = true;
+                route._dismiss = null;
+                route._presented = false;
+
+                this._presented = false;
+                route.setState({ active: false });
+                route.resetView();
+
+                if (
+                  _backUrl &&
+                  !hooks?.after &&
+                  !hooks?.before &&
+                  typeof this.dispatch === "function"
+                ) {
+                  this.dispatch(_backUrl, "PUSH", this, true);
+                } else {
+                  if (
+                    !hooks?.before &&
+                    this._historyController?.lastLocation
+                  ) {
+                    this.dispatch?.(
+                      this._historyController?.lastLocation,
+                      "POP",
+                      this,
+                      false
+                    );
+                  }
+                }
+                hooks?.after && hooks?.after();
               }
-              const lastLocationIndex = Router.getGlobalRouter().history.index;
-              // TODO: change lock logic because of when call nested url from another tab then the tab is blocked.
-              Router._lock = true;
 
-              this._renderer?.present(
-                route instanceof Router && route.renderer
-                  ? route.renderer._rootController
-                  : view,
-                this.isAnimated(),
-                () => (Router._lock = false)
-              );
-              let disposed = false;
-
-              route._dismiss = (hooks, animated = true) => {
+              const normalizeHistory = (hooks?: DismissHook) => {
                 if (disposed) return;
                 let diff =
                   Router.getGlobalRouter().history.index - lastLocationIndex;
@@ -366,40 +395,44 @@ export default class NativeStackRouter<
                   );
                   hooks.before();
                 }
+              }
+
+              const dismiss = (hooks?: DismissHook, animated: boolean = true): void => {
+                normalizeHistory(hooks);
+                
                 route.renderer?.dismiss(() => {
-                  disposed = true;
-
-                  route._dismiss = null;
-                  route._presented = false;
-
-                  this._presented = false;
-                  route.setState({ active: false });
-                  route.resetView();
-
-                  if (
-                    _backUrl &&
-                    !hooks?.after &&
-                    !hooks?.before &&
-                    typeof this.dispatch === "function"
-                  ) {
-                    this.dispatch(_backUrl, "PUSH", this, true);
-                  } else {
-                    if (
-                      !hooks?.before &&
-                      this._historyController?.lastLocation
-                    ) {
-                      this.dispatch?.(
-                        this._historyController?.lastLocation,
-                        "POP",
-                        this,
-                        false
-                      );
-                    }
-                  }
-                  hooks?.after && hooks?.after();
+                  onDismissComplete(hooks);                  
                 }, animated);
               };
+              Router._backUrl = null;
+              if (this._historyController?.lastLocationUrl !== url) {
+                this._historyController?.preventDefault();
+                url && this._historyController?.push(url);
+              }
+              const lastLocationIndex = Router.getGlobalRouter().history.index;
+              // TODO: change lock logic because of when call nested url from another tab then the tab is blocked.
+              Router._lock = true;
+
+              this._renderer?.present({
+                controller: route instanceof Router && route.renderer
+                  ? route.renderer._rootController
+                  : view,
+                animated: this.isAnimated(),
+                onDismissComplete: () => {
+                  normalizeHistory();
+                  onDismissComplete();
+                },
+                onComplete: () => (Router._lock = false),
+                type: this._modalType,
+                options: this._bottomSheetOptions || this._modalOptions
+              });
+              let disposed = false;
+
+              route._dismiss = (hooks, animated) => {
+                dismiss(hooks, animated)
+              }
             } catch (error) {
+              // @ts-ignore
               console.log(error);
               throw error;
             }

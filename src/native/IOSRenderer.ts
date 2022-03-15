@@ -5,6 +5,8 @@ import Animator from "./iOSAnimator";
 import { ControllerType } from "../core/Controller";
 import Page from "@smartface/native/ui/page";
 import NavigationController from "@smartface/native/ui/navigationcontroller";
+import { ModalType } from "./ModalType";
+import { BottomSheetOptions } from "./BottomSheetOptions";
 /**
  * Rendering strategy for iOS
  * It encapsulates all logic to display pages on iOS
@@ -65,7 +67,7 @@ export default class IOSRenderer extends Renderer {
      */
     if (
       this._rootController instanceof NavigationController &&
-      this._rootController.childControllers.some((p) => p === page)
+      this._rootController?.childControllers?.some((p) => p === page)
     ) {
       return;
     }
@@ -77,30 +79,32 @@ export default class IOSRenderer extends Renderer {
     }
   }
 
-  present(
-    controller: ControllerType,
-    animated: boolean,
-    onComplete: (...args: any) => void
-  ) {
-    if (this._rootController instanceof Page) {
-    } else if (this._rootController instanceof NavigationController) {
-      /**
-       * Present method actually exists on BottomTabBarController.
-       * Track the issue on Linear (TYPNG-15)
-       */
-      this._rootController.present({
-        controller: controller as any,
-        animated,
-        onComplete,
-      });
-    }
-  }
+  // present(params: {
+  //     type: ModalType,
+  //     controller: ControllerType,
+  //     animated: boolean,
+  //     onComplete: (...args: any) => void,
+  //     options?: BottomSheetOptions
+  //   }) {
+  //   if (this._rootController instanceof Page) {
+  //   } else if (this._rootController instanceof NavigationController) {
+  //     /**
+  //      * Present method actually exists on BottomTabBarController.
+  //      * Track the issue on Linear (TYPNG-15)
+  //      */
+  //     this._rootController.present({
+  //       controller: controller as any,
+  //       animated,
+  //       onComplete,
+  //     });
+  //   }
+  // }
 
   /**
    * @override
    */
   onNavigationControllerTransition(fn: (...args: any) => void) {
-    if (this._rootController instanceof NavigationController) {
+    if (this._rootController && this._rootController instanceof NavigationController) {
       const controller = this._rootController;
       controller.onTransition = fn;
       //@ts-ignore

@@ -15,7 +15,7 @@
     "lib": ["ES2015"]
   },
   "include": ["src"],
-  "files": ["./node_modules/@smartface/native/.types/typings.d.ts"],
+  "files": ["./node_modules/@smartface/native/.types/typings.d.ts", "./src/native/ModalType.ts"],
   "exclude": [
     "node_modules",
     "lib",

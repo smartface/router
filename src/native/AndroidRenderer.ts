@@ -45,7 +45,7 @@ export default class AndroidRenderer extends Renderer {
   
   setSelectedIndex(index: number) {
   if (this._rootController instanceof BottomTabBarController) {
-    if(this._rootController.selectedIndex !== index)
+    if(this._rootController && this._rootController?.selectedIndex !== index)
       this._rootController.selectedIndex = index;
     }
   }
@@ -56,12 +56,12 @@ export default class AndroidRenderer extends Renderer {
    */
   pushChild(page: Page, animated = true) {
     // To avoid Android error
-    if (this._rootController instanceof NavigationController) {
-      if (this._rootController.childControllers.length !== 0 && this._rootController.childControllers.some((p) => p === page)) {
+    if (this._rootController && this._rootController instanceof NavigationController) {
+      if (!!this._rootController.childControllers?.length && this._rootController.childControllers?.some((p) => p === page)) {
         return;
       }
-      animated = this._rootController.childControllers.length === 0 ? false : animated;
-      if (typeof this._rootController.push === 'function') {
+      animated = !this._rootController.childControllers?.length === false ? false : animated;
+      if (this._rootController && typeof this._rootController.push === 'function') {
         //@ts-ignore Check TYPING-14
         this._rootController.push({ controller: page, animated: animated });
   
@@ -105,10 +105,10 @@ export default class AndroidRenderer extends Renderer {
    */
   onNavigationControllerTransition(fn: (...args: any) => void) {
     if (this._rootController instanceof NavigationController) {
-      if (this._rootController.onTransition) {
+      if (this._rootController && this._rootController.onTransition) {
         this._rootController.onTransition = fn;
         return () => {
-          if (this._rootController instanceof NavigationController) {
+          if (this._rootController && this._rootController instanceof NavigationController) {
             return this._rootController.onTransition = () => null
           }
         }
@@ -121,8 +121,8 @@ export default class AndroidRenderer extends Renderer {
    * @override
    */
   popChild(animated = true) {
-    if (this._rootController instanceof NavigationController) {
-      if (this._rootController.childControllers.length > 1 && typeof this._rootController.pop === 'function') {
+    if (this._rootController && this._rootController instanceof NavigationController) {
+      if ((this._rootController.childControllers?.length || 0) > 1 && typeof this._rootController.pop === 'function') {
         this._rootController.pop({ animated: animated });
       }
     }

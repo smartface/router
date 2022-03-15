@@ -537,10 +537,12 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@smartface/native@^4.3.4 || ^4.3.5-beta || ^4.3.5.alpha":
-  version "4.3.5-beta.0"
-  resolved "https://registry.yarnpkg.com/@smartface/native/-/native-4.3.5-beta.0.tgz#ad2e3ef96322585212263c948c4a45e260529a9f"
-  integrity sha512-AZaVcLeTFdMw5lfekp+HEolp992bQxBJWtpapTDjJX8vii7e/NcCKNvr4Vm+85rW7FzbseoawlMnXHFXlR5voA==
+"@smartface/native@^4.4.1-alpha.26":
+  version "4.4.1-beta.3"
+  resolved "https://registry.yarnpkg.com/@smartface/native/-/native-4.4.1-beta.3.tgz#215bedb460e0419b33780249e46da721db19c1e9"
+  integrity sha512-BWJ0rCwDOpcxp1NVBMMCEWdGtDIm4Zku0GD8gWedFnS74DbsbBOwi9YZ42F/HP/YHnnuEditYHcOcK4mctlt6Q==
+  dependencies:
+    events "^3.3.0"
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -1930,6 +1932,11 @@ esutils@^2.0.2:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.3.tgz#74d2eb4de0b8da1293711910d50775b9b710ef64"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
+
+events@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
+  integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
 
 execa@^5.0.0:
   version "5.1.1"
