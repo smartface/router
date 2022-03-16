@@ -50,13 +50,13 @@ export default class AndroidRenderer extends Renderer {
     }
   }
 
-
   /**
    * @override
    */
   pushChild(page: Page, animated = true) {
     // To avoid Android error
     if (this._rootController && this._rootController instanceof NavigationController) {
+      // @ts-ignore
       if (!!this._rootController.childControllers?.length && this._rootController.childControllers?.some((p) => p === page)) {
         return;
       }

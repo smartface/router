@@ -3,6 +3,7 @@ import NavigationController from "@smartface/native/ui/navigationcontroller";
 import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller";
 import HeaderBar from "@smartface/native/ui/headerbar";
 import { BottomSheetOptions } from "native/BottomSheetOptions";
+import { EventEmitterNativeComponent } from "@smartface/native/core/eventemitter";
 
 export type ControllerType = (
   | (Omit<Page, "headerBar"> & { childControllers: undefined })
@@ -13,6 +14,6 @@ export type ControllerType = (
   animated: boolean,
   onComplete: (...args: any) => void,
   options?: BottomSheetOptions
-): void};
+): void} & EventEmitterNativeComponent<Page.Events | "dismissComplete", any>;
 
 export type HeaderBartype = ControllerType['headerBar']

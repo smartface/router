@@ -8,7 +8,8 @@
     "pretty": "prettier --write src/**/**",
     "build": "tsc",
     "watch": "tsc -w",
-    "docs": "rm -rf docs && node typedoc.js"
+    "docs": "rm -rf docs && node typedoc.js",
+    "dev": "tsc -w --project tsconfig.dev.json"
   },
   "repository": {
     "type": "git",

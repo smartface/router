@@ -67,6 +67,7 @@ export default class IOSRenderer extends Renderer {
      */
     if (
       this._rootController instanceof NavigationController &&
+      // @ts-ignore
       this._rootController?.childControllers?.some((p) => p === page)
     ) {
       return;
