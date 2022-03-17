@@ -502,7 +502,7 @@ export default class Router<Ttarget = unknown> extends Route<Ttarget> {
    * @param {number} n Amount of back as negative value
    * return {boolean}
    */
-  canGoBack(n: number) {
+  canGoBack(n?: number) {
     return this._historyController?.canGoBack(n);
   }
 
