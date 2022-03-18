@@ -7,6 +7,7 @@ import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller"
 import TabBarItem from "@smartface/native/ui/tabbaritem";
 import { ControllerType } from "../core/Controller";
 import { BottomSheetOptions } from "./BottomSheetOptions";
+import System from "@smartface/native/device/system";
 
 /**
  * Abstract Renderer Strategy
@@ -76,7 +77,7 @@ export default abstract class Renderer {
        * Track the issue on Linear (TYPNG-15)
        */
       // params.options && this._rootController?.applySheetOptions(params.controller, params.options);
-      if(this._rootController instanceof NavigationController && this._rootController && type === "bottom-sheet"){
+      if(this._rootController instanceof NavigationController && this._rootController){
         // @ts-ignore
         // this._rootController.dismissComplete = () => {
         //   params.onDismissComplete?.();
@@ -86,9 +87,13 @@ export default abstract class Renderer {
         params.controller.dismissStart = () => {
           // @ts-ignore
           options.controller.dismissComplete = null;
-          params.onDismissStart?.();
+          setTimeout(() => {
+            params.onDismissStart?.();
+          }, 50);
         }
-        this._rootController?.present(options, type === "bottom-sheet");
+
+        const isBottomSheet = type === "bottom-sheet" && parseFloat(System.OSVersion) >= 15 && System.OS === System.OSType.IOS; 
+        this._rootController?.present(options, isBottomSheet);
       }
       /*
       type === "modal"
@@ -100,7 +105,7 @@ export default abstract class Renderer {
             params.options
           );
         */
-    // }, 1);
+    // }, 100);
   }
 
   dismiss(onComplete: (...args: any) => void, animated: boolean) {

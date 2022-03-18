@@ -407,6 +407,7 @@ export default class NativeStackRouter<
               }
 
               const dismiss = (hooks?: DismissHook, animated: boolean = true): void => {
+                console.log("dismiss")
                 normalizeHistory(hooks);
                 
                 route.renderer?.dismiss(() => {
