@@ -175,8 +175,6 @@ export default class NativeStackRouter<
   constructor(params: NativeStackRouterParams<Page>) {
     super(params);
     this._modal = !!params.modal;
-    params.modal && 
-    console.log("NativeStackRouter ", this._id, params.modalType);
     if(params.modal)
       this._modalType = params.modalType || "modal";
     if(params.modal && params.modalType === "bottom-sheet"){
@@ -199,6 +197,14 @@ export default class NativeStackRouter<
       (this._renderer._rootController as ControllerType).headerBar =
         this._headerBarParams();
     }
+  }
+
+  get bottomSheetOptions() {
+    return {...this._bottomSheetOptions};
+  }
+
+  get modalOptions() {
+    return {...this._modalOptions};
   }
 
   /**
@@ -407,7 +413,6 @@ export default class NativeStackRouter<
               }
 
               const dismiss = (hooks?: DismissHook, animated: boolean = true): void => {
-                console.log("dismiss")
                 normalizeHistory(hooks);
                 
                 route.renderer?.dismiss(() => {
@@ -434,7 +439,7 @@ export default class NativeStackRouter<
                 },
                 onComplete: () => (Router._lock = false),
                 type: route.modalType,
-                options: this._bottomSheetOptions || this._modalOptions
+                options: route.bottomSheetOptions || route.modalOptions
               });
               let disposed = false;
 
