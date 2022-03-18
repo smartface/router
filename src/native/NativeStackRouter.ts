@@ -46,6 +46,8 @@ type NativeStackRouterParams<Ttarget = any> = RouterParams<Ttarget>
 | { modal?: true, modalType?: "modal", modalOptions?: any }
 | { modal?: false });
 type DismissHook = { before?: () => void; after?: () => void };
+
+let ID = 0;
 /**
  * Creates NavigationController and manages its behavours and routes.
  *
@@ -125,6 +127,7 @@ export default class NativeStackRouter<
     params.renderer = createRenderer(
       new NavigationController() as ControllerType
     );
+
     return new NativeStackRouter(params);
   }
   
@@ -135,7 +138,7 @@ export default class NativeStackRouter<
   private _modalType: ModalType = "modal";
   private _bottomSheetOptions?: BottomSheetOptions;
   private _modalOptions?: any;
-
+  private _id = ID++;
   /**
    * @ignore
    */
@@ -172,7 +175,9 @@ export default class NativeStackRouter<
   constructor(params: NativeStackRouterParams<Page>) {
     super(params);
     this._modal = !!params.modal;
-    if(params.modal === true)
+    params.modal && 
+    console.log("NativeStackRouter ", this._id, params.modalType);
+    if(params.modal)
       this._modalType = params.modalType || "modal";
     if(params.modal && params.modalType === "bottom-sheet"){
       this._bottomSheetOptions = params.bottomSheetOptions
@@ -282,6 +287,10 @@ export default class NativeStackRouter<
    */
   isModal() {
     return this._modal;
+  }
+
+  get modalType() {
+    return this._modalType;
   }
 
   /**
@@ -418,12 +427,12 @@ export default class NativeStackRouter<
                   ? route.renderer._rootController
                   : view,
                 animated: this.isAnimated(),
-                onDismissComplete: () => {
+                onDismissStart: () => {
                   normalizeHistory();
                   onDismissComplete();
                 },
                 onComplete: () => (Router._lock = false),
-                type: this._modalType,
+                type: route.modalType,
                 options: this._bottomSheetOptions || this._modalOptions
               });
               let disposed = false;

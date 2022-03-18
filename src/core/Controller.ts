@@ -9,7 +9,7 @@ export type ControllerType = (
   | (Omit<Page, "headerBar"> & { childControllers: undefined })
   | (Omit<NavigationController, "headerBar" | 'childControllers'> & {childControllers: ControllerType[] })
   | (Omit<BottomTabBarController,  "headerBar" | 'childControllers'> & {childControllers: ControllerType[] })
-) & { headerBar?: Partial<HeaderBar>, nativeObject: any, present(options: any): void, applySheetOptions(controller: any, options: BottomSheetOptions): void, presentBottomSheet(
+) & { headerBar?: Partial<HeaderBar>, nativeObject: any, present(params: any, bottomSheet?: boolean): void, applySheetOptions(controller: any, options: BottomSheetOptions): void, presentBottomSheet(
   controller: ControllerType,
   animated: boolean,
   onComplete: (...args: any) => void,

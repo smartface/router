@@ -62,24 +62,35 @@ export default abstract class Renderer {
       onComplete: (...args: any) => void;
       options?: BottomSheetOptions;
       onDismissComplete?: () => void;
+      onDismissStart?: () => void;
     } & (
       | { type: "modal" }
-      | { type: "bottom-sheet"; onDismissComplete: () => void }
+      | { type: "bottom-sheet"; onDismissStart: () => void; onDismissComplete?: () => void }
     )
   ) {
     const { type = "modal", ...options } = params;
     // @ts-ignore
-    setTimeout(() => {
+    // setTimeout(() => {
       /**
        * Present method actually exists on BottomTabBarController.
        * Track the issue on Linear (TYPNG-15)
        */
       // params.options && this._rootController?.applySheetOptions(params.controller, params.options);
       if(this._rootController instanceof NavigationController && this._rootController && type === "bottom-sheet"){
-        const dispose = this._rootController?.once("dismissComplete", () => {
-          params.onDismissComplete?.();
-        });
+        // @ts-ignore
+        // this._rootController.dismissComplete = () => {
+        //   params.onDismissComplete?.();
+        //   // if(this._rootController)
+        //   //   this._rootController.nativeObject.dismissComplete = null;
+        // };
+        params.controller.dismissStart = () => {
+          // @ts-ignore
+          options.controller.dismissComplete = null;
+          params.onDismissStart?.();
+        }
+        this._rootController?.present(options, type === "bottom-sheet");
       }
+      /*
       type === "modal"
         ? this._rootController?.present(options)
         : this._rootController?.presentBottomSheet(
@@ -88,7 +99,8 @@ export default abstract class Renderer {
             params.onComplete,
             params.options
           );
-    }, 1);
+        */
+    // }, 1);
   }
 
   dismiss(onComplete: (...args: any) => void, animated: boolean) {
