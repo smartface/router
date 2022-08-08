@@ -4,10 +4,10 @@ import Page from "@smartface/native/ui/page";
 import Application from "@smartface/native/application";
 import NavigationController from "@smartface/native/ui/navigationcontroller";
 import BottomTabBarController from "@smartface/native/ui/bottomtabbarcontroller";
-import View from "@smartface/native/ui/view";
 import TabBarItem from "@smartface/native/ui/tabbaritem";
 import { ControllerType } from "../core/Controller";
-import { runInThisContext } from "vm";
+import { BottomSheetOptions } from "./BottomSheetOptions";
+import System from "@smartface/native/device/system";
 
 /**
  * Abstract Renderer Strategy
@@ -28,16 +28,17 @@ export default abstract class Renderer {
     /**
      * Wrong typing on @smartface/native, track the issue on Linear (TYPNG-14)
      */
-     rootController && Application.setRootController({
-      //  @ts-ignore
-      controller: rootController,
-      animated: true
-    });
+    rootController &&
+      Application.setRootController({
+        //  @ts-ignore
+        controller: rootController,
+        animated: true,
+      });
   }
 
-  abstract dispose():void;
+  abstract dispose(): void;
 
-  constructor(controller?: ControllerType){
+  constructor(controller?: ControllerType) {
     this._rootController = controller;
   }
 
@@ -56,28 +57,61 @@ export default abstract class Renderer {
   }
 
   present(
-    controller: ControllerType,
-    animated: boolean,
-    onComplete: (...args: any) => void
+    params: {
+      controller: ControllerType;
+      animated: boolean;
+      onComplete: (...args: any) => void;
+      options?: BottomSheetOptions;
+      onDismissComplete?: () => void;
+      onDismissStart?: () => void;
+    } & (
+      | { type: "modal" }
+      | { type: "bottom-sheet"; onDismissStart: () => void; onDismissComplete?: () => void }
+    )
   ) {
-    setTimeout(() => {
+    const { type = "modal", ...options } = params;
+    // @ts-ignore
+    // setTimeout(() => {
       /**
        * Present method actually exists on BottomTabBarController.
        * Track the issue on Linear (TYPNG-15)
        */
-      //@ts-ignore
-      this._rootController.present({
-        controller,
-        animated,
-        onComplete,
-      });
-    }, 1);
+      // params.options && this._rootController?.applySheetOptions(params.controller, params.options);
+      if(this._rootController instanceof NavigationController && this._rootController){
+        // @ts-ignore
+        // this._rootController.dismissComplete = () => {
+        //   params.onDismissComplete?.();
+        //   // if(this._rootController)
+        //   //   this._rootController.nativeObject.dismissComplete = null;
+        // };
+        params.controller.dismissStart = () => {
+          // @ts-ignore
+          options.controller.dismissComplete = null;
+          setTimeout(() => {
+            params.onDismissStart?.();
+          }, 50);
+        }
+
+        const isBottomSheet = type === "bottom-sheet" && parseFloat(System.OSVersion) >= 15 && System.OS === System.OSType.IOS; 
+        this._rootController?.present(options, isBottomSheet);
+      }
+      /*
+      type === "modal"
+        ? this._rootController?.present(options)
+        : this._rootController?.presentBottomSheet(
+            params.controller,
+            params.animated,
+            params.onComplete,
+            params.options
+          );
+        */
+    // }, 100);
   }
 
   dismiss(onComplete: (...args: any) => void, animated: boolean) {
     /**
      * dismiss method actually exists on BottomTabBarController.
-       * dismiss method actually exists on BottomTabBarController. 
+     * dismiss method actually exists on BottomTabBarController.
      * dismiss method actually exists on BottomTabBarController.
      * Track the issue on Linear (TYPNG-15)
      */
@@ -137,7 +171,10 @@ export default abstract class Renderer {
    * @param {Array<TabBarItem>} items
    */
   setTabBarItems(items: (TabBarItem | Partial<TabBarItem>)[]) {
-    if (this._rootController instanceof BottomTabBarController) {
+    if (
+      this._rootController &&
+      this._rootController instanceof BottomTabBarController
+    ) {
       this._rootController.tabBar.items = items as TabBarItem[];
     }
   }
@@ -149,7 +186,10 @@ export default abstract class Renderer {
    */
   setSelectedIndex(index: number) {
     if (this._rootController instanceof BottomTabBarController) {
-      if (this._rootController.selectedIndex !== index) {
+      if (
+        this._rootController &&
+        this._rootController?.selectedIndex !== index
+      ) {
         this._rootController.selectedIndex = index;
       }
     }
@@ -209,7 +249,11 @@ export default abstract class Renderer {
   /**
    */
   popTo(n: number) {
-    if (this._rootController instanceof NavigationController) {
+    if (
+      this._rootController &&
+      this._rootController.childControllers?.[n] &&
+      this._rootController instanceof NavigationController
+    ) {
       this._rootController.popTo({
         controller: this._rootController.childControllers[n],
         animated: true,

@@ -4,7 +4,7 @@
     "sourceMap": true,
     "noEmit": false,
     "target": "ES5",
-    "outDir": "lib",
+    "outDir": "../helloworld-boilerplate/scripts/node_modules/@smartface/router/lib",
     "moduleResolution": "Node",
     "baseUrl": "src",
     "rootDir": "src",

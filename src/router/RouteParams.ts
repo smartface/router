@@ -22,7 +22,7 @@ import HeaderBar from "@smartface/native/ui/headerbar";
 export type RouteParams<Ttarget = unknown> = {
   name?: string;
   path?: string | RoutePath;
-  to?: (() => {}) | string;
+  to?: (() => string) | string;
   routes?: Route[];
   build?: (router: Router<any>, route: Route<any>) => any;
   exact?: boolean;
