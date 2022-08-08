@@ -1,6 +1,6 @@
 {
   "name": "@smartface/router",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Smmartface Router",
   "main": "lib/index.js",
   "scripts": {
@@ -25,8 +25,13 @@
     "path-to-regexp": "^2.4.0",
     "resolve-pathname": "^2.2.0"
   },
+  "peerDependenciesMeta": {
+    "@smartface/native": {
+      "optional": true
+    }
+  },
   "devDependencies": {
-    "@smartface/native": "^4.4.1-alpha.26",
+    "@smartface/native": "^5.0.0",
     "@types/jest": "^27.0.1",
     "@types/node": "^16.0.0",
     "esdoc": "^1.1.0",
@@ -44,6 +49,6 @@
     "typescript": "4.6.2"
   },
   "peerDependencies": {
-    "@smartface/native": "^4.4.1-alpha.26"
+    "@smartface/native": "^5.0.0"
   }
 }
